@@ -31,7 +31,6 @@ class HeroCarousel extends StatefulWidget {
 }
 
 class _HeroCarouselState extends State<HeroCarousel> {
-  bool _showAlert = true;
   int _currentIndex = 0;
   late PageController _pageController;
   Timer? _timer;
@@ -110,74 +109,44 @@ class _HeroCarouselState extends State<HeroCarousel> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        if (_showAlert)
-          Container(
-            color: MifcColors.navyBlue,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+    return SizedBox(
+      height: 480,
+      child: Stack(
+        children: [
+          PageView.builder(
+            controller: _pageController,
+            onPageChanged: (index) {
+              setState(() {
+                _currentIndex = index;
+              });
+              _startTimer();
+            },
+            itemCount: _slides.length,
+            itemBuilder: (context, index) {
+              return HeroSlideWidget(slide: _slides[index]);
+            },
+          ),
+          Positioned(
+            bottom: 32,
+            left: 24,
             child: Row(
-              children: [
-                const Icon(Icons.star_outline, color: MifcColors.black, size: 16),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'NEW 2025-26 KIT – NOW AVAILABLE',
-                    style: GoogleFonts.outfit(
-                      color: MifcColors.black,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 11,
-                      letterSpacing: 1.0,
-                    ),
+              children: List.generate(_slides.length, (index) {
+                return Container(
+                  width: index == _currentIndex ? 32 : 8,
+                  height: 2,
+                  margin: const EdgeInsets.only(right: 6),
+                  decoration: BoxDecoration(
+                    color: index == _currentIndex
+                        ? MifcColors.navyBlue
+                        : MifcColors.white.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(2),
                   ),
-                ),
-                GestureDetector(
-                  onTap: () => setState(() => _showAlert = false),
-                  child: const Icon(Icons.close, color: MifcColors.black, size: 14),
-                ),
-              ],
+                );
+              }),
             ),
           ),
-        SizedBox(
-          height: 480,
-          child: Stack(
-            children: [
-              PageView.builder(
-                controller: _pageController,
-                onPageChanged: (index) {
-                  setState(() {
-                    _currentIndex = index;
-                  });
-                  _startTimer();
-                },
-                itemCount: _slides.length,
-                itemBuilder: (context, index) {
-                  return HeroSlideWidget(slide: _slides[index]);
-                },
-              ),
-              Positioned(
-                bottom: 32,
-                left: 24,
-                child: Row(
-                  children: List.generate(_slides.length, (index) {
-                    return Container(
-                      width: index == _currentIndex ? 32 : 8,
-                      height: 2,
-                      margin: const EdgeInsets.only(right: 6),
-                      decoration: BoxDecoration(
-                        color: index == _currentIndex
-                            ? MifcColors.navyBlue
-                            : MifcColors.white.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    );
-                  }),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
