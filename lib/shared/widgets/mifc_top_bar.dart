@@ -10,15 +10,17 @@ class MifcTopBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const PromotionalHeader(), // Status bar/Banner area
+        const PromotionalHeader(),
         AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
           scrolledUnderElevation: 0,
+          toolbarHeight: 64, // Slightly taller for more presence
           leadingWidth: 56,
           leading: IconButton(
-            icon: const Icon(Icons.menu_rounded, color: MifcColors.white),
+            icon: const Icon(Icons.menu_rounded, color: MifcColors.white, size: 28),
             onPressed: () {},
           ),
           title: Column(
@@ -30,7 +32,7 @@ class MifcTopBar extends StatelessWidget implements PreferredSizeWidget {
                 children: [
                   Image.asset(
                     'assets/images/mifc_logo.png',
-                    height: 28, // Slightly smaller for better fit
+                    height: 24, // Consistent size
                     fit: BoxFit.contain,
                   ),
                   const SizedBox(width: 8),
@@ -39,8 +41,8 @@ class MifcTopBar extends StatelessWidget implements PreferredSizeWidget {
                       'MARK INTERNATIONAL FC',
                       style: GoogleFonts.outfit(
                         fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 1.2,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1.5,
                         color: MifcColors.white,
                       ),
                       overflow: TextOverflow.ellipsis,
@@ -48,13 +50,14 @@ class MifcTopBar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                 ],
               ),
+              const SizedBox(height: 1),
               Text(
                 'EST. 1878 · MANCHESTER',
                 style: GoogleFonts.inter(
                   fontSize: 8,
-                  fontWeight: FontWeight.w500,
-                  letterSpacing: 1.0,
-                  color: MifcColors.white.withValues(alpha: 0.5),
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 1.2,
+                  color: MifcColors.white.withValues(alpha: 0.6),
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -63,22 +66,22 @@ class MifcTopBar extends StatelessWidget implements PreferredSizeWidget {
           centerTitle: true,
           actions: [
             IconButton(
-              icon: const Icon(Icons.search_rounded, color: MifcColors.white),
+              icon: const Icon(Icons.search_rounded, color: MifcColors.white, size: 24),
               onPressed: () {},
             ),
             Stack(
               alignment: Alignment.center,
               children: [
                 IconButton(
-                  icon: const Icon(Icons.notifications_none_rounded, color: MifcColors.white),
+                  icon: const Icon(Icons.notifications_none_rounded, color: MifcColors.white, size: 24),
                   onPressed: () {},
                 ),
                 Positioned(
-                  right: 12,
-                  top: 12,
+                  right: 14,
+                  top: 14,
                   child: Container(
-                    width: 8,
-                    height: 8,
+                    width: 7,
+                    height: 7,
                     decoration: const BoxDecoration(
                       color: MifcColors.crimson,
                       shape: BoxShape.circle,
@@ -95,5 +98,5 @@ class MifcTopBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight + 40); // Standard height + Banner height
+  Size get preferredSize => const Size.fromHeight(140); // 64 (Toolbar) + ~70 (Promotion + Safe Area)
 }
