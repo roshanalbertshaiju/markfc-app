@@ -12,45 +12,55 @@ class MifcTopBar extends StatelessWidget implements PreferredSizeWidget {
       elevation: 0,
       scrolledUnderElevation: 0,
       toolbarHeight: 64,
-      leadingWidth: 80, // Slightly narrower since it's vertical now
       leading: Center(
         child: Padding(
           padding: const EdgeInsets.only(left: 12),
           child: InkWell(
             onTap: () {},
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(10),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Stack(
-                  alignment: Alignment.topCenter,
-                  children: [
-                    const Icon(
-                      Icons.calendar_today_rounded,
-                      color: MifcColors.white,
-                      size: 24,
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.05),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: const Color(0xFFE2C48D), // Prestige Gold
+                      width: 1.5,
                     ),
-                    Positioned(
-                      top: 2,
-                      child: Container(
-                        height: 4,
-                        width: 14,
-                        decoration: BoxDecoration(
-                          color: MifcColors.crimson,
-                          borderRadius: const BorderRadius.vertical(top: Radius.circular(1)),
+                  ),
+                  child: Center(
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        const Icon(
+                          Icons.shield_rounded,
+                          color: Color(0xFFE2C48D),
+                          size: 26,
                         ),
-                      ),
+                        const Positioned(
+                          top: 10,
+                          child: Icon(
+                            Icons.check,
+                            color: MifcColors.navyBlue,
+                            size: 16,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: 4),
                 Text(
                   'KICK-OFF',
                   style: GoogleFonts.outfit(
                     fontSize: 8,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 0.8,
-                    color: MifcColors.white,
+                    color: const Color(0xFFE2C48D),
                   ),
                 ),
               ],
@@ -58,43 +68,46 @@ class MifcTopBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
       ),
-      title: Column(
+      title: Row(
         mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Row(
+          Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: MifcColors.white.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Image.asset(
+              'assets/images/mifc_logo.png',
+              height: 38,
+              fit: BoxFit.contain,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Column(
             mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Image.asset(
-                'assets/images/mifc_logo.png',
-                height: 24,
-                fit: BoxFit.contain,
+              Text(
+                'MARK INT',
+                style: GoogleFonts.outfit(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 2.5,
+                  color: MifcColors.white,
+                ),
               ),
-              const SizedBox(width: 8),
-              Flexible(
-                child: Text(
-                  'MARK INTERNATIONAL FC',
-                  style: GoogleFonts.outfit(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 1.5,
-                    color: MifcColors.white,
-                  ),
-                  overflow: TextOverflow.ellipsis,
+              Text(
+                'FOOTBALL CLUB',
+                style: GoogleFonts.inter(
+                  fontSize: 9,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 4.0,
+                  color: MifcColors.white.withValues(alpha: 0.8),
                 ),
               ),
             ],
-          ),
-          const SizedBox(height: 1),
-          Text(
-            'EST. 1878 · MANCHESTER',
-            style: GoogleFonts.inter(
-              fontSize: 8,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 1.2,
-              color: MifcColors.white.withValues(alpha: 0.6),
-            ),
-            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
