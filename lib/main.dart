@@ -23,7 +23,7 @@ class MifcApp extends ConsumerWidget {
     return MaterialApp.router(
       title: 'MIFC',
       debugShowCheckedModeBanner: false,
-      theme: MifcTheme.lightTheme,
+      theme: MifcTheme.darkTheme,
       routerConfig: router,
     );
   }

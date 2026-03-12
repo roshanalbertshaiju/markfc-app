@@ -114,54 +114,32 @@ class _HeroCarouselState extends State<HeroCarousel> {
       children: [
         if (_showAlert)
           Container(
-            color: MifcColors.red,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            color: MifcColors.eliteBlue,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
             child: Row(
               children: [
-                const Icon(Icons.info_outline, color: MifcColors.white, size: 20),
+                const Icon(Icons.star_outline, color: MifcColors.black, size: 16),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'NEW 2025-26 KIT – NOW AVAILABLE!',
-                    style: GoogleFonts.barlowCondensed(
-                      color: MifcColors.white,
-                      fontWeight: FontWeight.w900,
-                      fontSize: 14,
+                    'NEW 2025-26 KIT – NOW AVAILABLE',
+                    style: GoogleFonts.outfit(
+                      color: MifcColors.black,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 11,
+                      letterSpacing: 1.0,
                     ),
                   ),
                 ),
-                TextButton(
-                  onPressed: () {},
-                  style: TextButton.styleFrom(
-                    backgroundColor: MifcColors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                    minimumSize: Size.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
-                  child: Text(
-                    'SHOP NOW',
-                    style: GoogleFonts.barlowCondensed(
-                      color: MifcColors.red,
-                      fontWeight: FontWeight.w900,
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                IconButton(
-                  icon: const Icon(Icons.close, color: MifcColors.white, size: 18),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  onPressed: () => setState(() => _showAlert = false),
+                GestureDetector(
+                  onTap: () => setState(() => _showAlert = false),
+                  child: const Icon(Icons.close, color: MifcColors.black, size: 14),
                 ),
               ],
             ),
           ),
         SizedBox(
-          height: 450,
+          height: 480,
           child: Stack(
             children: [
               PageView.builder(
@@ -170,7 +148,6 @@ class _HeroCarouselState extends State<HeroCarousel> {
                   setState(() {
                     _currentIndex = index;
                   });
-                  // Restart timer on manual swipe to give user more time
                   _startTimer();
                 },
                 itemCount: _slides.length,
@@ -179,21 +156,19 @@ class _HeroCarouselState extends State<HeroCarousel> {
                 },
               ),
               Positioned(
-                bottom: 24,
-                left: 0,
-                right: 0,
+                bottom: 32,
+                left: 24,
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
                   children: List.generate(_slides.length, (index) {
                     return Container(
-                      width: index == _currentIndex ? 24 : 8,
-                      height: 8,
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      width: index == _currentIndex ? 32 : 8,
+                      height: 2,
+                      margin: const EdgeInsets.only(right: 6),
                       decoration: BoxDecoration(
                         color: index == _currentIndex
-                            ? MifcColors.white
-                            : MifcColors.white.withOpacity(0.3),
-                        borderRadius: BorderRadius.circular(4),
+                            ? MifcColors.eliteBlue
+                            : MifcColors.white.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(2),
                       ),
                     );
                   }),
@@ -215,129 +190,134 @@ class HeroSlideWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Stack(
+      fit: StackFit.expand,
       children: [
-        // Background Image with Gradient
+        // Background Image with sophisticated overlay
+        Image.network(
+          slide.imageUrl,
+          fit: BoxFit.cover,
+        ),
         Container(
-          width: double.infinity,
-          height: double.infinity,
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [MifcColors.navy, MifcColors.navyDark],
-            ),
-          ),
-          child: Opacity(
-            opacity: 0.3,
-            child: Image.network(
-              slide.imageUrl,
-              fit: BoxFit.cover,
+              stops: const [0.0, 0.4, 0.8, 1.0],
+              colors: [
+                Colors.black.withValues(alpha: 0.2),
+                Colors.black.withValues(alpha: 0.0),
+                Colors.black.withValues(alpha: 0.6),
+                MifcColors.black,
+              ],
             ),
           ),
         ),
         // Content
-        Container(
-          width: double.infinity,
-          height: double.infinity,
-          padding: const EdgeInsets.fromLTRB(24, 24, 24, 48), // Bottom padding for dots
+        Padding(
+          padding: const EdgeInsets.fromLTRB(24, 24, 24, 64),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: MifcColors.red,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  slide.tag,
-                  style: GoogleFonts.barlowCondensed(
-                    color: MifcColors.white,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 12,
-                  ),
+              Text(
+                slide.tag.toUpperCase(),
+                style: GoogleFonts.outfit(
+                  color: MifcColors.eliteBlue,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 12,
+                  letterSpacing: 2.0,
                 ),
               ),
               const SizedBox(height: 12),
               Text(
-                slide.date,
-                style: GoogleFonts.barlowCondensed(
-                  color: MifcColors.white.withOpacity(0.7),
-                  fontWeight: FontWeight.w800,
-                  fontSize: 14,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
                 slide.headline,
-                style: GoogleFonts.barlowCondensed(
+                style: GoogleFonts.outfit(
                   color: MifcColors.white,
-                  fontSize: 36,
-                  fontWeight: FontWeight.w900,
-                  fontStyle: FontStyle.italic,
+                  fontSize: 32,
+                  fontWeight: FontWeight.w700,
                   height: 1.1,
+                  letterSpacing: -0.5,
                 ),
               ),
               const SizedBox(height: 12),
               Text(
                 slide.body,
-                style: GoogleFonts.barlow(
-                  color: MifcColors.white.withOpacity(0.8),
-                  fontSize: 14,
+                style: GoogleFonts.inter(
+                  color: MifcColors.white.withValues(alpha: 0.7),
+                  fontSize: 15,
                   fontWeight: FontWeight.w400,
+                  height: 1.5,
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 32),
               Row(
                 children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: MifcColors.red,
-                        foregroundColor: MifcColors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: Text(
-                        slide.primaryButtonLabel,
-                        style: GoogleFonts.barlowCondensed(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                    ),
-                  ),
+                  _PrimaryButton(label: slide.primaryButtonLabel),
                   const SizedBox(width: 12),
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () {},
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: MifcColors.white,
-                        side: const BorderSide(color: MifcColors.white, width: 1.5),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: Text(
-                        slide.secondaryButtonLabel,
-                        style: GoogleFonts.barlowCondensed(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                    ),
-                  ),
+                  _SecondaryButton(label: slide.secondaryButtonLabel),
                 ],
               ),
             ],
           ),
         ),
       ],
+    );
+  }
+}
+
+class _PrimaryButton extends StatelessWidget {
+  final String label;
+  const _PrimaryButton({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: () {},
+      style: ElevatedButton.styleFrom(
+        backgroundColor: MifcColors.white,
+        foregroundColor: MifcColors.black,
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(100),
+        ),
+      ),
+      child: Text(
+        label.toUpperCase(),
+        style: GoogleFonts.outfit(
+          fontSize: 12,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 1.0,
+        ),
+      ),
+    );
+  }
+}
+
+class _SecondaryButton extends StatelessWidget {
+  final String label;
+  const _SecondaryButton({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return OutlinedButton(
+      onPressed: () {},
+      style: OutlinedButton.styleFrom(
+        foregroundColor: MifcColors.white,
+        side: BorderSide(color: MifcColors.white.withValues(alpha: 0.3)),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(100),
+        ),
+      ),
+      child: Text(
+        label.toUpperCase(),
+        style: GoogleFonts.outfit(
+          fontSize: 12,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 1.0,
+        ),
+      ),
     );
   }
 }

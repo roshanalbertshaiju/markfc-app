@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
-import '../../../../core/theme/mifc_colors.dart';
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart' as emoji;
+import 'package:markfc/core/theme/mifc_colors.dart';
 
 class DiscussionInputBar extends StatefulWidget {
   final String? replyTarget;
@@ -63,33 +64,37 @@ class _DiscussionInputBarState extends State<DiscussionInputBar> {
         if (widget.replyTarget != null) _buildReplyChip(),
         
         Container(
-          padding: EdgeInsets.fromLTRB(12, 8, 12, 8 + MediaQuery.of(context).padding.bottom),
+          padding: EdgeInsets.fromLTRB(16, 12, 16, 12 + MediaQuery.of(context).padding.bottom),
           decoration: BoxDecoration(
-            color: MifcColors.navyDark,
-            border: Border(top: BorderSide(color: MifcColors.border)),
+            color: MifcColors.black,
+            border: const Border(top: BorderSide(color: MifcColors.border)),
           ),
           child: Row(
             children: [
               const CircleAvatar(
-                radius: 17,
-                backgroundColor: MifcColors.gold,
-                child: Text('SB', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.black)),
+                radius: 16,
+                backgroundColor: MifcColors.eliteBlue,
+                child: Text(
+                  'SB',
+                  style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: MifcColors.black),
+                ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 12),
               Expanded(
                 child: Container(
                   height: 40,
                   decoration: BoxDecoration(
-                    color: MifcColors.cardLight,
+                    color: MifcColors.white.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: MifcColors.white.withValues(alpha: 0.05)),
                   ),
                   child: TextField(
                     controller: _controller,
                     focusNode: _focusNode,
-                    style: GoogleFonts.barlow(fontSize: 14, color: Colors.white),
+                    style: GoogleFonts.inter(fontSize: 13, color: MifcColors.white),
                     decoration: InputDecoration(
                       hintText: 'Join the discussion...',
-                      hintStyle: GoogleFonts.barlow(fontSize: 14, color: Colors.white30),
+                      hintStyle: GoogleFonts.inter(fontSize: 13, color: MifcColors.white.withValues(alpha: 0.3)),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 16),
                       border: InputBorder.none,
                     ),
@@ -100,12 +105,16 @@ class _DiscussionInputBarState extends State<DiscussionInputBar> {
               IconButton(
                 icon: Icon(
                   _showEmojiPicker ? Icons.keyboard : Icons.sentiment_satisfied_alt_outlined,
-                  color: _showEmojiPicker ? MifcColors.gold : Colors.white30,
+                  color: _showEmojiPicker ? MifcColors.eliteBlue : MifcColors.white.withValues(alpha: 0.3),
+                  size: 20,
                 ),
                 onPressed: () {
                   setState(() => _showEmojiPicker = !_showEmojiPicker);
-                  if (_showEmojiPicker) FocusScope.of(context).unfocus();
-                  else _focusNode.requestFocus();
+                  if (_showEmojiPicker) {
+                    FocusScope.of(context).unfocus();
+                  } else {
+                    _focusNode.requestFocus();
+                  }
                 },
               ),
               GestureDetector(
@@ -114,10 +123,10 @@ class _DiscussionInputBarState extends State<DiscussionInputBar> {
                   width: 36,
                   height: 36,
                   decoration: const BoxDecoration(
-                    color: MifcColors.navy,
+                    color: MifcColors.crimson,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.send, color: MifcColors.white, size: 18),
+                  child: const Icon(Icons.send_rounded, color: MifcColors.white, size: 16),
                 ),
               ),
             ],
@@ -126,26 +135,29 @@ class _DiscussionInputBarState extends State<DiscussionInputBar> {
         if (_showEmojiPicker)
           SizedBox(
             height: 250,
-            child: EmojiPicker(
-              onEmojiSelected: (category, emoji) {
-                _controller.text += emoji.emoji;
+            child: emoji.EmojiPicker(
+              onEmojiSelected: (category, em) {
+                _controller.text += em.emoji;
               },
-              config: Config(
-                backgroundColor: MifcColors.navyDark,
-                indicatorColor: MifcColors.gold,
-                iconColorSelected: MifcColors.gold,
-                backspaceColor: MifcColors.gold,
-                skinToneIndicatorColor: Colors.grey,
-                enableSkinTones: true,
-                recentsLimit: 28,
-                noRecents: const Text(
-                  'No Recents',
-                  style: TextStyle(fontSize: 20, color: Colors.black26),
-                  textAlign: TextAlign.center,
+              config: emoji.Config(
+                height: 250,
+                checkPlatformCompatibility: true,
+                emojiViewConfig: emoji.EmojiViewConfig(
+                  backgroundColor: MifcColors.navyDark,
+                  columns: 7,
+                  emojiSizeMax: 28 * (defaultTargetPlatform == TargetPlatform.iOS ? 1.30 : 1.0),
                 ),
-                tabIndicatorAnimDuration: kTabScrollDuration,
-                categoryIcons: const CategoryIcons(),
-                buttonMode: ButtonMode.MATERIAL,
+                skinToneConfig: const emoji.SkinToneConfig(),
+                categoryViewConfig: emoji.CategoryViewConfig(
+                  backgroundColor: MifcColors.navyDark,
+                  indicatorColor: MifcColors.eliteBlue,
+                  iconColorSelected: MifcColors.eliteBlue,
+                  backspaceColor: MifcColors.eliteBlue,
+                ),
+                bottomActionBarConfig: const emoji.BottomActionBarConfig(
+                  enabled: false,
+                ),
+                searchViewConfig: const emoji.SearchViewConfig(),
               ),
             ),
           ),
@@ -155,24 +167,25 @@ class _DiscussionInputBarState extends State<DiscussionInputBar> {
 
   Widget _buildReplyChip() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      color: MifcColors.navy,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      color: MifcColors.charcoal,
       child: Row(
         children: [
-          const Icon(Icons.reply, size: 14, color: MifcColors.gold),
-          const SizedBox(width: 8),
+          const Icon(Icons.reply_rounded, size: 14, color: MifcColors.eliteBlue),
+          const SizedBox(width: 12),
           Text(
-            'Replying to @${widget.replyTarget}',
-            style: GoogleFonts.barlow(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: MifcColors.gold,
+            'REPLYING TO @${widget.replyTarget}'.toUpperCase(),
+            style: GoogleFonts.outfit(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              color: MifcColors.eliteBlue,
+              letterSpacing: 0.5,
             ),
           ),
           const Spacer(),
           GestureDetector(
             onTap: widget.onCancelReply,
-            child: const Icon(Icons.close, size: 14, color: Colors.white54),
+            child: Icon(Icons.close_rounded, size: 16, color: MifcColors.white.withValues(alpha: 0.3)),
           ),
         ],
       ),
@@ -191,7 +204,7 @@ class _DiscussionInputBarState extends State<DiscussionInputBar> {
       decoration: BoxDecoration(
         color: MifcColors.cardLight,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 10)],
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 10)],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,

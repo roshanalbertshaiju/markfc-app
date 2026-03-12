@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../../core/theme/mifc_colors.dart';
+import 'package:markfc/core/theme/mifc_colors.dart';
 
 class DiscussionHeader extends StatefulWidget {
   final int count;
@@ -19,7 +19,7 @@ class _DiscussionHeaderState extends State<DiscussionHeader> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -27,25 +27,26 @@ class _DiscussionHeaderState extends State<DiscussionHeader> {
                 children: [
                   Text(
                     'DISCUSSION',
-                    style: GoogleFonts.barlowCondensed(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w900,
-                      color: Colors.white,
+                    style: GoogleFonts.outfit(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: MifcColors.white,
+                      letterSpacing: 0.5,
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 12),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: MifcColors.red,
-                      borderRadius: BorderRadius.circular(10),
+                      color: MifcColors.crimson,
+                      borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
                       '${widget.count}',
-                      style: GoogleFonts.barlowCondensed(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.white,
+                      style: GoogleFonts.outfit(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w800,
+                        color: MifcColors.white,
                       ),
                     ),
                   ),
@@ -63,20 +64,22 @@ class _DiscussionHeaderState extends State<DiscussionHeader> {
 
   Widget _buildSortDropdown() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 14),
       decoration: BoxDecoration(
-        color: MifcColors.cardLight,
+        color: MifcColors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: MifcColors.white.withValues(alpha: 0.05)),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: _sortBy,
-          dropdownColor: MifcColors.cardLight,
-          icon: const Icon(Icons.expand_more, color: Colors.white54, size: 16),
-          style: GoogleFonts.barlowCondensed(
-            fontSize: 12,
-            fontWeight: FontWeight.w800,
-            color: Colors.white,
+          dropdownColor: MifcColors.charcoal,
+          icon: Icon(Icons.keyboard_arrow_down_rounded, color: MifcColors.white.withValues(alpha: 0.4), size: 16),
+          style: GoogleFonts.outfit(
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+            color: MifcColors.white,
+            letterSpacing: 0.5,
           ),
           onChanged: (String? newValue) {
             if (newValue != null) setState(() => _sortBy = newValue);
@@ -85,7 +88,7 @@ class _DiscussionHeaderState extends State<DiscussionHeader> {
               .map<DropdownMenuItem<String>>((String value) {
             return DropdownMenuItem<String>(
               value: value,
-              child: Text(value),
+              child: Text(value.toUpperCase()),
             );
           }).toList(),
         ),
@@ -95,7 +98,7 @@ class _DiscussionHeaderState extends State<DiscussionHeader> {
 
   Widget _buildNotificationToggle() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
       child: Row(
         children: [
           Transform.scale(
@@ -104,18 +107,18 @@ class _DiscussionHeaderState extends State<DiscussionHeader> {
             child: Switch(
               value: _notifyReplies,
               onChanged: (val) => setState(() => _notifyReplies = val),
-              activeColor: MifcColors.gold,
-              activeTrackColor: MifcColors.gold.withOpacity(0.3),
-              inactiveThumbColor: Colors.white54,
-              inactiveTrackColor: Colors.white12,
+              activeThumbColor: MifcColors.eliteBlue,
+              activeTrackColor: MifcColors.eliteBlue.withValues(alpha: 0.2),
+              inactiveThumbColor: MifcColors.white.withValues(alpha: 0.2),
+              inactiveTrackColor: MifcColors.white.withValues(alpha: 0.05),
             ),
           ),
           Text(
             'Notify me when someone replies to my comment',
-            style: GoogleFonts.barlow(
+            style: GoogleFonts.inter(
               fontSize: 11,
-              fontWeight: FontWeight.w500,
-              color: MifcColors.mutedOpacity,
+              fontWeight: FontWeight.w400,
+              color: MifcColors.white.withValues(alpha: 0.4),
             ),
           ),
         ],
@@ -123,3 +126,4 @@ class _DiscussionHeaderState extends State<DiscussionHeader> {
     );
   }
 }
+

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:markfc/core/theme/mifc_colors.dart';
 import 'package:markfc/shared/widgets/section_header.dart';
+import 'package:markfc/shared/widgets/mifc_card.dart';
+import 'package:markfc/shared/widgets/scroll_reveal.dart';
 
 class MotmPollSection extends StatelessWidget {
   const MotmPollSection({super.key});
@@ -10,103 +12,95 @@ class MotmPollSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const SectionHeader(title: 'FAN VOTE', actionText: 'ALL POLLS'),
+        const SectionHeader(
+          title: 'FAN VOTE', 
+          actionLabel: 'ALL POLLS',
+        ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Container(
-            decoration: BoxDecoration(
-              color: MifcColors.navyDark,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: Column(
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  color: MifcColors.red,
-                  child: Row(
-                    children: [
-                      const Icon(Icons.emoji_events, color: Colors.white, size: 18),
-                      const SizedBox(width: 8),
-                      Text(
-                        'MAN OF THE MATCH',
-                        style: GoogleFonts.barlowCondensed(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w900,
-                          fontSize: 14,
+          child: ScrollReveal(
+            type: AnimationType.fade,
+            child: MifcCard(
+              padding: EdgeInsets.zero,
+              child: Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: MifcColors.white.withValues(alpha: 0.05),
+                          width: 1,
                         ),
                       ),
-                      const Spacer(),
-                      const Icon(Icons.access_time, color: Colors.white, size: 14),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Closes in 4h',
-                        style: GoogleFonts.barlowCondensed(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 10,
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.emoji_events_outlined, color: MifcColors.eliteBlue, size: 16),
+                        const SizedBox(width: 8),
+                        Text(
+                          'PLAYER OF THE MATCH',
+                          style: GoogleFonts.outfit(
+                            color: MifcColors.white.withValues(alpha: 0.9),
+                            fontWeight: FontWeight.w700,
+                            fontSize: 11,
+                            letterSpacing: 1.0,
+                          ),
                         ),
-                      ),
-                    ],
+                        const Spacer(),
+                        const Icon(Icons.timer_outlined, color: MifcColors.white, size: 12),
+                        const SizedBox(width: 4),
+                        Text(
+                          '4H REMAINING',
+                          style: GoogleFonts.outfit(
+                            color: MifcColors.white.withValues(alpha: 0.4),
+                            fontWeight: FontWeight.w600,
+                            fontSize: 10,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      Text(
-                        'MIFC 3 - 1 Arsenal · Premier League · 08 Mar 2026',
-                        style: GoogleFonts.barlowCondensed(
-                          color: Colors.white.withOpacity(0.5),
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: const [
-                          PlayerPollColumn(
-                            name: 'M. Salah',
-                            number: '11',
-                            votes: 62,
-                            isLead: true,
-                          ),
-                          PlayerPollColumn(
-                            name: 'Bellingham',
-                            number: '8',
-                            votes: 26,
-                          ),
-                          PlayerPollColumn(
-                            name: 'Ekitike',
-                            number: '22',
-                            votes: 12,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: MifcColors.red,
-                          foregroundColor: Colors.white,
-                          minimumSize: const Size(double.infinity, 44),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                  Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      children: [
+                        Text(
+                          'MIFC 3-1 ARSENAL · 08 MAR 2026',
+                          style: GoogleFonts.inter(
+                            color: MifcColors.white.withValues(alpha: 0.3),
+                            fontSize: 10,
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: 0.5,
                           ),
                         ),
-                        child: Text(
-                          'VOTE NOW & EARN +50 PTS',
-                          style: GoogleFonts.barlowCondensed(
-                            fontWeight: FontWeight.w900,
-                            fontSize: 14,
-                          ),
+                        const SizedBox(height: 32),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: const [
+                            PlayerPollColumn(
+                              name: 'M. SALAH',
+                              votes: 62,
+                              isLead: true,
+                            ),
+                            PlayerPollColumn(
+                              name: 'J. BELLINGHAM',
+                              votes: 26,
+                            ),
+                            PlayerPollColumn(
+                              name: 'H. EKITIKE',
+                              votes: 12,
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 32),
+                        _VoteButton(),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -115,16 +109,40 @@ class MotmPollSection extends StatelessWidget {
   }
 }
 
+class _VoteButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: () {},
+      style: ElevatedButton.styleFrom(
+        backgroundColor: MifcColors.white,
+        foregroundColor: MifcColors.black,
+        minimumSize: const Size(double.infinity, 48),
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(100),
+        ),
+      ),
+      child: Text(
+        'CAST YOUR VOTE',
+        style: GoogleFonts.outfit(
+          fontWeight: FontWeight.w700,
+          fontSize: 12,
+          letterSpacing: 1.0,
+        ),
+      ),
+    );
+  }
+}
+
 class PlayerPollColumn extends StatelessWidget {
   final String name;
-  final String number;
   final int votes;
   final bool isLead;
 
   const PlayerPollColumn({
     super.key,
     required this.name,
-    required this.number,
     required this.votes,
     this.isLead = false,
   });
@@ -133,77 +151,77 @@ class PlayerPollColumn extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Stack(
-          alignment: Alignment.center,
-          children: [
-            Container(
-              width: 80,
-              height: 110,
-              decoration: BoxDecoration(
-                color: isLead ? MifcColors.navy : Colors.white.withOpacity(0.05),
-                borderRadius: BorderRadius.circular(12),
-                border: isLead
-                    ? Border.all(color: MifcColors.gold.withOpacity(0.5), width: 1)
-                    : null,
-              ),
-              child: Opacity(
-                opacity: 0.1,
-                child: Center(
-                  child: Text(
-                    number,
-                    style: GoogleFonts.barlowCondensed(
-                      fontSize: 48,
-                      fontWeight: FontWeight.w900,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            if (isLead)
-              const Positioned(
-                top: 8,
-                right: 8,
-                child: Icon(Icons.workspace_premium, color: MifcColors.gold, size: 16),
-              ),
-            const Icon(Icons.person, color: Colors.white, size: 40),
-          ],
-        ),
-        const SizedBox(height: 10),
-        Text(
-          name,
-          style: GoogleFonts.barlowCondensed(
-            color: Colors.white,
-            fontWeight: FontWeight.w800,
-            fontSize: 12,
-          ),
-        ),
-        const SizedBox(height: 6),
         Container(
           width: 80,
-          height: 4,
+          height: 80,
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(2),
+            color: MifcColors.card.withValues(alpha: 0.5),
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: (isLead ? MifcColors.eliteBlue : MifcColors.white).withValues(alpha: 0.1),
+              width: 1,
+            ),
+          ),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Icon(
+                Icons.person_outline_rounded,
+                color: MifcColors.white.withValues(alpha: isLead ? 0.8 : 0.2),
+                size: 32,
+              ),
+              if (isLead)
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: const BoxDecoration(
+                      color: MifcColors.eliteBlue,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.star, color: MifcColors.black, size: 8),
+                  ),
+                ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          name,
+          style: GoogleFonts.outfit(
+            color: MifcColors.white.withValues(alpha: isLead ? 1.0 : 0.6),
+            fontWeight: isLead ? FontWeight.w700 : FontWeight.w500,
+            fontSize: 10,
+            letterSpacing: 0.5,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          '$votes%',
+          style: GoogleFonts.outfit(
+            color: isLead ? MifcColors.eliteBlue : MifcColors.white.withValues(alpha: 0.3),
+            fontWeight: FontWeight.w700,
+            fontSize: 16,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          width: 60,
+          height: 2,
+          decoration: BoxDecoration(
+            color: MifcColors.white.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(1),
           ),
           child: FractionallySizedBox(
             alignment: Alignment.centerLeft,
             widthFactor: votes / 100,
             child: Container(
               decoration: BoxDecoration(
-                color: isLead ? MifcColors.gold : MifcColors.muted,
-                borderRadius: BorderRadius.circular(2),
+                color: isLead ? MifcColors.eliteBlue : MifcColors.white.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(1),
               ),
             ),
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          '$votes%',
-          style: GoogleFonts.barlowCondensed(
-            color: isLead ? MifcColors.gold : Colors.white.withOpacity(0.5),
-            fontWeight: FontWeight.w900,
-            fontSize: 14,
           ),
         ),
       ],

@@ -3,82 +3,81 @@ import 'package:google_fonts/google_fonts.dart';
 import 'mifc_colors.dart';
 
 class MifcTheme {
-  static ThemeData get lightTheme {
+  static ThemeData get darkTheme {
     return ThemeData(
       useMaterial3: true,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: MifcColors.navy,
-        primary: MifcColors.navy,
-        secondary: MifcColors.red,
-        surface: MifcColors.surface,
-        onSurface: MifcColors.navyDark,
+      brightness: Brightness.dark,
+      colorScheme: ColorScheme.dark(
+        primary: MifcColors.eliteBlue,
+        secondary: MifcColors.crimson,
+        surface: MifcColors.black,
+        onSurface: MifcColors.white,
       ),
-      scaffoldBackgroundColor: MifcColors.surface,
+      scaffoldBackgroundColor: MifcColors.black,
       appBarTheme: const AppBarTheme(
-        backgroundColor: MifcColors.navy,
+        backgroundColor: MifcColors.black,
         foregroundColor: MifcColors.white,
         elevation: 0,
+        centerTitle: true,
       ),
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: MifcColors.white,
-        indicatorColor: MifcColors.navy.withOpacity(0.1),
+        backgroundColor: MifcColors.black,
+        indicatorColor: MifcColors.eliteBlue.withValues(alpha: 0.1),
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) {
-            return GoogleFonts.barlow(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: MifcColors.navy,
-            );
-          }
-          return GoogleFonts.barlow(
+          final isSelected = states.contains(WidgetState.selected);
+          return GoogleFonts.outfit(
             fontSize: 12,
-            fontWeight: FontWeight.w500,
-            color: MifcColors.muted,
+            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+            color: isSelected ? MifcColors.eliteBlue : MifcColors.muted,
+            letterSpacing: 0.5,
           );
         }),
       ),
       textTheme: TextTheme(
-        displayLarge: GoogleFonts.barlowCondensed(
+        displayLarge: GoogleFonts.outfit(
           fontSize: 32,
-          fontWeight: FontWeight.w900,
-          fontStyle: FontStyle.italic,
-          color: MifcColors.navyDark,
+          fontWeight: FontWeight.w700,
+          color: MifcColors.white,
+          letterSpacing: -0.5,
         ),
-        displayMedium: GoogleFonts.barlowCondensed(
+        displayMedium: GoogleFonts.outfit(
           fontSize: 28,
-          fontWeight: FontWeight.w900,
-          fontStyle: FontStyle.italic,
-          color: MifcColors.navyDark,
+          fontWeight: FontWeight.w700,
+          color: MifcColors.white,
+          letterSpacing: -0.5,
         ),
-        headlineLarge: GoogleFonts.barlowCondensed(
+        headlineLarge: GoogleFonts.outfit(
           fontSize: 24,
-          fontWeight: FontWeight.w900,
-          color: MifcColors.navyDark,
-        ),
-        headlineMedium: GoogleFonts.barlowCondensed(
-          fontSize: 20,
-          fontWeight: FontWeight.w800,
-          color: MifcColors.navyDark,
-        ),
-        titleLarge: GoogleFonts.barlowCondensed(
-          fontSize: 18,
-          fontWeight: FontWeight.w900,
-          color: MifcColors.navyDark,
-        ),
-        bodyLarge: GoogleFonts.barlow(
-          fontSize: 16,
           fontWeight: FontWeight.w600,
-          color: MifcColors.navyDark,
+          color: MifcColors.white,
         ),
-        bodyMedium: GoogleFonts.barlow(
+        headlineMedium: GoogleFonts.outfit(
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+          color: MifcColors.white,
+        ),
+        titleLarge: GoogleFonts.outfit(
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+          color: MifcColors.white,
+        ),
+        bodyLarge: GoogleFonts.inter(
+          fontSize: 16,
+          fontWeight: FontWeight.w400,
+          color: MifcColors.white,
+          height: 1.5,
+        ),
+        bodyMedium: GoogleFonts.inter(
           fontSize: 14,
           fontWeight: FontWeight.w400,
-          color: MifcColors.navyDark,
+          color: MifcColors.white.withValues(alpha: 0.7),
+          height: 1.4,
         ),
-        labelLarge: GoogleFonts.barlowCondensed(
+        labelLarge: GoogleFonts.outfit(
           fontSize: 14,
-          fontWeight: FontWeight.w800,
-          color: MifcColors.red,
+          fontWeight: FontWeight.w600,
+          color: MifcColors.eliteBlue,
+          letterSpacing: 1.0,
         ),
       ),
     );

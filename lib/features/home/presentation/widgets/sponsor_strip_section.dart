@@ -8,31 +8,32 @@ class SponsorStripSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 32),
-      color: MifcColors.white,
+      padding: const EdgeInsets.symmetric(vertical: 64),
+      color: Colors.transparent,
       child: Column(
         children: [
           Text(
             'OUR PARTNERS',
-            style: GoogleFonts.barlowCondensed(
-              fontSize: 12,
-              fontWeight: FontWeight.w800,
-              color: MifcColors.muted.withOpacity(0.5),
+            style: GoogleFonts.outfit(
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              color: MifcColors.white.withValues(alpha: 0.2),
               letterSpacing: 2,
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 48),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
             child: Row(
               children: [
-                const SizedBox(width: 24),
-                _buildSponsorLogo('Adidas'),
-                _buildSponsorLogo('Fly Emirates'),
-                _buildSponsorLogo('TeamViewer'),
-                _buildSponsorLogo('Cadbury'),
-                _buildSponsorLogo('Standard Chartered'),
-                const SizedBox(width: 24),
+                const SizedBox(width: 32),
+                _buildSponsorLogo('ADIDAS'),
+                _buildSponsorLogo('EMIRATES'),
+                _buildSponsorLogo('TEAMVIEWER'),
+                _buildSponsorLogo('CADBURY'),
+                _buildSponsorLogo('STANDARD CHARTERED'),
+                const SizedBox(width: 32),
               ],
             ),
           ),
@@ -43,19 +44,20 @@ class SponsorStripSection extends StatelessWidget {
 
   Widget _buildSponsorLogo(String name) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Opacity(
-        opacity: 0.4,
+        opacity: 0.15,
         child: Column(
           children: [
-            Icon(Icons.business, color: MifcColors.muted, size: 32),
-            const SizedBox(height: 4),
+            const Icon(Icons.business_center_outlined, color: MifcColors.white, size: 24),
+            const SizedBox(height: 8),
             Text(
-              name.toUpperCase(),
-              style: GoogleFonts.barlowCondensed(
-                fontSize: 10,
-                fontWeight: FontWeight.w700,
-                color: MifcColors.muted,
+              name,
+              style: GoogleFonts.outfit(
+                fontSize: 8,
+                fontWeight: FontWeight.w500,
+                color: MifcColors.white,
+                letterSpacing: 1.0,
               ),
             ),
           ],

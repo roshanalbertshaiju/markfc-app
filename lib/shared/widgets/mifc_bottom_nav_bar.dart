@@ -86,7 +86,7 @@ class MifcMoreMenu extends StatelessWidget {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: MifcColors.muted.withOpacity(0.2),
+              color: MifcColors.muted.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(2),
             ),
           ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../../core/theme/mifc_colors.dart';
+import 'package:markfc/core/theme/mifc_colors.dart';
 
 class LiveReadersBar extends StatefulWidget {
   final int count;
@@ -36,11 +36,11 @@ class _LiveReadersBarState extends State<LiveReadersBar> with SingleTickerProvid
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 36,
+      height: 48,
       decoration: BoxDecoration(
-        color: MifcColors.gold.withOpacity(0.06),
+        color: MifcColors.eliteBlue.withValues(alpha: 0.04),
         border: Border(
-          bottom: BorderSide(color: MifcColors.gold.withOpacity(0.12)),
+          bottom: BorderSide(color: MifcColors.white.withValues(alpha: 0.05)),
         ),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -52,21 +52,22 @@ class _LiveReadersBarState extends State<LiveReadersBar> with SingleTickerProvid
               FadeTransition(
                 opacity: _opacityAnimation,
                 child: Container(
-                  width: 8,
-                  height: 8,
+                  width: 6,
+                  height: 6,
                   decoration: const BoxDecoration(
-                    color: MifcColors.gold,
+                    color: MifcColors.eliteBlue,
                     shape: BoxShape.circle,
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 10),
               Text(
-                '${widget.count.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')} fans reading this now',
-                style: GoogleFonts.barlowCondensed(
-                  fontSize: 13,
+                '${widget.count.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')} FANS READING NOW',
+                style: GoogleFonts.outfit(
+                  fontSize: 10,
                   fontWeight: FontWeight.w700,
-                  color: MifcColors.gold,
+                  color: MifcColors.eliteBlue,
+                  letterSpacing: 0.8,
                 ),
               ),
             ],
@@ -84,25 +85,26 @@ class _LiveReadersBarState extends State<LiveReadersBar> with SingleTickerProvid
     return Row(
       children: [
         SizedBox(
-          width: 70,
+          width: 60,
+          height: 24,
           child: Stack(
             children: List.generate(4, (index) {
               return Positioned(
-                left: index * 14.0,
+                left: index * 12.0,
                 child: Container(
-                  width: 20,
-                  height: 20,
+                  width: 24,
+                  height: 24,
                   decoration: BoxDecoration(
                     color: colors[index],
                     shape: BoxShape.circle,
-                    border: Border.all(color: MifcColors.navyDark, width: 1.5),
+                    border: Border.all(color: MifcColors.black, width: 2),
                   ),
                   alignment: Alignment.center,
                   child: Text(
                     initials[index],
-                    style: const TextStyle(
+                    style: GoogleFonts.outfit(
                       fontSize: 8,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w700,
                       color: Colors.white,
                     ),
                   ),
@@ -112,14 +114,18 @@ class _LiveReadersBarState extends State<LiveReadersBar> with SingleTickerProvid
           ),
         ),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
-            color: MifcColors.cardLight,
-            borderRadius: BorderRadius.circular(10),
+            color: MifcColors.white.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(12),
           ),
-          child: const Text(
-            '+2k',
-            style: TextStyle(fontSize: 8, color: Colors.white70, fontWeight: FontWeight.bold),
+          child: Text(
+            '+2K',
+            style: GoogleFonts.outfit(
+              fontSize: 9,
+              color: MifcColors.white.withValues(alpha: 0.6),
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ),
       ],

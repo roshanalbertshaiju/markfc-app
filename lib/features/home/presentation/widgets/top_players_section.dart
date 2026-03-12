@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'package:markfc/core/theme/mifc_colors.dart';
 import 'package:markfc/shared/widgets/section_header.dart';
+import 'package:markfc/shared/widgets/scroll_reveal.dart';
 
 class PlayerStats {
   final String id;
@@ -95,7 +96,7 @@ class TopPlayersSection extends StatelessWidget {
       children: [
         const SectionHeader(
           title: 'TOP PLAYERS',
-          actionText: 'SEE ALL',
+          actionLabel: 'SEE ALL',
         ),
         SizedBox(
           height: 200, // Card height (180) + padding
@@ -105,7 +106,11 @@ class TopPlayersSection extends StatelessWidget {
             itemCount: _mockPlayers.length,
             itemBuilder: (context, index) {
               final player = _mockPlayers[index];
-              return _buildPlayerCard(context, player);
+              return ScrollReveal(
+                type: AnimationType.fade,
+                delay: Duration(milliseconds: index * 100),
+                child: _buildPlayerCard(context, player),
+              );
             },
           ),
         ),
@@ -117,126 +122,96 @@ class TopPlayersSection extends StatelessWidget {
     return GestureDetector(
       onTap: () => context.push('/squad/player/${player.id}'),
       child: Container(
-        width: 150,
-        height: 180,
-        margin: const EdgeInsets.only(right: 12, top: 8, bottom: 12),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [MifcColors.navy, MifcColors.navyDark],
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.3),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Stack(
+        width: 140,
+        margin: const EdgeInsets.only(right: 16, top: 8, bottom: 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Shirt Number Watermark
-            Positioned(
-              right: -10,
-              bottom: 40,
-              child: Opacity(
-                opacity: 0.1,
-                child: Text(
-                  player.shirtNumber,
-                  style: GoogleFonts.barlowCondensed(
-                    color: MifcColors.white,
-                    fontSize: 80,
-                    fontWeight: FontWeight.w900,
+            // Player Image with subtle border
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: MifcColors.white.withValues(alpha: 0.1),
+                    width: 0.5,
+                  ),
+                  image: DecorationImage(
+                    image: NetworkImage(player.imageUrl),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.transparent,
+                        Colors.black.withValues(alpha: 0.8),
+                      ],
+                    ),
+                  ),
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        player.shirtNumber,
+                        style: GoogleFonts.outfit(
+                          color: MifcColors.eliteBlue,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
-            // Content
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Header: Position + Nationality
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: MifcColors.red,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          player.position,
-                          style: GoogleFonts.barlowCondensed(
-                            color: MifcColors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                      ),
-                      Text(
-                        player.nationality,
-                        style: const TextStyle(fontSize: 14),
-                      ),
-                    ],
-                  ),
-                  const Spacer(),
-                  // Name
-                  Text(
-                    player.name,
-                    style: GoogleFonts.barlowCondensed(
-                      color: MifcColors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                      height: 1,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 8),
-                  // Stats
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _buildStatColumn('GA', player.goals),
-                      _buildStatColumn('AS', player.assists),
-                      _buildStatColumn('RT', player.rating),
-                    ],
-                  ),
-                ],
+            const SizedBox(height: 12),
+            // Name
+            Text(
+              player.name,
+              style: GoogleFonts.outfit(
+                color: MifcColors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.2,
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 4),
+            // Position & Rating
+            Row(
+              children: [
+                Text(
+                  player.position,
+                  style: GoogleFonts.inter(
+                    color: MifcColors.white.withValues(alpha: 0.5),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const Spacer(),
+                const Icon(Icons.star, color: MifcColors.eliteBlue, size: 10),
+                const SizedBox(width: 4),
+                Text(
+                  player.rating,
+                  style: GoogleFonts.outfit(
+                    color: MifcColors.white,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildStatColumn(String label, String value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: GoogleFonts.barlow(
-            color: MifcColors.white.withOpacity(0.5),
-            fontSize: 9,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        Text(
-          value,
-          style: GoogleFonts.barlowCondensed(
-            color: MifcColors.gold,
-            fontSize: 14,
-            fontWeight: FontWeight.w900,
-          ),
-        ),
-      ],
     );
   }
 }

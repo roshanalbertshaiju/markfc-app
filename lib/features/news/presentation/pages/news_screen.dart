@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../../../shared/widgets/mifc_top_bar.dart';
 import '../../../../shared/widgets/chat_fab.dart';
 import '../../../../core/theme/mifc_colors.dart';
+import '../../../../shared/widgets/mifc_card.dart';
+import '../../../../shared/widgets/scroll_reveal.dart';
 
 class NewsScreen extends StatefulWidget {
   const NewsScreen({super.key});
@@ -36,7 +38,7 @@ class _NewsScreenState extends State<NewsScreen> with SingleTickerProviderStateM
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0d1840),
+      backgroundColor: MifcColors.black,
       appBar: const MifcTopBar(),
       floatingActionButton: const ChatFab(),
       body: Column(
@@ -65,18 +67,26 @@ class CategoryTabBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 48,
-      color: const Color(0xFF0d1840),
+      color: MifcColors.black,
       child: TabBar(
         controller: controller,
         isScrollable: true,
-        indicatorColor: const Color(0xFFD0021B),
-        indicatorWeight: 3,
-        indicatorPadding: const EdgeInsets.symmetric(horizontal: 16),
-        labelColor: Colors.white,
-        unselectedLabelColor: Colors.white.withOpacity(0.45),
-        labelStyle: GoogleFonts.barlowCondensed(
-          fontSize: 13,
-          fontWeight: FontWeight.w800,
+        indicatorColor: MifcColors.crimson,
+        indicatorWeight: 2,
+        tabAlignment: TabAlignment.start,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        indicatorPadding: const EdgeInsets.symmetric(horizontal: 12),
+        labelColor: MifcColors.white,
+        unselectedLabelColor: MifcColors.white.withValues(alpha: 0.3),
+        labelStyle: GoogleFonts.outfit(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 0.5,
+        ),
+        unselectedLabelStyle: GoogleFonts.outfit(
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+          letterSpacing: 0.5,
         ),
         tabs: categories.map((cat) => Tab(text: cat.toUpperCase())).toList(),
       ),
@@ -97,7 +107,7 @@ class ArticlesVideosToggle extends StatelessWidget {
       child: Row(
         children: [
           _buildToggleButton('ARTICLES', !showVideos, () => onChanged(false)),
-          const SizedBox(width: 8),
+          const SizedBox(width: 12),
           _buildToggleButton('VIDEOS', showVideos, () => onChanged(true)),
         ],
       ),
@@ -108,22 +118,24 @@ class ArticlesVideosToggle extends StatelessWidget {
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
-        child: Container(
-          height: 38,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          height: 36,
           decoration: BoxDecoration(
-            color: isActive ? const Color(0xFFD0021B) : Colors.transparent,
+            color: isActive ? MifcColors.white.withValues(alpha: 0.05) : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: isActive ? Colors.transparent : const Color(0xFF1a2760),
+              color: isActive ? MifcColors.white.withValues(alpha: 0.1) : Colors.transparent,
             ),
           ),
           alignment: Alignment.center,
           child: Text(
             label,
-            style: GoogleFonts.barlowCondensed(
-              fontSize: 13,
-              fontWeight: FontWeight.w800,
-              color: Colors.white,
+            style: GoogleFonts.outfit(
+              fontSize: 11,
+              fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
+              color: isActive ? MifcColors.white : MifcColors.white.withValues(alpha: 0.4),
+              letterSpacing: 1.0,
             ),
           ),
         ),
@@ -138,54 +150,83 @@ class NewsScrollBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      padding: const EdgeInsets.only(bottom: 24),
+      padding: const EdgeInsets.only(bottom: 40),
+      physics: const BouncingScrollPhysics(),
       children: [
-        const FeaturedHeroCard(),
+        const ScrollReveal(
+          type: AnimationType.fade,
+          child: FeaturedHeroCard(),
+        ),
         _buildLatestUpdatesHeader(),
-        const HorizontalNewsCard(
-          category: 'TRANSFER NEWS',
-          categoryColor: Color(0xFFD0021B),
-          title: 'Club in talks over summer midfield signing',
-          time: '2 hours ago',
-          emoji: '🤝',
+        const ScrollReveal(
+          type: AnimationType.fade,
+          delay: Duration(milliseconds: 100),
+          child: HorizontalNewsCard(
+            category: 'TRANSFER NEWS',
+            categoryColor: MifcColors.crimson,
+            title: 'CLUB IN TALKS OVER SUMMER MIDFIELD SIGNING',
+            time: '2 HOURS AGO',
+            emoji: '🤝',
+          ),
         ),
-        const HorizontalNewsCard(
-          category: 'TEAM NEWS',
-          categoryColor: Color(0xFF4CAF50),
-          title: 'Injury Update: Bellingham returns to full training',
-          time: '4 hours ago',
-          emoji: '🤕',
+        const ScrollReveal(
+          type: AnimationType.fade,
+          delay: Duration(milliseconds: 200),
+          child: HorizontalNewsCard(
+            category: 'TEAM NEWS',
+            categoryColor: Colors.greenAccent,
+            title: 'INJURY UPDATE: BELLINGHAM RETURNS TO FULL TRAINING',
+            time: '4 HOURS AGO',
+            emoji: '🤕',
+          ),
         ),
-        const FullWidthNewsCard(
-          category: 'ACADEMY UPDATES',
-          categoryColor: Color(0xFFF5C518),
-          title: 'U18s Continue Unbeaten Run With Dominant 4-0 Win',
-          excerpt: 'The young Reds showcased their talent with a four-goal display against traditional rivals...',
-          time: '6 hours ago',
-          imageUrl: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=800',
+        const ScrollReveal(
+          type: AnimationType.fade,
+          delay: Duration(milliseconds: 300),
+          child: FullWidthNewsCard(
+            category: 'ACADEMY UPDATES',
+            categoryColor: MifcColors.eliteBlue,
+            title: 'U18S CONTINUE UNBEATEN RUN WITH DOMINANT 4-0 WIN',
+            excerpt: 'The young Reds showcased their talent with a four-goal display against traditional rivals at the academy grounds this morning...',
+            time: '6 HOURS AGO',
+            imageUrl: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=800',
+          ),
         ),
-        const HorizontalNewsCard(
-          category: 'INTERVIEW',
-          categoryColor: Colors.white70,
-          title: 'Bellingham: "This squad has the hunger to go all the way"',
-          time: '8 hours ago',
-          emoji: '🎙️',
+        const ScrollReveal(
+          type: AnimationType.fade,
+          delay: Duration(milliseconds: 400),
+          child: HorizontalNewsCard(
+            category: 'INTERVIEW',
+            categoryColor: Colors.white70,
+            title: 'BELLINGHAM: "THIS SQUAD HAS THE HUNGER TO GO ALL THE WAY"',
+            time: '8 HOURS AGO',
+            emoji: '🎙️',
+          ),
         ),
-        const HorizontalNewsCard(
-          category: 'MATCH REPORT',
-          categoryColor: Color(0xFFCE93D8),
-          title: 'MIFC 3-1 Arsenal: Player Ratings & Analysis',
-          time: 'Yesterday',
-          emoji: '📊',
+        const ScrollReveal(
+          type: AnimationType.fade,
+          delay: Duration(milliseconds: 500),
+          child: HorizontalNewsCard(
+            category: 'MATCH REPORT',
+            categoryColor: Colors.purpleAccent,
+            title: 'MIFC 3-1 ARSENAL: PLAYER RATINGS & ANALYSIS',
+            time: 'YESTERDAY',
+            emoji: '📊',
+          ),
         ),
-        const FullWidthNewsCard(
-          category: 'CLUB NEWS',
-          categoryColor: Colors.white70,
-          title: 'New 2025-26 Away Kit Officially Unveiled',
-          excerpt: 'The club has pulled back the curtain on the new away strip for next season...',
-          time: '2 days ago',
-          imageUrl: 'https://images.unsplash.com/photo-1543351611-58f88d736768?q=80&w=800',
+        const ScrollReveal(
+          type: AnimationType.fade,
+          delay: Duration(milliseconds: 600),
+          child: FullWidthNewsCard(
+            category: 'CLUB NEWS',
+            categoryColor: Colors.white70,
+            title: 'NEW 2025-26 AWAY KIT OFFICIALLY UNVEILED',
+            excerpt: 'The club has pulled back the curtain on the new away strip for next season, featuring a bold monochrome aesthetic...',
+            time: '2 DAYS AGO',
+            imageUrl: 'https://images.unsplash.com/photo-1543351611-58f88d736768?q=80&w=800',
+          ),
         ),
+        const SizedBox(height: 16),
         _buildLoadMoreButton(),
       ],
     );
@@ -193,28 +234,30 @@ class NewsScrollBody extends StatelessWidget {
 
   Widget _buildLatestUpdatesHeader() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      padding: const EdgeInsets.fromLTRB(16, 32, 16, 20),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             'LATEST UPDATES',
-            style: GoogleFonts.barlowCondensed(
-              fontSize: 20,
-              fontWeight: FontWeight.w900,
-              color: Colors.white,
+            style: GoogleFonts.outfit(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: MifcColors.white.withValues(alpha: 0.4),
+              letterSpacing: 1.5,
             ),
           ),
           Row(
             children: [
-              const Icon(Icons.tune, color: Color(0xFFD0021B), size: 18),
-              const SizedBox(width: 4),
+              Icon(Icons.tune, color: MifcColors.white.withValues(alpha: 0.4), size: 14),
+              const SizedBox(width: 6),
               Text(
                 'FILTER',
-                style: GoogleFonts.barlowCondensed(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w800,
-                  color: const Color(0xFFD0021B),
+                style: GoogleFonts.outfit(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  color: MifcColors.white.withValues(alpha: 0.4),
+                  letterSpacing: 1.0,
                 ),
               ),
             ],
@@ -226,20 +269,18 @@ class NewsScrollBody extends StatelessWidget {
 
   Widget _buildLoadMoreButton() {
     return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Container(
-        height: 48,
-        decoration: BoxDecoration(
-          color: const Color(0xFFD0021B),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        alignment: Alignment.center,
-        child: Text(
-          'LOAD OLDER STORIES',
-          style: GoogleFonts.barlowCondensed(
-            fontSize: 15,
-            fontWeight: FontWeight.w900,
-            color: Colors.white,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: MifcCard(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        child: Center(
+          child: Text(
+            'LOAD OLDER STORIES',
+            style: GoogleFonts.outfit(
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: MifcColors.white,
+              letterSpacing: 1.0,
+            ),
           ),
         ),
       ),
@@ -255,41 +296,57 @@ class VideoListTab extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: const [
-        VideoCard(
-          title: 'Salah Post-Match: "We believe in the title"',
-          category: 'INTERVIEW',
-          categoryColor: Color(0xFFD0021B),
-          duration: '04:20',
-          views: '12K views',
-          date: '2 hours ago',
-          imageUrl: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=400',
+        ScrollReveal(
+          type: AnimationType.fade,
+          delay: Duration(milliseconds: 100),
+          child: VideoCard(
+            title: 'SALAH POST-MATCH: "WE BELIEVE IN THE TITLE"',
+            category: 'INTERVIEW',
+            categoryColor: MifcColors.crimson,
+            duration: '04:20',
+            views: '12K VIEWS',
+            date: '2 HOURS AGO',
+            imageUrl: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=400',
+          ),
         ),
-        VideoCard(
-          title: 'Highlights: MIFC 3-1 Arsenal',
-          category: 'HIGHLIGHTS',
-          categoryColor: MifcColors.navy,
-          duration: '10:15',
-          views: '45K views',
-          date: 'Yesterday',
-          imageUrl: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=400',
+        ScrollReveal(
+          type: AnimationType.fade,
+          delay: Duration(milliseconds: 200),
+          child: VideoCard(
+            title: 'HIGHLIGHTS: MIFC 3-1 ARSENAL',
+            category: 'HIGHLIGHTS',
+            categoryColor: Colors.blueAccent,
+            duration: '10:15',
+            views: '45K VIEWS',
+            date: 'YESTERDAY',
+            imageUrl: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=400',
+          ),
         ),
-        VideoCard(
-          title: 'Behind The Scenes: Training Ground Focus',
-          category: 'BTS',
-          categoryColor: Colors.teal,
-          duration: '06:45',
-          views: '8K views',
-          date: '2 days ago',
-          imageUrl: 'https://images.unsplash.com/photo-1543351611-58f88d736768?q=80&w=400',
+        ScrollReveal(
+          type: AnimationType.fade,
+          delay: Duration(milliseconds: 300),
+          child: VideoCard(
+            title: 'BEHIND THE SCENES: TRAINING GROUND FOCUS',
+            category: 'BTS',
+            categoryColor: Colors.tealAccent,
+            duration: '06:45',
+            views: '8K VIEWS',
+            date: '2 DAYS AGO',
+            imageUrl: 'https://images.unsplash.com/photo-1543351611-58f88d736768?q=80&w=400',
+          ),
         ),
-        VideoCard(
-          title: 'Manager Press Conference: Liverpool Preview',
-          category: 'PRESS',
-          categoryColor: Colors.purple,
-          duration: '15:30',
-          views: '15K views',
-          date: '3 days ago',
-          imageUrl: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?q=80&w=400',
+        ScrollReveal(
+          type: AnimationType.fade,
+          delay: Duration(milliseconds: 400),
+          child: VideoCard(
+            title: 'MANAGER PRESS CONFERENCE: LIVERPOOL PREVIEW',
+            category: 'PRESS',
+            categoryColor: Colors.purpleAccent,
+            duration: '15:30',
+            views: '15K VIEWS',
+            date: '3 DAYS AGO',
+            imageUrl: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?q=80&w=400',
+          ),
         ),
       ],
     );
@@ -304,72 +361,89 @@ class FeaturedHeroCard extends StatelessWidget {
     return GestureDetector(
       onTap: () => context.push('/news/article/1'),
       child: Container(
-        height: 220,
-        margin: const EdgeInsets.symmetric(horizontal: 14),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(18),
-        ),
-        clipBehavior: Clip.antiAlias,
+        height: 280,
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: Stack(
           children: [
             Hero(
               tag: 'article_image_1',
-              child: CachedNetworkImage(
-                imageUrl: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=1000',
-                fit: BoxFit.cover,
-                width: double.infinity,
-                height: 220,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(24),
+                child: CachedNetworkImage(
+                  imageUrl: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=1000',
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  height: 280,
+                ),
               ),
             ),
             Container(
               decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(24),
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
                     Colors.transparent,
-                    Colors.black.withOpacity(0.8),
+                    MifcColors.black.withValues(alpha: 0.9),
                   ],
+                  stops: const [0.4, 1.0],
                 ),
               ),
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF5C518),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(
-                      '⚡ EXCLUSIVE',
-                      style: GoogleFonts.barlowCondensed(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.black,
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: MifcColors.crimson,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          'EXCLUSIVE',
+                          style: GoogleFonts.outfit(
+                            fontSize: 9,
+                            fontWeight: FontWeight.w700,
+                            color: MifcColors.white,
+                            letterSpacing: 1.0,
+                          ),
+                        ),
                       ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'TRANSFER NEWS',
+                        style: GoogleFonts.outfit(
+                          fontSize: 9,
+                          fontWeight: FontWeight.w600,
+                          color: MifcColors.white.withValues(alpha: 0.5),
+                          letterSpacing: 1.0,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'SALAH SIGNS NEW DEAL: STAYING UNTIL 2028',
+                    style: GoogleFonts.outfit(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w700,
+                      color: MifcColors.white,
+                      height: 1.1,
+                      letterSpacing: 0.5,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Salah Signs New Deal – Staying Until 2028',
-                    style: GoogleFonts.barlowCondensed(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w900,
-                      fontStyle: FontStyle.italic,
-                      color: Colors.white,
-                      height: 1.0,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Transfer News • 45 mins ago',
-                    style: GoogleFonts.barlow(
-                      fontSize: 12,
-                      color: Colors.white.withOpacity(0.7),
-                      fontWeight: FontWeight.w500,
+                    '45 MINUTES AGO',
+                    style: GoogleFonts.inter(
+                      fontSize: 9,
+                      color: MifcColors.white.withValues(alpha: 0.3),
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.5,
                     ),
                   ),
                 ],
@@ -402,70 +476,61 @@ class HorizontalNewsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => context.push('/news/article/pending'),
-      child: Container(
+      child: MifcCard(
         margin: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-        height: 90,
-        decoration: BoxDecoration(
-          color: const Color(0xFF131e52),
-          borderRadius: BorderRadius.circular(14),
-        ),
+        padding: const EdgeInsets.all(16),
         child: Row(
           children: [
             Container(
-              width: 90,
+              width: 56,
+              height: 56,
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [categoryColor.withOpacity(0.2), categoryColor.withOpacity(0.1)],
-                ),
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(14),
-                  bottomLeft: Radius.circular(14),
-                ),
+                color: MifcColors.white.withValues(alpha: 0.03),
+                borderRadius: BorderRadius.circular(12),
               ),
               alignment: Alignment.center,
               child: Text(
                 emoji,
-                style: const TextStyle(fontSize: 32),
+                style: const TextStyle(fontSize: 24),
               ),
             ),
+            const SizedBox(width: 16),
             Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      category.toUpperCase(),
-                      style: GoogleFonts.barlowCondensed(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w900,
-                        color: categoryColor,
-                        letterSpacing: 0.5,
-                      ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    category,
+                    style: GoogleFonts.outfit(
+                      fontSize: 9,
+                      fontWeight: FontWeight.w700,
+                      color: categoryColor.withValues(alpha: 0.8),
+                      letterSpacing: 1.0,
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      title,
-                      style: GoogleFonts.barlowCondensed(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                        height: 1.2,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    title,
+                    style: GoogleFonts.outfit(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: MifcColors.white,
+                      height: 1.3,
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      time,
-                      style: GoogleFonts.barlow(
-                        fontSize: 10,
-                        color: Colors.white.withOpacity(0.5),
-                      ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    time,
+                    style: GoogleFonts.inter(
+                      fontSize: 9,
+                      fontWeight: FontWeight.w500,
+                      color: MifcColors.white.withValues(alpha: 0.3),
+                      letterSpacing: 0.5,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -497,89 +562,93 @@ class FullWidthNewsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => context.push('/news/article/pending'),
-      child: Container(
+      child: MifcCard(
         margin: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-        decoration: BoxDecoration(
-          color: const Color(0xFF1a2760),
-          borderRadius: BorderRadius.circular(14),
-        ),
-        clipBehavior: Clip.antiAlias,
+        padding: EdgeInsets.zero,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CachedNetworkImage(
-              imageUrl: imageUrl,
-              height: 160,
-              width: double.infinity,
-              fit: BoxFit.cover,
+            ClipRRect(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+              child: CachedNetworkImage(
+                imageUrl: imageUrl,
+                height: 180,
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
             ),
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '✨ $category',
-                    style: GoogleFonts.barlowCondensed(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w900,
+                    category,
+                    style: GoogleFonts.outfit(
+                      fontSize: 9,
+                      fontWeight: FontWeight.w700,
                       color: categoryColor,
+                      letterSpacing: 1.0,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 12),
                   Text(
                     title,
-                    style: GoogleFonts.barlowCondensed(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w900,
-                      color: Colors.white,
-                      height: 1.0,
+                    style: GoogleFonts.outfit(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: MifcColors.white,
+                      height: 1.2,
                     ),
                   ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  excerpt,
-                  style: GoogleFonts.barlow(
-                    fontSize: 13,
-                    color: Colors.white.withOpacity(0.6),
-                    height: 1.4,
+                  const SizedBox(height: 12),
+                  Text(
+                    excerpt,
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      color: MifcColors.white.withValues(alpha: 0.4),
+                      height: 1.6,
+                      fontWeight: FontWeight.w400,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      time,
-                      style: GoogleFonts.barlow(
-                        fontSize: 11,
-                        color: Colors.white.withOpacity(0.4),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        time,
+                        style: GoogleFonts.inter(
+                          fontSize: 9,
+                          fontWeight: FontWeight.w600,
+                          color: MifcColors.white.withValues(alpha: 0.2),
+                          letterSpacing: 0.5,
+                        ),
                       ),
-                    ),
-                    Row(
-                      children: [
-                        Text(
-                          'Read Article',
-                          style: GoogleFonts.barlowCondensed(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w800,
-                            color: const Color(0xFFD0021B),
+                      Row(
+                        children: [
+                          Text(
+                            'READ FULL STORY',
+                            style: GoogleFonts.outfit(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              color: MifcColors.eliteBlue,
+                              letterSpacing: 0.5,
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 4),
-                        const Icon(
-                          Icons.arrow_forward,
-                          size: 14,
-                          color: Color(0xFFD0021B),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
+                          const SizedBox(width: 6),
+                          Icon(
+                            Icons.arrow_forward_ios,
+                            size: 10,
+                            color: MifcColors.eliteBlue,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -610,105 +679,99 @@ class VideoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      height: 110,
-      decoration: BoxDecoration(
-        color: const Color(0xFF131e52),
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Row(
-        children: [
-          Stack(
-            children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(14),
-                  bottomLeft: Radius.circular(14),
-                ),
-                child: CachedNetworkImage(
-                  imageUrl: imageUrl,
-                  width: 150,
-                  height: 110,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              const Positioned.fill(
-                child: Center(
-                  child: CircleAvatar(
-                    backgroundColor: Colors.white24,
-                    radius: 18,
-                    child: Icon(Icons.play_arrow, color: Colors.white),
+    return GestureDetector(
+      onTap: () {}, // Handle video play
+      child: MifcCard(
+        margin: const EdgeInsets.only(bottom: 16),
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          children: [
+            Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: CachedNetworkImage(
+                    imageUrl: imageUrl,
+                    width: 140,
+                    height: 90,
+                    fit: BoxFit.cover,
                   ),
                 ),
-              ),
-              Positioned(
-                right: 8,
-                bottom: 8,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.8),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    duration,
-                    style: const TextStyle(color: Colors.white, fontSize: 10),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 8,
-                top: 8,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: categoryColor,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    category,
-                    style: GoogleFonts.barlowCondensed(
-                      fontSize: 8,
-                      fontWeight: FontWeight.w900,
-                      color: Colors.white,
+                Positioned.fill(
+                  child: Center(
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: MifcColors.white.withValues(alpha: 0.9),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.play_arrow_rounded, color: MifcColors.black, size: 20),
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(12),
+                Positioned(
+                  right: 8,
+                  bottom: 8,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: MifcColors.black.withValues(alpha: 0.6),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      duration,
+                      style: GoogleFonts.outfit(
+                        color: MifcColors.white,
+                        fontSize: 9,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(width: 16),
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
+                    category,
+                    style: GoogleFonts.outfit(
+                      fontSize: 8,
+                      fontWeight: FontWeight.w700,
+                      color: categoryColor,
+                      letterSpacing: 1.0,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
                     title,
-                    style: GoogleFonts.barlowCondensed(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white,
-                      height: 1.1,
+                    style: GoogleFonts.outfit(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: MifcColors.white,
+                      height: 1.2,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 10),
                   Text(
-                    '$views • $date',
-                    style: GoogleFonts.barlow(
-                      fontSize: 11,
-                      color: Colors.white.withOpacity(0.5),
+                    '$views · $date',
+                    style: GoogleFonts.inter(
+                      fontSize: 9,
+                      fontWeight: FontWeight.w500,
+                      color: MifcColors.white.withValues(alpha: 0.3),
+                      letterSpacing: 0.5,
                     ),
                   ),
                 ],
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

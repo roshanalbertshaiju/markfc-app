@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/mifc_colors.dart';
 
 class SectionHeader extends StatelessWidget {
   final String title;
-  final String actionText;
+  final String? subtitle;
+  final String? actionLabel;
   final VoidCallback? onActionTap;
 
   const SectionHeader({
     super.key,
     required this.title,
-    this.actionText = 'SEE ALL',
+    this.subtitle,
+    this.actionLabel,
     this.onActionTap,
   });
 
@@ -21,32 +22,55 @@ class SectionHeader extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            width: 4,
-            height: 20,
+            width: 3,
+            height: 24,
             decoration: BoxDecoration(
-              color: MifcColors.red,
+              color: MifcColors.eliteBlue,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          const SizedBox(width: 8),
-          Text(
-            title.toUpperCase(),
-            style: GoogleFonts.barlowCondensed(
-              fontSize: 17,
-              fontWeight: FontWeight.w900,
-              color: MifcColors.navyDark,
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title.toUpperCase(),
+                  style: const TextStyle(
+                    color: MifcColors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w300, // Light weight for prestige
+                    letterSpacing: 1.5,
+                  ),
+                ),
+                if (subtitle != null) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle!.toUpperCase(),
+                    style: TextStyle(
+                      color: MifcColors.white.withValues(alpha: 0.5),
+                      fontSize: 10,
+                      fontWeight: FontWeight.w400,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                ],
+              ],
             ),
           ),
-          const Spacer(),
-          if (onActionTap != null || actionText.isNotEmpty)
-            GestureDetector(
-              onTap: onActionTap,
+          if (onActionTap != null)
+            TextButton(
+              onPressed: onActionTap,
+              style: TextButton.styleFrom(
+                foregroundColor: MifcColors.eliteBlue,
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              ),
               child: Text(
-                actionText.toUpperCase(),
-                style: GoogleFonts.barlowCondensed(
+                actionLabel?.toUpperCase() ?? 'SEE ALL',
+                style: const TextStyle(
                   fontSize: 12,
-                  fontWeight: FontWeight.w800,
-                  color: MifcColors.red,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 1.0,
                 ),
               ),
             ),

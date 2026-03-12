@@ -19,11 +19,12 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: const MifcTopBar(),
       body: ListView(
+        padding: EdgeInsets.zero,
         children: [
           const HeroCarousel(),
-          _buildDivider(),
           const LatestNewsSection(),
           _buildDivider(),
           const MatchCentreSection(),
@@ -48,17 +49,22 @@ class HomePage extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
-        backgroundColor: MifcColors.red,
-        child: const Icon(Icons.chat_bubble_outline, color: Colors.white),
+        backgroundColor: MifcColors.crimson,
+        elevation: 4,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: const Icon(Icons.chat_bubble_outline, color: MifcColors.white),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 
   Widget _buildDivider() {
-    return Container(
-      height: 8,
-      color: const Color(0xFFE4E7F5),
+    return Divider(
+      height: 48,
+      thickness: 1,
+      color: MifcColors.white.withValues(alpha: 0.03),
+      indent: 24,
+      endIndent: 24,
     );
   }
 }

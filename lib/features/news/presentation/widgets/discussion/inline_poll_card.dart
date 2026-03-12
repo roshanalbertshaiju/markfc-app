@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../../core/theme/mifc_colors.dart';
+import 'package:markfc/core/theme/mifc_colors.dart';
+import 'package:markfc/shared/widgets/mifc_card.dart';
+import 'package:markfc/shared/widgets/scroll_reveal.dart';
 
 class InlinePollCard extends StatefulWidget {
   const InlinePollCard({super.key});
@@ -14,9 +16,9 @@ class _InlinePollCardState extends State<InlinePollCard> {
   String? _selectedOption;
 
   final Map<String, int> _options = {
-    'M. Salah': 7478,
-    'Ekitike': 4458,
-    'Bellingham': 2446,
+    'M. SALAH': 7478,
+    'H. EKITIKE': 4458,
+    'J. BELLINGHAM': 2446,
   };
 
   void _vote(String option) {
@@ -30,146 +32,155 @@ class _InlinePollCardState extends State<InlinePollCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-      decoration: BoxDecoration(
-        color: MifcColors.card,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: MifcColors.gold.withOpacity(0.15)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            decoration: BoxDecoration(
-              color: MifcColors.gold.withOpacity(0.08),
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(15),
-                topRight: Radius.circular(15),
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    const Icon(Icons.poll_outlined, color: MifcColors.gold, size: 16),
-                    const SizedBox(width: 8),
-                    Text(
-                      'QUICK POLL · MOTM',
-                      style: GoogleFonts.barlowCondensed(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w900,
-                        color: MifcColors.gold,
-                      ),
-                    ),
-                  ],
-                ),
-                Text(
-                  '${_totalVotes.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')} VOTES',
-                  style: GoogleFonts.barlowCondensed(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w800,
-                    color: MifcColors.white.withOpacity(0.4),
+    return ScrollReveal(
+      type: AnimationType.fade,
+      child: MifcCard(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+        color: MifcColors.white.withValues(alpha: 0.02),
+        borderRadius: BorderRadius.circular(24),
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border.all(color: MifcColors.white.withValues(alpha: 0.05)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                decoration: BoxDecoration(
+                  color: MifcColors.white.withValues(alpha: 0.03),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(24),
+                    topRight: Radius.circular(24),
                   ),
                 ),
-              ],
-            ),
-          ),
-          // Question
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-            child: Text(
-              'Who was Man of the Match?',
-              style: GoogleFonts.barlowCondensed(
-                fontSize: 16,
-                fontWeight: FontWeight.w900,
-                color: Colors.white,
-              ),
-            ),
-          ),
-          // Options
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            child: Column(
-              children: _options.entries.map((entry) {
-                final percentage = (entry.value / _totalVotes * 100).round();
-                final isSelected = _selectedOption == entry.key;
-                final isLeading = entry.value == _options.values.reduce((a, b) => a > b ? a : b);
-
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: GestureDetector(
-                    onTap: () => _vote(entry.key),
-                    child: Stack(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
                       children: [
-                        // Progress Background
-                        Container(
-                          height: 44,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.05),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        // Progress Fill
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 600),
-                          curve: Curves.easeOutCubic,
-                          height: 44,
-                          width: MediaQuery.of(context).size.width * (percentage / 100),
-                          decoration: BoxDecoration(
-                            color: isLeading 
-                                ? MifcColors.gold.withOpacity(0.15) 
-                                : Colors.white.withOpacity(0.08),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        // Label & Percentage
-                        Positioned.fill(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    if (isSelected) 
-                                      const Padding(
-                                        padding: EdgeInsets.only(right: 8),
-                                        child: Icon(Icons.check_circle, color: MifcColors.gold, size: 14),
-                                      ),
-                                    Text(
-                                      entry.key,
-                                      style: GoogleFonts.barlowCondensed(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w800,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Text(
-                                  '$percentage%',
-                                  style: GoogleFonts.barlowCondensed(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w900,
-                                    color: isLeading ? MifcColors.gold : Colors.white.withOpacity(0.4),
-                                  ),
-                                ),
-                              ],
-                            ),
+                        const Icon(Icons.poll_rounded, color: MifcColors.eliteBlue, size: 14),
+                        const SizedBox(width: 10),
+                        Text(
+                          'SQUAD POLL · MOTM',
+                          style: GoogleFonts.outfit(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            color: MifcColors.eliteBlue,
+                            letterSpacing: 1.0,
                           ),
                         ),
                       ],
                     ),
+                    Text(
+                      '${_totalVotes.toString().replaceAllMapped(RegExp(r"(\d{1,3})(?=(\d{3})+(?!\d))"), (Match m) => "${m[1]},")} VOTES',
+                      style: GoogleFonts.outfit(
+                        fontSize: 9,
+                        fontWeight: FontWeight.w700,
+                        color: MifcColors.white.withValues(alpha: 0.3),
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Question
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+                child: Text(
+                  'WHO WAS YOUR MAN OF THE MATCH?',
+                  style: GoogleFonts.outfit(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: MifcColors.white,
+                    letterSpacing: 0.2,
                   ),
-                );
-              }).toList(),
-            ),
+                ),
+              ),
+              // Options
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+                child: Column(
+                  children: _options.entries.map((entry) {
+                    final percentage = (entry.value / _totalVotes * 100).round();
+                    final isSelected = _selectedOption == entry.key;
+                    final isLeading = entry.value == _options.values.reduce((a, b) => a > b ? a : b);
+
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: GestureDetector(
+                        onTap: () => _vote(entry.key),
+                        child: Stack(
+                          children: [
+                            // Progress Background
+                            Container(
+                              height: 52,
+                              decoration: BoxDecoration(
+                                color: MifcColors.white.withValues(alpha: 0.03),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: MifcColors.white.withValues(alpha: 0.05)),
+                              ),
+                            ),
+                            // Progress Fill
+                            AnimatedContainer(
+                              duration: const Duration(milliseconds: 800),
+                              curve: Curves.easeOutQuart,
+                              height: 52,
+                              width: MediaQuery.of(context).size.width * (percentage / 100),
+                              decoration: BoxDecoration(
+                                color: isLeading 
+                                    ? MifcColors.eliteBlue.withValues(alpha: 0.12) 
+                                    : MifcColors.white.withValues(alpha: 0.06),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            // Label & Percentage
+                            Positioned.fill(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 20),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        if (isSelected) 
+                                          const Padding(
+                                            padding: EdgeInsets.only(right: 12),
+                                            child: Icon(Icons.check_circle_rounded, color: MifcColors.eliteBlue, size: 16),
+                                          ),
+                                        Text(
+                                          entry.key,
+                                          style: GoogleFonts.inter(
+                                            fontSize: 13,
+                                            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                                            color: isSelected ? MifcColors.eliteBlue : MifcColors.white.withValues(alpha: 0.8),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Text(
+                                      '$percentage%',
+                                      style: GoogleFonts.outfit(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w700,
+                                        color: isLeading ? MifcColors.eliteBlue : MifcColors.white.withValues(alpha: 0.4),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

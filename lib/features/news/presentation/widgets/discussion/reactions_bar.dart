@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../../core/theme/mifc_colors.dart';
+import 'package:markfc/core/theme/mifc_colors.dart';
 
 class ReactionsBar extends StatefulWidget {
   const ReactionsBar({super.key});
@@ -41,14 +41,14 @@ class _ReactionsBarState extends State<ReactionsBar> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           child: Text(
             'REACT TO THIS ARTICLE',
-            style: GoogleFonts.barlowCondensed(
-              fontSize: 11,
-              fontWeight: FontWeight.w800,
-              color: MifcColors.mutedOpacity,
-              letterSpacing: 1.0,
+            style: GoogleFonts.outfit(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              color: MifcColors.white.withValues(alpha: 0.3),
+              letterSpacing: 1.2,
             ),
           ),
         ),
@@ -97,19 +97,18 @@ class ReactionPill extends StatelessWidget {
 
     // Tier system
     if (isActive) {
-      bgColor = MifcColors.gold.withOpacity(0.12);
-      borderColor = MifcColors.gold;
-      countColor = MifcColors.gold;
+      bgColor = MifcColors.eliteBlue.withValues(alpha: 0.1);
+      borderColor = MifcColors.eliteBlue.withValues(alpha: 0.3);
+      countColor = MifcColors.eliteBlue;
     } else if (count >= 1000) {
-      bgColor = MifcColors.red.withOpacity(0.15);
-      borderColor = MifcColors.red;
-      countColor = MifcColors.red;
+      bgColor = MifcColors.crimson.withValues(alpha: 0.08);
+      borderColor = MifcColors.crimson.withValues(alpha: 0.2);
+      countColor = MifcColors.crimson;
     } else if (count >= 500) {
-      bgColor = MifcColors.gold.withOpacity(0.1);
-      borderColor = MifcColors.gold;
+      bgColor = MifcColors.white.withValues(alpha: 0.05);
+      borderColor = MifcColors.white.withValues(alpha: 0.1);
     } else {
-      bgColor = MifcColors.cardLight;
-      borderColor = null;
+      bgColor = MifcColors.white.withValues(alpha: 0.03);
     }
 
     final String displayCount = count >= 1000 ? '${(count / 1000).toStringAsFixed(1)}k' : '$count';
@@ -138,10 +137,10 @@ class ReactionPill extends StatelessWidget {
                     child: Text(
                       displayCount,
                       key: ValueKey(count),
-                      style: GoogleFonts.barlowCondensed(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w900,
-                        color: countColor,
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: countColor.withValues(alpha: 0.9),
                       ),
                     ),
                   ),
@@ -154,14 +153,14 @@ class ReactionPill extends StatelessWidget {
                 width: 30, // Base width for consistency
                 alignment: Alignment.centerLeft,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.1),
+                  color: Colors.white.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(1),
                 ),
                 child: FractionallySizedBox(
                   widthFactor: progress.clamp(0.0, 1.0),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: isActive || count >= 500 ? MifcColors.gold : MifcColors.muted,
+                    color: isActive || count >= 500 ? MifcColors.eliteBlue : MifcColors.white.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(1),
                     ),
                   ),

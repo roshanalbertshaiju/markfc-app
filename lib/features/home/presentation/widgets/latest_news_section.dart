@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:markfc/core/theme/mifc_colors.dart';
 import 'package:markfc/shared/widgets/section_header.dart';
+import 'package:markfc/shared/widgets/mifc_card.dart';
+import 'package:markfc/shared/widgets/scroll_reveal.dart';
 
 class LatestNewsSection extends StatelessWidget {
   const LatestNewsSection({super.key});
@@ -12,33 +14,40 @@ class LatestNewsSection extends StatelessWidget {
       children: [
         const SectionHeader(title: 'LATEST NEWS'),
         SizedBox(
-          height: 200,
+          height: 240,
           child: ListView(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 16),
             children: const [
-              NewsCard(
-                category: 'TRANSFER',
-                title: 'Club Confirms Salah Contract Extension Until 2028',
-                subtitle: '2 hours ago · Official Announcement',
-                color: MifcColors.navy,
-                icon: Icons.emoji_events,
+              ScrollReveal(
+                type: AnimationType.fade,
+                delay: Duration(milliseconds: 100),
+                child: NewsCard(
+                  category: 'TRANSFER',
+                  title: 'Club Confirms Salah Contract Extension Until 2028',
+                  time: '2H AGO',
+                  imageUrl: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=500&q=80',
+                ),
               ),
-              NewsCard(
-                category: 'INJURY',
-                title: 'Nunez Out 2 Weeks With Hamstring Strain',
-                subtitle: '3 hours ago · Team News',
-                color: Colors.green,
-                icon: Icons.sentiment_very_dissatisfied,
-                isLarge: false,
+              ScrollReveal(
+                type: AnimationType.fade,
+                delay: Duration(milliseconds: 200),
+                child: NewsCard(
+                  category: 'TEAM NEWS',
+                  title: 'Nunez Out 2 Weeks With Hamstring Strain',
+                  time: '3H AGO',
+                  imageUrl: 'https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?w=500&q=80',
+                ),
               ),
-              NewsCard(
-                category: 'MATCH REPORT',
-                title: '3-1 Win vs Arsenal Sends Us 2nd',
-                subtitle: 'Yesterday · Match Centre',
-                color: MifcColors.navy,
-                icon: Icons.sports_soccer,
-                isLarge: false,
+              ScrollReveal(
+                type: AnimationType.fade,
+                delay: Duration(milliseconds: 300),
+                child: NewsCard(
+                  category: 'ACADEMY',
+                  title: 'Academy Talents Secure U21 Cup Victory',
+                  time: '5H AGO',
+                  imageUrl: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=500&q=80',
+                ),
               ),
             ],
           ),
@@ -51,106 +60,93 @@ class LatestNewsSection extends StatelessWidget {
 class NewsCard extends StatelessWidget {
   final String category;
   final String title;
-  final String subtitle;
-  final Color color;
-  final IconData icon;
-  final bool isLarge;
+  final String time;
+  final String imageUrl;
 
   const NewsCard({
     super.key,
     required this.category,
     required this.title,
-    required this.subtitle,
-    required this.color,
-    required this.icon,
-    this.isLarge = true,
+    required this.time,
+    required this.imageUrl,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: isLarge ? 280 : 240,
-      margin: const EdgeInsets.only(right: 12),
-      decoration: BoxDecoration(
-        color: MifcColors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            flex: 3,
-            child: Container(
-              decoration: BoxDecoration(
-                color: color,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-              ),
+      width: 260,
+      margin: const EdgeInsets.only(right: 16, bottom: 12),
+      child: MifcCard(
+        padding: EdgeInsets.zero,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              flex: 3,
               child: Stack(
+                fit: StackFit.expand,
                 children: [
+                  Image.network(
+                    imageUrl,
+                    fit: BoxFit.cover,
+                  ),
                   Positioned(
                     top: 12,
                     left: 12,
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: MifcColors.red,
+                        color: Colors.black.withValues(alpha: 0.6),
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
                         category,
-                        style: GoogleFonts.barlowCondensed(
-                          color: Colors.white,
+                        style: GoogleFonts.outfit(
+                          color: MifcColors.eliteBlue,
                           fontSize: 10,
-                          fontWeight: FontWeight.w900,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1,
                         ),
                       ),
                     ),
                   ),
-                  Center(
-                    child: Icon(icon, size: 48, color: Colors.white.withOpacity(0.8)),
-                  ),
                 ],
               ),
             ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.barlow(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: MifcColors.navyDark,
+            Expanded(
+              flex: 2,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.outfit(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: MifcColors.white,
+                        height: 1.3,
+                      ),
                     ),
-                  ),
-                  Text(
-                    subtitle,
-                    style: GoogleFonts.barlow(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w500,
-                      color: MifcColors.muted,
+                    const Spacer(),
+                    Text(
+                      time,
+                      style: GoogleFonts.inter(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w500,
+                        color: MifcColors.white.withValues(alpha: 0.4),
+                        letterSpacing: 0.5,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

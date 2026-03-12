@@ -7,7 +7,6 @@ import '../../features/news/presentation/pages/article_detail_screen.dart';
 import '../../shared/widgets/mifc_bottom_nav_bar.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
-final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
