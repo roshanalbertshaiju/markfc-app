@@ -44,7 +44,7 @@ class _HeroCarouselState extends State<HeroCarousel> {
       body: 'A commanding performance at Old Trafford keeps the title dream very much alive heading into March.',
       primaryButtonLabel: 'READ REPORT',
       secondaryButtonLabel: 'VIEW GALLERY',
-      imageUrl: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=1000',
+      imageUrl: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=2000',
     ),
     HeroSlide(
       tag: 'NEXT FIXTURE',
@@ -53,7 +53,7 @@ class _HeroCarouselState extends State<HeroCarousel> {
       body: "Old Trafford · Premier League GW29 · Don't miss out",
       primaryButtonLabel: 'BOOK TICKETS',
       secondaryButtonLabel: 'KICK-OFF INFO',
-      imageUrl: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?auto=format&fit=crop&q=80&w=1000',
+      imageUrl: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?q=80&w=2000',
     ),
     HeroSlide(
       tag: 'MEMBERSHIP',
@@ -62,7 +62,7 @@ class _HeroCarouselState extends State<HeroCarousel> {
       body: 'Join thousands of passionate fans. Access exclusive content, priority tickets and loyalty rewards.',
       primaryButtonLabel: 'BECOME A MEMBER',
       secondaryButtonLabel: 'LEARN MORE',
-      imageUrl: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&q=80&w=1000',
+      imageUrl: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?q=80&w=2000',
     ),
     HeroSlide(
       tag: 'NEW KIT DROP',
@@ -71,7 +71,7 @@ class _HeroCarouselState extends State<HeroCarousel> {
       body: 'Wear your colours with pride. Limited stock available — order yours today.',
       primaryButtonLabel: 'SHOP NOW',
       secondaryButtonLabel: 'VIEW COLLECTION',
-      imageUrl: 'https://images.unsplash.com/photo-1570498839593-e565b39455fc?auto=format&fit=crop&q=80&w=1000',
+      imageUrl: 'https://images.unsplash.com/photo-1575361204480-aadea25e6e68?q=80&w=2000',
     ),
   ];
 

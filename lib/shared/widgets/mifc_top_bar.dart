@@ -9,34 +9,35 @@ class MifcTopBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      leadingWidth: 100,
+      leadingWidth: 80,
       leading: Padding(
-        padding: const EdgeInsets.only(left: 12, top: 8, bottom: 8),
+        padding: const EdgeInsets.only(left: 12, top: 2, bottom: 2),
         child: GestureDetector(
           onTap: () => context.push('/fixtures'),
           child: Container(
             decoration: BoxDecoration(
               color: MifcColors.gold,
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: MifcColors.gold.withOpacity(0.3),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
-            child: Row(
+            child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.calendar_today, size: 14, color: MifcColors.navyDark),
-                const SizedBox(width: 4),
+                const Icon(Icons.calendar_month, size: 20, color: MifcColors.navyDark),
+                const SizedBox(height: 1),
                 Text(
                   'KICK-OFF',
                   style: GoogleFonts.barlowCondensed(
-                    fontSize: 12,
+                    fontSize: 11,
                     fontWeight: FontWeight.w900,
                     color: MifcColors.navyDark,
+                    letterSpacing: -0.2,
                   ),
                 ),
               ],
