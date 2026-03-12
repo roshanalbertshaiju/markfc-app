@@ -60,14 +60,14 @@ class _InlinePollCardState extends State<InlinePollCard> {
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.poll_rounded, color: MifcColors.eliteBlue, size: 14),
+                        const Icon(Icons.poll_rounded, color: MifcColors.navyBlue, size: 14),
                         const SizedBox(width: 10),
                         Text(
                           'SQUAD POLL · MOTM',
                           style: GoogleFonts.outfit(
                             fontSize: 10,
                             fontWeight: FontWeight.w700,
-                            color: MifcColors.eliteBlue,
+                            color: MifcColors.navyBlue,
                             letterSpacing: 1.0,
                           ),
                         ),
@@ -130,7 +130,7 @@ class _InlinePollCardState extends State<InlinePollCard> {
                               width: MediaQuery.of(context).size.width * (percentage / 100),
                               decoration: BoxDecoration(
                                 color: isLeading 
-                                    ? MifcColors.eliteBlue.withValues(alpha: 0.12) 
+                                    ? MifcColors.navyBlue.withValues(alpha: 0.12) 
                                     : MifcColors.white.withValues(alpha: 0.06),
                                 borderRadius: BorderRadius.circular(12),
                               ),
@@ -147,14 +147,14 @@ class _InlinePollCardState extends State<InlinePollCard> {
                                         if (isSelected) 
                                           const Padding(
                                             padding: EdgeInsets.only(right: 12),
-                                            child: Icon(Icons.check_circle_rounded, color: MifcColors.eliteBlue, size: 16),
+                                            child: Icon(Icons.check_circle_rounded, color: MifcColors.navyBlue, size: 16),
                                           ),
                                         Text(
                                           entry.key,
                                           style: GoogleFonts.inter(
                                             fontSize: 13,
                                             fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                                            color: isSelected ? MifcColors.eliteBlue : MifcColors.white.withValues(alpha: 0.8),
+                                            color: isSelected ? MifcColors.navyBlue : MifcColors.white.withValues(alpha: 0.8),
                                           ),
                                         ),
                                       ],
@@ -164,7 +164,7 @@ class _InlinePollCardState extends State<InlinePollCard> {
                                       style: GoogleFonts.outfit(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w700,
-                                        color: isLeading ? MifcColors.eliteBlue : MifcColors.white.withValues(alpha: 0.4),
+                                        color: isLeading ? MifcColors.navyBlue : MifcColors.white.withValues(alpha: 0.4),
                                       ),
                                     ),
                                   ],

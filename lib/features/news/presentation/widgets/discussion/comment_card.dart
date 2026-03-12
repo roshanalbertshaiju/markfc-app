@@ -65,15 +65,15 @@ class _CommentCardState extends State<CommentCard> {
                   MifcCard(
                     elevation: 0,
                     color: widget.isPinned 
-                        ? MifcColors.eliteBlue.withValues(alpha: 0.03) 
+                        ? MifcColors.navyBlue.withValues(alpha: 0.03) 
                         : (widget.isOfficial ? Colors.transparent : MifcColors.white.withValues(alpha: 0.02)),
                     borderRadius: BorderRadius.circular(20),
                     child: Container(
                       decoration: BoxDecoration(
                         border: widget.isPinned 
-                            ? Border.all(color: MifcColors.eliteBlue.withValues(alpha: 0.15))
+                            ? Border.all(color: MifcColors.navyBlue.withValues(alpha: 0.15))
                             : (widget.isOfficial 
-                                ? Border.all(color: MifcColors.eliteBlue.withValues(alpha: 0.3), width: 1)
+                                ? Border.all(color: MifcColors.navyBlue.withValues(alpha: 0.3), width: 1)
                                 : Border.all(color: MifcColors.white.withValues(alpha: 0.05))),
                         gradient: widget.isOfficial 
                             ? LinearGradient(
@@ -157,19 +157,19 @@ class _CommentCardState extends State<CommentCard> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: MifcColors.eliteBlue.withValues(alpha: 0.05),
+        color: MifcColors.navyBlue.withValues(alpha: 0.05),
         borderRadius: const BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
       ),
       child: Row(
         children: [
-          const Icon(Icons.push_pin_rounded, color: MifcColors.eliteBlue, size: 10),
+          const Icon(Icons.push_pin_rounded, color: MifcColors.navyBlue, size: 10),
           const SizedBox(width: 8),
           Text(
             'PINNED BY CLUB',
             style: GoogleFonts.outfit(
               fontSize: 9,
               fontWeight: FontWeight.w700,
-              color: MifcColors.eliteBlue,
+              color: MifcColors.navyBlue,
               letterSpacing: 1.0,
             ),
           ),
@@ -185,7 +185,7 @@ class _CommentCardState extends State<CommentCard> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: MifcColors.eliteBlue,
+          color: MifcColors.navyBlue,
           borderRadius: BorderRadius.circular(6),
           boxShadow: [
             BoxShadow(
@@ -256,7 +256,7 @@ class CommentHeader extends StatelessWidget {
                   ),
                   if (isOfficial) ...[
                     const SizedBox(width: 6),
-                    const Icon(Icons.verified_rounded, color: MifcColors.eliteBlue, size: 14),
+                    const Icon(Icons.verified_rounded, color: MifcColors.navyBlue, size: 14),
                   ],
                 ],
               ),
@@ -308,7 +308,7 @@ class CommentHeader extends StatelessWidget {
         height: 36,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          border: Border.all(color: MifcColors.eliteBlue, width: 1.5),
+          border: Border.all(color: MifcColors.navyBlue, width: 1.5),
           color: MifcColors.black,
         ),
         alignment: Alignment.center,
@@ -339,10 +339,10 @@ class CommentHeader extends StatelessWidget {
   Widget _buildUserBadge() {
     Color color;
     switch (badge) {
-      case 'GOLD MEMBER': color = MifcColors.eliteBlue; break;
+      case 'GOLD MEMBER': color = MifcColors.navyBlue; break;
       case 'SEASON TICKET': color = const Color(0xFF4CAF50); break;
       case 'TOP COMMENTER': color = const Color(0xFF9C27B0); break;
-      default: color = MifcColors.eliteBlue;
+      default: color = MifcColors.navyBlue;
     }
 
     return Container(
@@ -432,7 +432,7 @@ class CommentActions extends StatelessWidget {
         _buildActionButton(
           icon: isLiked ? Icons.thumb_up_rounded : Icons.thumb_up_outlined,
           label: likes.toString(),
-          color: isLiked ? MifcColors.eliteBlue : MifcColors.white.withValues(alpha: 0.4),
+          color: isLiked ? MifcColors.navyBlue : MifcColors.white.withValues(alpha: 0.4),
           onTap: onLike,
         ),
         const SizedBox(width: 24),

@@ -107,8 +107,8 @@ class _DiscussionHeaderState extends State<DiscussionHeader> {
             child: Switch(
               value: _notifyReplies,
               onChanged: (val) => setState(() => _notifyReplies = val),
-              activeThumbColor: MifcColors.eliteBlue,
-              activeTrackColor: MifcColors.eliteBlue.withValues(alpha: 0.2),
+              activeThumbColor: MifcColors.navyBlue,
+              activeTrackColor: MifcColors.navyBlue.withValues(alpha: 0.2),
               inactiveThumbColor: MifcColors.white.withValues(alpha: 0.2),
               inactiveTrackColor: MifcColors.white.withValues(alpha: 0.05),
             ),

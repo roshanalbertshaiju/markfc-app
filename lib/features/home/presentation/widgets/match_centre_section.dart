@@ -91,7 +91,7 @@ class MatchCentreSection extends StatelessWidget {
                     Text(
                       "72'",
                       style: GoogleFonts.outfit(
-                        color: MifcColors.eliteBlue,
+                        color: MifcColors.navyBlue,
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
                       ),

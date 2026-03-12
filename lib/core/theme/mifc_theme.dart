@@ -8,7 +8,7 @@ class MifcTheme {
       useMaterial3: true,
       brightness: Brightness.dark,
       colorScheme: ColorScheme.dark(
-        primary: MifcColors.eliteBlue,
+        primary: MifcColors.navyBlue,
         secondary: MifcColors.crimson,
         surface: MifcColors.black,
         onSurface: MifcColors.white,
@@ -22,13 +22,13 @@ class MifcTheme {
       ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: MifcColors.black,
-        indicatorColor: MifcColors.eliteBlue.withValues(alpha: 0.1),
+        indicatorColor: MifcColors.navyBlue.withValues(alpha: 0.1),
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           final isSelected = states.contains(WidgetState.selected);
           return GoogleFonts.outfit(
             fontSize: 12,
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-            color: isSelected ? MifcColors.eliteBlue : MifcColors.muted,
+            color: isSelected ? MifcColors.navyBlue : MifcColors.muted,
             letterSpacing: 0.5,
           );
         }),
@@ -76,7 +76,7 @@ class MifcTheme {
         labelLarge: GoogleFonts.outfit(
           fontSize: 14,
           fontWeight: FontWeight.w600,
-          color: MifcColors.eliteBlue,
+          color: MifcColors.navyBlue,
           letterSpacing: 1.0,
         ),
       ),

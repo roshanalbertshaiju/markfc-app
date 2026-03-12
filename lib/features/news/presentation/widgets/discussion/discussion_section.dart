@@ -119,14 +119,14 @@ class _DiscussionSectionState extends State<DiscussionSection> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.keyboard_arrow_down_rounded, color: MifcColors.eliteBlue, size: 18),
+            const Icon(Icons.keyboard_arrow_down_rounded, color: MifcColors.navyBlue, size: 18),
             const SizedBox(width: 8),
             Text(
               'LOAD 45 MORE COMMENTS',
               style: GoogleFonts.outfit(
                 fontSize: 11,
                 fontWeight: FontWeight.w700,
-                color: MifcColors.eliteBlue,
+                color: MifcColors.navyBlue,
                 letterSpacing: 1.0,
               ),
             ),

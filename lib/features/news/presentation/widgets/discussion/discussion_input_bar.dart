@@ -73,7 +73,7 @@ class _DiscussionInputBarState extends State<DiscussionInputBar> {
             children: [
               const CircleAvatar(
                 radius: 16,
-                backgroundColor: MifcColors.eliteBlue,
+                backgroundColor: MifcColors.navyBlue,
                 child: Text(
                   'SB',
                   style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: MifcColors.black),
@@ -105,7 +105,7 @@ class _DiscussionInputBarState extends State<DiscussionInputBar> {
               IconButton(
                 icon: Icon(
                   _showEmojiPicker ? Icons.keyboard : Icons.sentiment_satisfied_alt_outlined,
-                  color: _showEmojiPicker ? MifcColors.eliteBlue : MifcColors.white.withValues(alpha: 0.3),
+                  color: _showEmojiPicker ? MifcColors.navyBlue : MifcColors.white.withValues(alpha: 0.3),
                   size: 20,
                 ),
                 onPressed: () {
@@ -150,9 +150,9 @@ class _DiscussionInputBarState extends State<DiscussionInputBar> {
                 skinToneConfig: const emoji.SkinToneConfig(),
                 categoryViewConfig: emoji.CategoryViewConfig(
                   backgroundColor: MifcColors.navyDark,
-                  indicatorColor: MifcColors.eliteBlue,
-                  iconColorSelected: MifcColors.eliteBlue,
-                  backspaceColor: MifcColors.eliteBlue,
+                  indicatorColor: MifcColors.navyBlue,
+                  iconColorSelected: MifcColors.navyBlue,
+                  backspaceColor: MifcColors.navyBlue,
                 ),
                 bottomActionBarConfig: const emoji.BottomActionBarConfig(
                   enabled: false,
@@ -171,14 +171,14 @@ class _DiscussionInputBarState extends State<DiscussionInputBar> {
       color: MifcColors.charcoal,
       child: Row(
         children: [
-          const Icon(Icons.reply_rounded, size: 14, color: MifcColors.eliteBlue),
+          const Icon(Icons.reply_rounded, size: 14, color: MifcColors.navyBlue),
           const SizedBox(width: 12),
           Text(
             'REPLYING TO @${widget.replyTarget}'.toUpperCase(),
             style: GoogleFonts.outfit(
               fontSize: 10,
               fontWeight: FontWeight.w700,
-              color: MifcColors.eliteBlue,
+              color: MifcColors.navyBlue,
               letterSpacing: 0.5,
             ),
           ),

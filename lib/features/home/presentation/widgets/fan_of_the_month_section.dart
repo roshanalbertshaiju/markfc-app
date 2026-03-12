@@ -28,7 +28,7 @@ class FanOfTheMonthSection extends StatelessWidget {
                       color: MifcColors.card.withValues(alpha: 0.5),
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: MifcColors.eliteBlue.withValues(alpha: 0.1),
+                        color: MifcColors.navyBlue.withValues(alpha: 0.1),
                         width: 1,
                       ),
                     ),
@@ -50,12 +50,12 @@ class FanOfTheMonthSection extends StatelessWidget {
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.star_outline, color: MifcColors.eliteBlue, size: 14),
+                            const Icon(Icons.star_outline, color: MifcColors.navyBlue, size: 14),
                             const SizedBox(width: 6),
                             Text(
                               'FEBRUARY 2026 RECIPIENT',
                               style: GoogleFonts.outfit(
-                                color: MifcColors.eliteBlue,
+                                color: MifcColors.navyBlue,
                                 fontSize: 9,
                                 fontWeight: FontWeight.w700,
                                 letterSpacing: 1.0,

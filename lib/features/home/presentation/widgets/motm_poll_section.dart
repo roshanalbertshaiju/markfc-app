@@ -36,7 +36,7 @@ class MotmPollSection extends StatelessWidget {
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.emoji_events_outlined, color: MifcColors.eliteBlue, size: 16),
+                        const Icon(Icons.emoji_events_outlined, color: MifcColors.navyBlue, size: 16),
                         const SizedBox(width: 8),
                         Text(
                           'PLAYER OF THE MATCH',
@@ -158,7 +158,7 @@ class PlayerPollColumn extends StatelessWidget {
             color: MifcColors.card.withValues(alpha: 0.5),
             shape: BoxShape.circle,
             border: Border.all(
-              color: (isLead ? MifcColors.eliteBlue : MifcColors.white).withValues(alpha: 0.1),
+              color: (isLead ? MifcColors.navyBlue : MifcColors.white).withValues(alpha: 0.1),
               width: 1,
             ),
           ),
@@ -177,7 +177,7 @@ class PlayerPollColumn extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.all(4),
                     decoration: const BoxDecoration(
-                      color: MifcColors.eliteBlue,
+                      color: MifcColors.navyBlue,
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(Icons.star, color: MifcColors.black, size: 8),
@@ -200,7 +200,7 @@ class PlayerPollColumn extends StatelessWidget {
         Text(
           '$votes%',
           style: GoogleFonts.outfit(
-            color: isLead ? MifcColors.eliteBlue : MifcColors.white.withValues(alpha: 0.3),
+            color: isLead ? MifcColors.navyBlue : MifcColors.white.withValues(alpha: 0.3),
             fontWeight: FontWeight.w700,
             fontSize: 16,
           ),
@@ -218,7 +218,7 @@ class PlayerPollColumn extends StatelessWidget {
             widthFactor: votes / 100,
             child: Container(
               decoration: BoxDecoration(
-                color: isLead ? MifcColors.eliteBlue : MifcColors.white.withValues(alpha: 0.2),
+                color: isLead ? MifcColors.navyBlue : MifcColors.white.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(1),
               ),
             ),

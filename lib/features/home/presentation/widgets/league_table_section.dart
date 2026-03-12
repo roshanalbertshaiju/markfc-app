@@ -46,7 +46,7 @@ class LeagueTableSection extends StatelessWidget {
                         Text(
                           'WEEK 28',
                           style: GoogleFonts.outfit(
-                            color: MifcColors.eliteBlue,
+                            color: MifcColors.navyBlue,
                             fontSize: 10,
                             fontWeight: FontWeight.w700,
                             letterSpacing: 1.0,

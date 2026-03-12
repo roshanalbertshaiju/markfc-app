@@ -114,7 +114,7 @@ class _HeroCarouselState extends State<HeroCarousel> {
       children: [
         if (_showAlert)
           Container(
-            color: MifcColors.eliteBlue,
+            color: MifcColors.navyBlue,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
             child: Row(
               children: [
@@ -166,7 +166,7 @@ class _HeroCarouselState extends State<HeroCarousel> {
                       margin: const EdgeInsets.only(right: 6),
                       decoration: BoxDecoration(
                         color: index == _currentIndex
-                            ? MifcColors.eliteBlue
+                            ? MifcColors.navyBlue
                             : MifcColors.white.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(2),
                       ),
@@ -222,7 +222,7 @@ class HeroSlideWidget extends StatelessWidget {
               Text(
                 slide.tag.toUpperCase(),
                 style: GoogleFonts.outfit(
-                  color: MifcColors.eliteBlue,
+                  color: MifcColors.navyBlue,
                   fontWeight: FontWeight.w700,
                   fontSize: 12,
                   letterSpacing: 2.0,

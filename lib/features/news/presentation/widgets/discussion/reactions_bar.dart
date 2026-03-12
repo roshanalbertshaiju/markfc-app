@@ -97,9 +97,9 @@ class ReactionPill extends StatelessWidget {
 
     // Tier system
     if (isActive) {
-      bgColor = MifcColors.eliteBlue.withValues(alpha: 0.1);
-      borderColor = MifcColors.eliteBlue.withValues(alpha: 0.3);
-      countColor = MifcColors.eliteBlue;
+      bgColor = MifcColors.navyBlue.withValues(alpha: 0.1);
+      borderColor = MifcColors.navyBlue.withValues(alpha: 0.3);
+      countColor = MifcColors.navyBlue;
     } else if (count >= 1000) {
       bgColor = MifcColors.crimson.withValues(alpha: 0.08);
       borderColor = MifcColors.crimson.withValues(alpha: 0.2);
@@ -160,7 +160,7 @@ class ReactionPill extends StatelessWidget {
                   widthFactor: progress.clamp(0.0, 1.0),
                   child: Container(
                     decoration: BoxDecoration(
-                    color: isActive || count >= 500 ? MifcColors.eliteBlue : MifcColors.white.withValues(alpha: 0.15),
+                    color: isActive || count >= 500 ? MifcColors.navyBlue : MifcColors.white.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(1),
                     ),
                   ),

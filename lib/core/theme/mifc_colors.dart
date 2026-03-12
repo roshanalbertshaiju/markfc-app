@@ -8,7 +8,7 @@ class MifcColors {
   
   // Accents - Precious Metals & Sartorial Tones
   static const Color crimson = Color(0xFF9D1C1E); // Sartorial Crimson
-  static const Color eliteBlue = Color(0xFF1E4DFF); // Elite Blue
+  static const Color navyBlue = Color(0xFF162460); // Elite Navy Blue
   static const Color palladium = Color(0xFFD1D1D1); // Palladium Silver
 
   // Surface & Layout
@@ -28,8 +28,9 @@ class MifcColors {
   static const Color navyDark = black;
   static const Color navy = charcoal;
   static const Color red = crimson;
-  static const Color gold = eliteBlue;
-  static const Color champagne = eliteBlue;
+  static const Color gold = navyBlue;
+  static const Color champagne = navyBlue;
+  static const Color eliteBlue = navyBlue;
   static const Color dartsurface = darkSurface;
-  static const Color cardLight = charcoal; // Using the typo version temporarily if needed, but fixed above
+  static const Color cardLight = charcoal;
 }

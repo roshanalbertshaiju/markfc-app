@@ -185,7 +185,7 @@ class NewsScrollBody extends StatelessWidget {
           delay: Duration(milliseconds: 300),
           child: FullWidthNewsCard(
             category: 'ACADEMY UPDATES',
-            categoryColor: MifcColors.eliteBlue,
+            categoryColor: MifcColors.navyBlue,
             title: 'U18S CONTINUE UNBEATEN RUN WITH DOMINANT 4-0 WIN',
             excerpt: 'The young Reds showcased their talent with a four-goal display against traditional rivals at the academy grounds this morning...',
             time: '6 HOURS AGO',
@@ -633,7 +633,7 @@ class FullWidthNewsCard extends StatelessWidget {
                             style: GoogleFonts.outfit(
                               fontSize: 10,
                               fontWeight: FontWeight.w700,
-                              color: MifcColors.eliteBlue,
+                              color: MifcColors.navyBlue,
                               letterSpacing: 0.5,
                             ),
                           ),
@@ -641,7 +641,7 @@ class FullWidthNewsCard extends StatelessWidget {
                           Icon(
                             Icons.arrow_forward_ios,
                             size: 10,
-                            color: MifcColors.eliteBlue,
+                            color: MifcColors.navyBlue,
                           ),
                         ],
                       ),

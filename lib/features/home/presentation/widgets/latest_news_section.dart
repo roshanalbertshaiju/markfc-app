@@ -102,7 +102,7 @@ class NewsCard extends StatelessWidget {
                       child: Text(
                         category,
                         style: GoogleFonts.outfit(
-                          color: MifcColors.eliteBlue,
+                          color: MifcColors.navyBlue,
                           fontSize: 10,
                           fontWeight: FontWeight.w600,
                           letterSpacing: 1,

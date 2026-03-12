@@ -161,7 +161,7 @@ class TopPlayersSection extends StatelessWidget {
                       Text(
                         player.shirtNumber,
                         style: GoogleFonts.outfit(
-                          color: MifcColors.eliteBlue,
+                          color: MifcColors.navyBlue,
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                         ),
@@ -197,7 +197,7 @@ class TopPlayersSection extends StatelessWidget {
                   ),
                 ),
                 const Spacer(),
-                const Icon(Icons.star, color: MifcColors.eliteBlue, size: 10),
+                const Icon(Icons.star, color: MifcColors.navyBlue, size: 10),
                 const SizedBox(width: 4),
                 Text(
                   player.rating,

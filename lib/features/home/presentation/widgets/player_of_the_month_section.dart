@@ -48,7 +48,7 @@ class PlayerOfTheMonthSection extends StatelessWidget {
                               Text(
                                 'FEBRUARY 2026',
                                 style: GoogleFonts.outfit(
-                                  color: MifcColors.eliteBlue,
+                                  color: MifcColors.navyBlue,
                                   fontWeight: FontWeight.w700,
                                   fontSize: 10,
                                   letterSpacing: 1.5,

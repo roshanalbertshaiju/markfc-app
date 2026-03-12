@@ -38,7 +38,7 @@ class _LiveReadersBarState extends State<LiveReadersBar> with SingleTickerProvid
     return Container(
       height: 48,
       decoration: BoxDecoration(
-        color: MifcColors.eliteBlue.withValues(alpha: 0.04),
+        color: MifcColors.navyBlue.withValues(alpha: 0.04),
         border: Border(
           bottom: BorderSide(color: MifcColors.white.withValues(alpha: 0.05)),
         ),
@@ -55,7 +55,7 @@ class _LiveReadersBarState extends State<LiveReadersBar> with SingleTickerProvid
                   width: 6,
                   height: 6,
                   decoration: const BoxDecoration(
-                    color: MifcColors.eliteBlue,
+                    color: MifcColors.navyBlue,
                     shape: BoxShape.circle,
                   ),
                 ),
@@ -66,7 +66,7 @@ class _LiveReadersBarState extends State<LiveReadersBar> with SingleTickerProvid
                 style: GoogleFonts.outfit(
                   fontSize: 10,
                   fontWeight: FontWeight.w700,
-                  color: MifcColors.eliteBlue,
+                  color: MifcColors.navyBlue,
                   letterSpacing: 0.8,
                 ),
               ),

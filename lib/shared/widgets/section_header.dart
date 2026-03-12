@@ -25,7 +25,7 @@ class SectionHeader extends StatelessWidget {
             width: 3,
             height: 24,
             decoration: BoxDecoration(
-              color: MifcColors.eliteBlue,
+              color: MifcColors.navyBlue,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -62,7 +62,7 @@ class SectionHeader extends StatelessWidget {
             TextButton(
               onPressed: onActionTap,
               style: TextButton.styleFrom(
-                foregroundColor: MifcColors.eliteBlue,
+                foregroundColor: MifcColors.navyBlue,
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               ),
               child: Text(
