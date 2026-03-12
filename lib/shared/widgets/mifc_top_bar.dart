@@ -39,30 +39,17 @@ class MifcTopBar extends StatelessWidget implements PreferredSizeWidget {
                       width: 1.5,
                     ),
                   ),
-                  child: Center(
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        const Icon(
-                          Icons.shield_rounded,
-                          color: Color(0xFFE2C48D),
-                          size: 26,
-                        ),
-                        const Positioned(
-                          top: 10,
-                          child: Icon(
-                            Icons.check,
-                            color: MifcColors.navyBlue,
-                            size: 16,
-                          ),
-                        ),
-                      ],
+                  child: const Center(
+                    child: Icon(
+                      Icons.sports_soccer_rounded,
+                      color: Color(0xFFE2C48D),
+                      size: 28,
                     ),
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'KICK-OFF',
+                  'Matches',
                   style: GoogleFonts.outfit(
                     fontSize: 8,
                     fontWeight: FontWeight.w900,
@@ -89,7 +76,7 @@ class MifcTopBar extends StatelessWidget implements PreferredSizeWidget {
               ),
               child: Image.asset(
                 'assets/images/mifc_logo.png',
-                height: 38,
+                height: 44,
                 fit: BoxFit.contain,
               ),
             ),
