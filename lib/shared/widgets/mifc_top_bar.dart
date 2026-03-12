@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:markfc/core/theme/mifc_colors.dart';
 
@@ -12,6 +13,12 @@ class MifcTopBar extends StatelessWidget implements PreferredSizeWidget {
       elevation: 0,
       scrolledUnderElevation: 0,
       toolbarHeight: 64,
+      systemOverlayStyle: const SystemUiOverlayStyle(
+        statusBarColor: Colors.black,
+        statusBarIconBrightness: Brightness.light, // White icons for Android
+        statusBarBrightness: Brightness.dark, // White icons for iOS
+      ),
+      leadingWidth: 76, // Restored to provide enough space for KICK-OFF icon
       leading: Center(
         child: Padding(
           padding: const EdgeInsets.only(left: 12),
@@ -68,48 +75,51 @@ class MifcTopBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
       ),
-      title: Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              color: MifcColors.white.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Image.asset(
-              'assets/images/mifc_logo.png',
-              height: 38,
-              fit: BoxFit.contain,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'MARK INT',
-                style: GoogleFonts.outfit(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 2.5,
-                  color: MifcColors.white,
-                ),
+      title: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: MifcColors.white.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
               ),
-              Text(
-                'FOOTBALL CLUB',
-                style: GoogleFonts.inter(
-                  fontSize: 9,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 4.0,
-                  color: MifcColors.white.withValues(alpha: 0.8),
-                ),
+              child: Image.asset(
+                'assets/images/mifc_logo.png',
+                height: 38,
+                fit: BoxFit.contain,
               ),
-            ],
-          ),
-        ],
+            ),
+            const SizedBox(width: 12),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'MARK INT',
+                  style: GoogleFonts.outfit(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 2.5,
+                    color: MifcColors.white,
+                  ),
+                ),
+                Text(
+                  'FOOTBALL CLUB',
+                  style: GoogleFonts.inter(
+                    fontSize: 9,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 4.0,
+                    color: MifcColors.white.withValues(alpha: 0.8),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
       centerTitle: true,
       actions: [
