@@ -95,7 +95,7 @@ class TopPlayersSection extends StatelessWidget {
       children: [
         const SectionHeader(
           title: 'TOP PLAYERS',
-          actionLabel: 'SEE ALL',
+          actionText: 'SEE ALL',
         ),
         SizedBox(
           height: 200, // Card height (180) + padding

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../features/home/presentation/pages/home_page.dart';
+import '../../features/news/presentation/pages/news_screen.dart';
+import '../../features/news/presentation/pages/article_detail_screen.dart';
 import '../../shared/widgets/mifc_bottom_nav_bar.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -29,7 +31,16 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: '/news',
-                builder: (context, state) => const Scaffold(body: Center(child: Text('News'))),
+                builder: (context, state) => const NewsScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'article/:id',
+                    builder: (context, state) {
+                      final id = state.pathParameters['id'] ?? '1';
+                      return ArticleDetailScreen(id: id);
+                    },
+                  ),
+                ],
               ),
             ],
           ),

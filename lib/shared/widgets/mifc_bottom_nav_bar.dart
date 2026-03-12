@@ -42,9 +42,9 @@ class MifcBottomNavBar extends StatelessWidget {
           label: 'Home',
         ),
         NavigationDestination(
-          icon: Icon(Icons.newspaper_outlined),
-          selectedIcon: Icon(Icons.newspaper, color: Colors.white),
-          label: 'News',
+          icon: Icon(Icons.live_tv_outlined),
+          selectedIcon: Icon(Icons.live_tv, color: Colors.white),
+          label: 'MITV',
         ),
         NavigationDestination(
           icon: Icon(Icons.groups_outlined),

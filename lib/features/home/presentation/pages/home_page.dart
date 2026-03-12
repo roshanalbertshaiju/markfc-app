@@ -5,6 +5,7 @@ import '../widgets/hero_carousel.dart';
 import '../widgets/latest_news_section.dart';
 import '../widgets/match_centre_section.dart';
 import '../widgets/motm_poll_section.dart';
+import '../widgets/fixture_countdown_section.dart';
 import '../widgets/player_of_the_month_section.dart';
 import '../widgets/top_players_section.dart';
 import '../widgets/league_table_section.dart';

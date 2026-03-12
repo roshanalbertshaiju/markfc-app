@@ -9,15 +9,15 @@ class MifcTopBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      leadingWidth: 80,
+      leadingWidth: 70, // Slightly narrower
       leading: Padding(
-        padding: const EdgeInsets.only(left: 12, top: 2, bottom: 2),
+        padding: const EdgeInsets.only(left: 8, top: 4, bottom: 4),
         child: GestureDetector(
           onTap: () => context.push('/fixtures'),
           child: Container(
             decoration: BoxDecoration(
               color: MifcColors.gold,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.2),
@@ -29,12 +29,12 @@ class MifcTopBar extends StatelessWidget implements PreferredSizeWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.calendar_month, size: 20, color: MifcColors.navyDark),
+                const Icon(Icons.calendar_month, size: 18, color: MifcColors.navyDark),
                 const SizedBox(height: 1),
                 Text(
                   'KICK-OFF',
                   style: GoogleFonts.barlowCondensed(
-                    fontSize: 11,
+                    fontSize: 10,
                     fontWeight: FontWeight.w900,
                     color: MifcColors.navyDark,
                     letterSpacing: -0.2,
@@ -45,55 +45,77 @@ class MifcTopBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
       ),
-      title: Column(
+      title: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
-            'Mark International',
-            style: GoogleFonts.barlowCondensed(
-              fontSize: 18,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 0.5,
-              color: MifcColors.white,
-            ),
+          Image.asset(
+            'assets/images/mifc_logo.png',
+            height: 48, // Increased size
+            fit: BoxFit.contain,
           ),
-          Text(
-            'FOOTBALL CLUB · MANCHESTER',
-            style: GoogleFonts.barlow(
-              fontSize: 10,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 1,
-              color: MifcColors.white.withOpacity(0.8),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Mark International',
+                  style: GoogleFonts.barlowCondensed(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0.2,
+                    color: MifcColors.white,
+                    height: 1.0,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  'FC · MANCHESTER',
+                  style: GoogleFonts.barlow(
+                    fontSize: 9,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.5,
+                    color: MifcColors.white.withOpacity(0.8),
+                    height: 1.0,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
             ),
           ),
         ],
       ),
       centerTitle: true,
       actions: [
-        Stack(
-          children: [
-            IconButton(
-              icon: const Icon(Icons.notifications_none_outlined),
-              onPressed: () {},
-            ),
-            Positioned(
-              right: 12,
-              top: 12,
-              child: Container(
-                width: 8,
-                height: 8,
-                decoration: const BoxDecoration(
-                  color: MifcColors.red,
-                  shape: BoxShape.circle,
+        IconButton(
+          constraints: const BoxConstraints(maxWidth: 40),
+          icon: Stack(
+            children: [
+              const Icon(Icons.notifications_none_outlined),
+              Positioned(
+                right: 0,
+                top: 0,
+                child: Container(
+                  width: 8,
+                  height: 8,
+                  decoration: const BoxDecoration(
+                    color: MifcColors.red,
+                    shape: BoxShape.circle,
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
+          onPressed: () {},
         ),
         IconButton(
+          constraints: const BoxConstraints(maxWidth: 40),
           icon: const Icon(Icons.search),
           onPressed: () {},
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: 4),
       ],
     );
   }
