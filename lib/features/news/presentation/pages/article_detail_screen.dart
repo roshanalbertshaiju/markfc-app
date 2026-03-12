@@ -3,7 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/mifc_colors.dart';
-import '../pages/news_screen.dart'; // To reuse HorizontalNewsCard
+import '../widgets/news_articles_tab.dart'; // To reuse HorizontalNewsCard
+import '../widgets/discussion/discussion_section.dart';
 
 class ArticleDetailScreen extends StatelessWidget {
   final String id;
@@ -18,19 +19,23 @@ class ArticleDetailScreen extends StatelessWidget {
         slivers: [
           _buildSliverAppBar(context),
           SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildArticleHeader(),
-                  const SizedBox(height: 24),
-                  _buildArticleBody(),
-                  const SizedBox(height: 48),
-                  _buildRelatedArticles(),
-                  const SizedBox(height: 40),
-                ],
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildArticleHeader(),
+                      const SizedBox(height: 24),
+                      _buildArticleBody(),
+                    ],
+                  ),
+                ),
+                const DiscussionSection(),
+                const SizedBox(height: 100), // Space for input bar
+              ],
             ),
           ),
         ],
@@ -133,44 +138,6 @@ class ArticleDetailScreen extends StatelessWidget {
         height: 1.6,
         fontWeight: FontWeight.w400,
       ),
-    );
-  }
-
-  Widget _buildRelatedArticles() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'RELATED ARTICLES',
-          style: GoogleFonts.barlowCondensed(
-            fontSize: 18,
-            fontWeight: FontWeight.w900,
-            color: Colors.white,
-          ),
-        ),
-        const SizedBox(height: 16),
-        const HorizontalNewsCard(
-          category: 'TEAM NEWS',
-          categoryColor: Color(0xFF4CAF50),
-          title: 'Injury Update: Bellingham returns to full training',
-          time: '4 hours ago',
-          emoji: '🤕',
-        ),
-        const HorizontalNewsCard(
-          category: 'INTERVIEW',
-          categoryColor: Colors.white70,
-          title: 'Bellingham: "This squad has the hunger to go all the way"',
-          time: '8 hours ago',
-          emoji: '🎙️',
-        ),
-        const HorizontalNewsCard(
-          category: 'MATCH REPORT',
-          categoryColor: Color(0xFFCE93D8),
-          title: 'MIFC 3-1 Arsenal: Player Ratings & Analysis',
-          time: 'Yesterday',
-          emoji: '📊',
-        ),
-      ],
     );
   }
 }
