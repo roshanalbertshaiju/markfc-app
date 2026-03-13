@@ -5,14 +5,20 @@ import '../../features/home/presentation/pages/home_page.dart';
 import '../../features/news/presentation/pages/news_screen.dart';
 import '../../features/news/presentation/pages/article_detail_screen.dart';
 import '../../shared/widgets/mifc_bottom_nav_bar.dart';
+import '../../features/splash/presentation/pages/splash_screen.dart';
+
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    initialLocation: '/',
+    initialLocation: '/splash',
     navigatorKey: _rootNavigatorKey,
     routes: [
+      GoRoute(
+        path: '/splash',
+        builder: (context, state) => const SplashScreen(),
+      ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return MifcShellPage(navigationShell: navigationShell);
