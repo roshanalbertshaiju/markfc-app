@@ -68,17 +68,10 @@ class MifcTopBar extends StatelessWidget implements PreferredSizeWidget {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: MifcColors.white.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Image.asset(
-                'assets/images/mifc_logo.png',
-                height: 44,
-                fit: BoxFit.contain,
-              ),
+            Image.asset(
+              'assets/images/mifc_logo.png',
+              height: 56,
+              fit: BoxFit.contain,
             ),
             const SizedBox(width: 12),
             Column(

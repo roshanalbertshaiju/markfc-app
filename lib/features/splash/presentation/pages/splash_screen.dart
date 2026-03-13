@@ -45,10 +45,12 @@ class _SplashScreenState extends State<SplashScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // Logo
-                Image.asset(
-                  'assets/images/mifc_logo.png',
-                  width: 180,
-                  height: 180,
+                ClipOval(
+                  child: Image.asset(
+                    'assets/images/mifc_logo.png',
+                    width: 280,
+                    height: 280,
+                  ),
                 ),
                 const SizedBox(height: 40),
                 // Greeting
