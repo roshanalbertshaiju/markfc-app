@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart';
 import 'package:markfc/core/theme/mifc_colors.dart';
 import 'package:markfc/shared/widgets/scroll_reveal.dart';
 
@@ -40,12 +41,12 @@ class ProfileScreen extends StatelessWidget {
                   _buildAccountItem(
                     Icons.settings_outlined, 
                     'Settings',
-                    onTap: () => _showComingSoon(context, 'Settings'),
+                    onTap: () => context.push('/profile/settings'),
                   ),
                   _buildAccountItem(
                     Icons.help_outline_rounded, 
                     'Help & Support',
-                    onTap: () => _showComingSoon(context, 'Help & Support'),
+                    onTap: () => context.push('/profile/help'),
                   ),
                   _buildAccountItem(
                     Icons.logout_rounded, 
@@ -59,20 +60,6 @@ class ProfileScreen extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  void _showComingSoon(BuildContext context, String feature) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          '$feature functionality coming soon!',
-          style: GoogleFonts.inter(fontWeight: FontWeight.w600),
-        ),
-        backgroundColor: MifcColors.navyBlue,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
   }

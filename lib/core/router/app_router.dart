@@ -10,6 +10,7 @@ import '../../features/squad/presentation/pages/squad_screen.dart';
 import '../../features/store/presentation/pages/store_screen.dart';
 import '../../features/fixtures/presentation/pages/fixtures_screen.dart';
 import '../../features/profile/presentation/pages/profile_screen.dart';
+import '../../features/profile/presentation/pages/account_detail_screen.dart';
 
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -74,6 +75,33 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: '/profile',
                 builder: (context, state) => const ProfileScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'settings',
+                    builder: (context, state) => const AccountDetailScreen(
+                      title: 'SETTINGS',
+                      options: [
+                        AccountOption(Icons.person_outline, 'Personal Information'),
+                        AccountOption(Icons.notifications_none, 'Notification Preferences'),
+                        AccountOption(Icons.lock_outline, 'Security & Privacy'),
+                        AccountOption(Icons.language, 'App Language'),
+                        AccountOption(Icons.delete_outline, 'Delete Account'),
+                      ],
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'help',
+                    builder: (context, state) => const AccountDetailScreen(
+                      title: 'HELP & SUPPORT',
+                      options: [
+                        AccountOption(Icons.help_outline, 'FAQ'),
+                        AccountOption(Icons.chat_bubble_outline, 'Contact Club'),
+                        AccountOption(Icons.description_outlined, 'Terms of Service'),
+                        AccountOption(Icons.privacy_tip, 'Privacy Policy'),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

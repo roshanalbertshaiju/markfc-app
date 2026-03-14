@@ -12,12 +12,14 @@ class MifcTopBar extends StatelessWidget implements PreferredSizeWidget {
   final double opacity;
   final bool showBackButton;
   final bool showCalendar;
+  final String? title;
   
   const MifcTopBar({
     super.key, 
     this.opacity = 1.0,
     this.showBackButton = false,
     this.showCalendar = false,
+    this.title,
   });
 
   @override
@@ -77,45 +79,55 @@ class MifcTopBar extends StatelessWidget implements PreferredSizeWidget {
               ),
         ),
       ),
-      title: FittedBox(
-        fit: BoxFit.scaleDown,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(
-              'assets/images/mifc_logo.png',
-              height: 56,
-              fit: BoxFit.contain,
+      title: title != null 
+        ? Text(
+            title!,
+            style: GoogleFonts.outfit(
+              fontSize: 20,
+              fontWeight: FontWeight.w900,
+              color: Colors.white,
+              letterSpacing: 1,
             ),
-            const SizedBox(width: 12),
-            Column(
+          )
+        : FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Row(
               mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  'MARK INT',
-                  style: GoogleFonts.outfit(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 2.5,
-                    color: MifcColors.white,
-                  ),
+                Image.asset(
+                  'assets/images/mifc_logo.png',
+                  height: 56,
+                  fit: BoxFit.contain,
                 ),
-                Text(
-                  'FOOTBALL CLUB',
-                  style: GoogleFonts.inter(
-                    fontSize: 9,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 4.0,
-                    color: MifcColors.white.withValues(alpha: 0.8),
-                  ),
+                const SizedBox(width: 12),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'MARK INT',
+                      style: GoogleFonts.outfit(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 2.5,
+                        color: MifcColors.white,
+                      ),
+                    ),
+                    Text(
+                      'FOOTBALL CLUB',
+                      style: GoogleFonts.inter(
+                        fontSize: 9,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 4.0,
+                        color: MifcColors.white.withValues(alpha: 0.8),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
-        ),
-      ),
+          ),
       centerTitle: true,
       actions: [
         if (showCalendar)
