@@ -64,7 +64,7 @@ class TopPlayersSection extends StatelessWidget {
       goals: '9',
       assists: '4',
       rating: '7.8',
-      imageUrl: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=400&auto=format&fit=crop&q=60',
+      imageUrl: 'https://images.unsplash.com/photo-1551958219-acbc608c6377?w=400&auto=format&fit=crop&q=60',
     ),
     PlayerStats(
       id: '4',

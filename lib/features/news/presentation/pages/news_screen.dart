@@ -306,7 +306,7 @@ class VideoListTab extends StatelessWidget {
             duration: '04:20',
             views: '12K VIEWS',
             date: '2 HOURS AGO',
-            imageUrl: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=400',
+            imageUrl: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=400',
           ),
         ),
         ScrollReveal(
@@ -370,7 +370,7 @@ class FeaturedHeroCard extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(24),
                 child: CachedNetworkImage(
-                  imageUrl: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=1000',
+                  imageUrl: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1000',
                   fit: BoxFit.cover,
                   width: double.infinity,
                   height: 280,
