@@ -67,10 +67,9 @@ class _FixturesScreenState extends State<FixturesScreen> with SingleTickerProvid
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Image.asset(
-                        'assets/images/calendar_icon.png',
-                        width: 20,
-                        height: 20,
+                      const Icon(
+                        Icons.calendar_today_rounded,
+                        size: 20,
                         color: Colors.white,
                       ),
                       const SizedBox(width: 8),
