@@ -4,13 +4,14 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:markfc/core/theme/mifc_colors.dart';
 
 class MifcTopBar extends StatelessWidget implements PreferredSizeWidget {
-  const MifcTopBar({super.key});
+  final double opacity;
+  const MifcTopBar({super.key, this.opacity = 1.0});
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: MifcColors.navyBlue,
-      elevation: 0,
+      backgroundColor: const Color(0xFF0D1B3E).withValues(alpha: opacity),
+      elevation: opacity * 4,
       scrolledUnderElevation: 0,
       toolbarHeight: 64,
       systemOverlayStyle: const SystemUiOverlayStyle(
@@ -28,24 +29,10 @@ class MifcTopBar extends StatelessWidget implements PreferredSizeWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.05),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: const Color(0xFFE2C48D), // Prestige Gold
-                      width: 1.5,
-                    ),
-                  ),
-                  child: const Center(
-                    child: Icon(
-                      Icons.sports_soccer_rounded,
-                      color: Color(0xFFE2C48D),
-                      size: 28,
-                    ),
-                  ),
+                const Icon(
+                  Icons.sports_soccer_rounded,
+                  color: Color(0xFFE2C48D), // Prestige Gold
+                  size: 28,
                 ),
                 const SizedBox(height: 4),
                 Text(

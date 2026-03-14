@@ -13,38 +13,88 @@ import '../widgets/mifc_tv_section.dart';
 import '../widgets/fan_of_the_month_section.dart';
 import '../widgets/sponsor_strip_section.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  final ScrollController _scrollController = ScrollController();
+  double _opacity = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    final offset = _scrollController.offset;
+    double newOpacity = 0.0;
+    
+    if (offset <= 50) {
+      newOpacity = 0.0;
+    } else if (offset >= 200) {
+      newOpacity = 1.0;
+    } else {
+      newOpacity = (offset - 50) / 150.0;
+    }
+
+    if (newOpacity != _opacity) {
+      setState(() {
+        _opacity = newOpacity;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: false,
-      appBar: const MifcTopBar(),
-      body: ListView(
-        padding: EdgeInsets.zero,
+      extendBodyBehindAppBar: true,
+      body: Stack(
         children: [
-          const HeroCarousel(),
-          const LatestNewsSection(),
-          _buildDivider(),
-          const MatchCentreSection(),
-          _buildDivider(),
-          const MotmPollSection(),
-          _buildDivider(),
-          const FixtureCountdownSection(), // Moved up
-          _buildDivider(),
-          const PlayerOfTheMonthSection(),
-          _buildDivider(),
-          const TopPlayersSection(), // Added
-          _buildDivider(),
-          const LeagueTableSection(),
-          _buildDivider(),
-          const MifcTvSection(),
-          _buildDivider(),
-          const FanOfTheMonthSection(),
-          _buildDivider(),
-          const SponsorStripSection(),
-          const SizedBox(height: 100), // Space for FAB and Nav Bar
+          ListView(
+            controller: _scrollController,
+            padding: EdgeInsets.zero,
+            children: [
+              const HeroCarousel(),
+              const LatestNewsSection(),
+              _buildDivider(),
+              const MatchCentreSection(),
+              _buildDivider(),
+              const MotmPollSection(),
+              _buildDivider(),
+              const FixtureCountdownSection(), 
+              _buildDivider(),
+              const PlayerOfTheMonthSection(),
+              _buildDivider(),
+              const TopPlayersSection(), 
+              _buildDivider(),
+              const LeagueTableSection(),
+              _buildDivider(),
+              const MifcTvSection(),
+              _buildDivider(),
+              const FanOfTheMonthSection(),
+              _buildDivider(),
+              const SponsorStripSection(),
+              const SizedBox(height: 100), 
+            ],
+          ),
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: MifcTopBar(opacity: _opacity),
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton(

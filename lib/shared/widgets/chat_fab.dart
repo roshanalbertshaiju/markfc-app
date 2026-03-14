@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/mifc_colors.dart';
+import 'package:markfc/core/theme/mifc_colors.dart';
 
 class ChatFab extends StatelessWidget {
   const ChatFab({super.key});

@@ -171,12 +171,12 @@ class HeroSlideWidget extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              stops: const [0.0, 0.4, 0.8, 1.0],
+              stops: const [0.0, 0.3, 0.7, 1.0],
               colors: [
-                Colors.black.withValues(alpha: 0.2),
-                Colors.black.withValues(alpha: 0.0),
-                Colors.black.withValues(alpha: 0.6),
-                MifcColors.black,
+                const Color(0xFF0D1B3E).withValues(alpha: 0.7),
+                const Color(0xFF0D1B3E).withValues(alpha: 0.0),
+                const Color(0xFF0D1B3E).withValues(alpha: 0.0),
+                const Color(0xFF0D1B3E).withValues(alpha: 0.8),
               ],
             ),
           ),
