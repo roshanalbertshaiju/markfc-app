@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:markfc/core/theme/mifc_colors.dart';
 import 'package:markfc/shared/widgets/mifc_card.dart';
 import 'package:markfc/shared/widgets/scroll_reveal.dart';
+import 'package:markfc/shared/widgets/mifc_top_bar.dart';
 
 class FixturesScreen extends StatefulWidget {
   const FixturesScreen({super.key});
@@ -15,16 +16,48 @@ class FixturesScreen extends StatefulWidget {
 
 class _FixturesScreenState extends State<FixturesScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  final ScrollController _scrollController = ScrollController();
+  double _opacity = 0.0;
+  int _activeTab = 0;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(() {
+      if (_tabController.index != _activeTab) {
+        setState(() {
+          _activeTab = _tabController.index;
+        });
+      }
+    });
+    _scrollController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    final offset = _scrollController.offset;
+    double newOpacity = 0.0;
+    
+    if (offset <= 50) {
+      newOpacity = 0.0;
+    } else if (offset >= 120) {
+      newOpacity = 1.0;
+    } else {
+      newOpacity = (offset - 50) / 70.0;
+    }
+
+    if (newOpacity != _opacity) {
+      setState(() {
+        _opacity = newOpacity;
+      });
+    }
   }
 
   @override
   void dispose() {
     _tabController.dispose();
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -32,97 +65,151 @@ class _FixturesScreenState extends State<FixturesScreen> with SingleTickerProvid
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF06080F),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF0D1B3E),
-        elevation: 0,
-        toolbarHeight: 64,
-        centerTitle: true,
-        systemOverlayStyle: const SystemUiOverlayStyle(
-          statusBarColor: Colors.black,
-          statusBarIconBrightness: Brightness.light,
-          statusBarBrightness: Brightness.dark,
-        ),
-        title: Text(
-          'MATCHES',
-          style: GoogleFonts.outfit(
-            fontSize: 18,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 1.5,
-            color: Colors.white,
-          ),
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
-          onPressed: () => context.pop(),
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: Center(
-              child: InkWell(
-                onTap: () {},
-                borderRadius: BorderRadius.circular(8),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(
-                        Icons.calendar_today_rounded,
-                        size: 20,
-                        color: Colors.white,
+      extendBodyBehindAppBar: true,
+      body: Stack(
+        children: [
+          ListView(
+            controller: _scrollController,
+            padding: EdgeInsets.zero,
+            children: [
+              _buildHero(),
+              _buildTabsHeader(),
+              _activeTab == 0 
+                ? _buildMatchesList()
+                : const Center(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 100),
+                      child: Text(
+                        'All Teams Fixtures Coming Soon', 
+                        style: TextStyle(color: Colors.white70)
                       ),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Calendar',
-                        style: GoogleFonts.outfit(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
+              const SizedBox(height: 100),
+            ],
+          ),
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: MifcTopBar(
+              opacity: _opacity,
+              showBackButton: true,
+              showCalendar: true,
             ),
           ),
         ],
-        bottom: TabBar(
-          controller: _tabController,
-          indicatorColor: MifcColors.navyBlue,
-          indicatorWeight: 3,
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.white.withValues(alpha: 0.5),
-          labelStyle: GoogleFonts.outfit(
-            fontSize: 14,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 1.0,
-          ),
-          indicatorPadding: const EdgeInsets.symmetric(horizontal: 16),
-          tabs: const [
-            Tab(text: 'UNITED'),
-            Tab(text: 'ALL TEAMS'),
-          ],
-        ),
       ),
-      body: TabBarView(
-        controller: _tabController,
+    );
+  }
+
+  Widget _buildHero() {
+    return Container(
+      height: 340,
+      width: double.infinity,
+      child: Stack(
+        fit: StackFit.expand,
         children: [
-          _buildMatchesList(),
-          const Center(child: Text('All Teams Fixtures', style: TextStyle(color: Colors.white))),
+          Image.network(
+            'https://images.unsplash.com/photo-1522778119026-d647f0596c20?q=80&w=2000',
+            fit: BoxFit.cover,
+          ),
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.black.withValues(alpha: 0.4),
+                  const Color(0xFF06080F),
+                ],
+                stops: const [0.0, 1.0],
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 40,
+            left: 24,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: MifcColors.crimson,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    'SEASON 2025/26',
+                    style: GoogleFonts.outfit(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.white,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'MATCHES & FIXTURES',
+                  style: GoogleFonts.outfit(
+                    fontSize: 32,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
+                    letterSpacing: -0.5,
+                    height: 1.0,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Follow the journey of the United squad',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    color: Colors.white.withValues(alpha: 0.6),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTabsHeader() {
+    return Container(
+      color: const Color(0xFF06080F),
+      child: Column(
+        children: [
+          TabBar(
+            controller: _tabController,
+            indicatorColor: MifcColors.navyBlue,
+            indicatorWeight: 3,
+            labelColor: Colors.white,
+            unselectedLabelColor: Colors.white.withValues(alpha: 0.5),
+            dividerColor: Colors.white.withValues(alpha: 0.05),
+            labelStyle: GoogleFonts.outfit(
+              fontSize: 14,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1.0,
+            ),
+            indicatorPadding: const EdgeInsets.symmetric(horizontal: 16),
+            tabs: const [
+              Tab(text: 'UNITED'),
+              Tab(text: 'ALL TEAMS'),
+            ],
+          ),
         ],
       ),
     );
   }
 
   Widget _buildMatchesList() {
-    return ListView(
-      padding: const EdgeInsets.symmetric(vertical: 24),
+    return Column(
       children: [
-        _MatchGroupHeader(title: 'SEPTEMBER 2025'),
-        _MatchCard(
+        const _MatchGroupHeader(title: 'SEPTEMBER 2025'),
+        const _MatchCard(
           date: 'Sat 13 Sep | English Premier League',
           homeTeam: 'Grimsby',
           awayTeam: 'Mark Intl',
@@ -130,7 +217,7 @@ class _FixturesScreenState extends State<FixturesScreen> with SingleTickerProvid
           awayScore: '2',
           isReviewAvailable: true,
         ),
-        _MatchCard(
+        const _MatchCard(
           date: 'Sat 20 Sep | English Premier League',
           homeTeam: 'Mark Intl',
           awayTeam: 'Burnley',
@@ -138,8 +225,8 @@ class _FixturesScreenState extends State<FixturesScreen> with SingleTickerProvid
           awayScore: '2',
           isReviewAvailable: true,
         ),
-        _MatchGroupHeader(title: 'OCTOBER 2025'),
-        _MatchCard(
+        const _MatchGroupHeader(title: 'OCTOBER 2025'),
+        const _MatchCard(
           date: 'Sun 04 Oct | English Premier League',
           homeTeam: 'Man City',
           awayTeam: 'Mark Intl',
@@ -147,7 +234,7 @@ class _FixturesScreenState extends State<FixturesScreen> with SingleTickerProvid
           awayScore: '0',
           isReviewAvailable: true,
         ),
-        _MatchCard(
+        const _MatchCard(
           date: 'Sat 10 Oct | English Premier League',
           homeTeam: 'Mark Intl',
           awayTeam: 'Chelsea',

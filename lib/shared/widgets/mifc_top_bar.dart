@@ -8,7 +8,15 @@ import '../../features/store/presentation/providers/cart_provider.dart';
 
 class MifcTopBar extends StatelessWidget implements PreferredSizeWidget {
   final double opacity;
-  const MifcTopBar({super.key, this.opacity = 1.0});
+  final bool showBackButton;
+  final bool showCalendar;
+  
+  const MifcTopBar({
+    super.key, 
+    this.opacity = 1.0,
+    this.showBackButton = false,
+    this.showCalendar = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -26,40 +34,45 @@ class MifcTopBar extends StatelessWidget implements PreferredSizeWidget {
       leading: Center(
         child: Padding(
           padding: const EdgeInsets.only(left: 12),
-          child: InkWell(
-            onTap: () => context.push('/fixtures'),
-            borderRadius: BorderRadius.circular(10),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFE2C48D).withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Center(
-                    child: Icon(
-                      Icons.sports_soccer_rounded,
-                      color: Color(0xFFE2C48D), // Prestige Gold
-                      size: 28,
+          child: showBackButton 
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
+                onPressed: () => context.pop(),
+              )
+            : InkWell(
+                onTap: () => context.push('/fixtures'),
+                borderRadius: BorderRadius.circular(10),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE2C48D).withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Center(
+                        child: Icon(
+                          Icons.sports_soccer_rounded,
+                          color: Color(0xFFE2C48D), // Prestige Gold
+                          size: 28,
+                        ),
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Matches',
+                      style: GoogleFonts.outfit(
+                        fontSize: 8,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 0.8,
+                        color: const Color(0xFFE2C48D),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  'Matches',
-                  style: GoogleFonts.outfit(
-                    fontSize: 8,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 0.8,
-                    color: const Color(0xFFE2C48D),
-                  ),
-                ),
-              ],
-            ),
-          ),
+              ),
         ),
       ),
       title: FittedBox(
@@ -103,73 +116,108 @@ class MifcTopBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       centerTitle: true,
       actions: [
-        IconButton(
-          icon: const Icon(Icons.search_rounded, color: MifcColors.white, size: 24),
-          onPressed: () {},
-        ),
-        // Cart Icon with Badge
-        Consumer(
-          builder: (context, ref, child) {
-            final cartCount = ref.watch(cartCountProvider);
-            return Stack(
-              alignment: Alignment.center,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.shopping_bag_outlined, color: MifcColors.white, size: 24),
-                  onPressed: () {
-                    // Navigate to cart or show summary
-                  },
-                ),
-                if (cartCount > 0)
-                  Positioned(
-                    right: 8,
-                    top: 8,
-                    child: Container(
-                      padding: const EdgeInsets.all(2),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFC9A84C),
-                        shape: BoxShape.circle,
+        if (showCalendar)
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: Center(
+              child: InkWell(
+                onTap: () {},
+                borderRadius: BorderRadius.circular(8),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.calendar_today_rounded,
+                        size: 20,
+                        color: Colors.white,
                       ),
-                      constraints: const BoxConstraints(
-                        minWidth: 14,
-                        minHeight: 14,
-                      ),
-                      child: Text(
-                        '$cartCount',
-                        style: const TextStyle(
-                          color: Colors.black,
-                          fontSize: 8,
-                          fontWeight: FontWeight.bold,
+                      const SizedBox(width: 8),
+                      Text(
+                        'Calendar',
+                        style: GoogleFonts.outfit(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                          letterSpacing: 0.5,
                         ),
-                        textAlign: TextAlign.center,
                       ),
-                    ),
+                    ],
                   ),
-              ],
-            );
-          },
-        ),
-        Stack(
-          alignment: Alignment.center,
-          children: [
-            IconButton(
-              icon: const Icon(Icons.notifications_none_rounded, color: MifcColors.white, size: 24),
-              onPressed: () {},
-            ),
-            Positioned(
-              right: 14,
-              top: 14,
-              child: Container(
-                width: 7,
-                height: 7,
-                decoration: const BoxDecoration(
-                  color: MifcColors.crimson,
-                  shape: BoxShape.circle,
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        if (!showCalendar) ...[
+          IconButton(
+            icon: const Icon(Icons.search_rounded, color: MifcColors.white, size: 24),
+            onPressed: () {},
+          ),
+          // Cart Icon with Badge
+          Consumer(
+            builder: (context, ref, child) {
+              final cartCount = ref.watch(cartCountProvider);
+              return Stack(
+                alignment: Alignment.center,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.shopping_bag_outlined, color: MifcColors.white, size: 24),
+                    onPressed: () {
+                      // Navigate to cart or show summary
+                    },
+                  ),
+                  if (cartCount > 0)
+                    Positioned(
+                      right: 8,
+                      top: 8,
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: const BoxDecoration(
+                          color: Color(0xFFC9A84C),
+                          shape: BoxShape.circle,
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 14,
+                          minHeight: 14,
+                        ),
+                        child: Text(
+                          '$cartCount',
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontSize: 8,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.notifications_none_rounded, color: MifcColors.white, size: 24),
+                onPressed: () {},
+              ),
+              Positioned(
+                right: 14,
+                top: 14,
+                child: Container(
+                  width: 7,
+                  height: 7,
+                  decoration: const BoxDecoration(
+                    color: MifcColors.crimson,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
         const SizedBox(width: 8),
       ],
     );
