@@ -29,10 +29,20 @@ class MifcTopBar extends StatelessWidget implements PreferredSizeWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
-                  Icons.sports_soccer_rounded,
-                  color: Color(0xFFE2C48D), // Prestige Gold
-                  size: 28,
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE2C48D).withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      Icons.sports_soccer_rounded,
+                      color: Color(0xFFE2C48D), // Prestige Gold
+                      size: 28,
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(
