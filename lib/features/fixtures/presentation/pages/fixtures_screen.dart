@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'package:markfc/core/theme/mifc_colors.dart';
@@ -34,6 +35,11 @@ class _FixturesScreenState extends State<FixturesScreen> with SingleTickerProvid
       appBar: AppBar(
         backgroundColor: const Color(0xFF0D1B3E),
         elevation: 0,
+        systemOverlayStyle: const SystemUiOverlayStyle(
+          statusBarColor: Colors.black,
+          statusBarIconBrightness: Brightness.light,
+          statusBarBrightness: Brightness.dark,
+        ),
         title: Text(
           'MATCHES',
           style: GoogleFonts.outfit(
