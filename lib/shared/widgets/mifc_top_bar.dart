@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:markfc/core/theme/mifc_colors.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/store/presentation/providers/cart_provider.dart';
+import 'notification_center.dart';
 
 class MifcTopBar extends StatelessWidget implements PreferredSizeWidget {
   final double opacity;
@@ -201,7 +202,7 @@ class MifcTopBar extends StatelessWidget implements PreferredSizeWidget {
             children: [
               IconButton(
                 icon: const Icon(Icons.notifications_none_rounded, color: MifcColors.white, size: 24),
-                onPressed: () {},
+                onPressed: () => NotificationCenter.show(context),
               ),
               Positioned(
                 right: 14,
