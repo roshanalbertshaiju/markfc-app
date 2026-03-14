@@ -26,7 +26,7 @@ class MifcTopBar extends StatelessWidget implements PreferredSizeWidget {
         child: Padding(
           padding: const EdgeInsets.only(left: 12),
           child: InkWell(
-            onTap: () {},
+            onTap: () => context.push('/fixtures'),
             borderRadius: BorderRadius.circular(10),
             child: Column(
               mainAxisSize: MainAxisSize.min,

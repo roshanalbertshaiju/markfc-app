@@ -8,6 +8,7 @@ import '../../shared/widgets/mifc_bottom_nav_bar.dart';
 import '../../features/splash/presentation/pages/splash_screen.dart';
 import '../../features/squad/presentation/pages/squad_screen.dart';
 import '../../features/store/presentation/pages/store_screen.dart';
+import '../../features/fixtures/presentation/pages/fixtures_screen.dart';
 
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -79,7 +80,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/fixtures',
-        builder: (context, state) => const Scaffold(body: Center(child: Text('Fixtures'))),
+        builder: (context, state) => const FixturesScreen(),
       ),
     ],
   );
