@@ -35,6 +35,8 @@ class _FixturesScreenState extends State<FixturesScreen> with SingleTickerProvid
       appBar: AppBar(
         backgroundColor: const Color(0xFF0D1B3E),
         elevation: 0,
+        toolbarHeight: 64,
+        centerTitle: true,
         systemOverlayStyle: const SystemUiOverlayStyle(
           statusBarColor: Colors.black,
           statusBarIconBrightness: Brightness.light,
@@ -55,33 +57,34 @@ class _FixturesScreenState extends State<FixturesScreen> with SingleTickerProvid
         ),
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: InkWell(
-              onTap: () {},
-              borderRadius: BorderRadius.circular(8),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      'assets/images/calendar_icon.png',
-                      width: 24,
-                      height: 24,
-                      color: Colors.white,
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'Calendar',
-                      style: GoogleFonts.outfit(
-                        fontSize: 8,
-                        fontWeight: FontWeight.w700,
+            padding: const EdgeInsets.only(right: 8),
+            child: Center(
+              child: InkWell(
+                onTap: () {},
+                borderRadius: BorderRadius.circular(8),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Image.asset(
+                        'assets/images/calendar_icon.png',
+                        width: 20,
+                        height: 20,
                         color: Colors.white,
-                        letterSpacing: 0.5,
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 8),
+                      Text(
+                        'Calendar',
+                        style: GoogleFonts.outfit(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

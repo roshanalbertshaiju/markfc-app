@@ -83,6 +83,7 @@ flutter:
     - assets/images/mifc_logo.png
     - assets/images/kickoff_ball.png
     - assets/images/launcher_icon.png
+    - assets/images/calendar_icon.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
