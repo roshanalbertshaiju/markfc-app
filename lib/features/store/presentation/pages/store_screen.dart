@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:markfc/shared/widgets/mifc_top_bar.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/cart_provider.dart';
+import '../../data/models/cart_item.dart';
 
-class StoreScreen extends StatelessWidget {
+class StoreScreen extends ConsumerWidget {
   const StoreScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: const Color(0xFF06080F),
       appBar: const MifcTopBar(),
@@ -138,7 +141,7 @@ class _SeasonKitSection extends StatelessWidget {
           child: ListView(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 24),
-            children: const [
+            children: [
               _KitCard(
                 name: 'HOME KIT',
                 price: '£85',
@@ -185,7 +188,7 @@ class _SeasonKitSection extends StatelessWidget {
   }
 }
 
-class _KitCard extends StatelessWidget {
+class _KitCard extends ConsumerWidget {
   final String name;
   final String price;
   final List<Color> gradientColors;
@@ -205,7 +208,7 @@ class _KitCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Container(
       width: 220,
       decoration: BoxDecoration(
@@ -258,6 +261,48 @@ class _KitCard extends StatelessWidget {
                     child: Text(
                       emoji,
                       style: const TextStyle(fontSize: 80),
+                    ),
+                  ),
+                  // Add to Cart mini button on image
+                  Positioned(
+                    bottom: 8,
+                    right: 8,
+                    child: GestureDetector(
+                      onTap: () {
+                        ref.read(cartProvider.notifier).addItem(
+                          CartItem(
+                            id: 'kit_$name',
+                            name: name,
+                            price: price,
+                            emoji: emoji,
+                          ),
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('$name added to cart'),
+                            duration: const Duration(seconds: 1),
+                            backgroundColor: const Color(0xFF0D1B3E),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.9),
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.2),
+                              blurRadius: 4,
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.add_shopping_cart_rounded,
+                          size: 16,
+                          color: Colors.black,
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -332,7 +377,7 @@ class _AccessoriesSection extends StatelessWidget {
           child: ListView(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 24),
-            children: const [
+            children: [
               _AccessoryCard(name: 'CLUB SCARF', price: '£22', emoji: '🧣'),
               SizedBox(width: 12),
               _AccessoryCard(name: 'SNAPBACK', price: '£28', emoji: '🧢'),
@@ -352,7 +397,7 @@ class _AccessoriesSection extends StatelessWidget {
   }
 }
 
-class _AccessoryCard extends StatelessWidget {
+class _AccessoryCard extends ConsumerWidget {
   final String name;
   final String price;
   final String emoji;
@@ -364,7 +409,7 @@ class _AccessoryCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Container(
       width: 140,
       padding: const EdgeInsets.all(12),
@@ -380,11 +425,50 @@ class _AccessoryCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
-            child: Center(
-              child: Text(
-                emoji,
-                style: const TextStyle(fontSize: 40),
-              ),
+            child: Stack(
+              children: [
+                Center(
+                  child: Text(
+                    emoji,
+                    style: const TextStyle(fontSize: 40),
+                  ),
+                ),
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: GestureDetector(
+                    onTap: () {
+                      ref.read(cartProvider.notifier).addItem(
+                        CartItem(
+                          id: 'acc_$name',
+                          name: name,
+                          price: price,
+                          emoji: emoji,
+                        ),
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('$name added to cart'),
+                          duration: const Duration(seconds: 1),
+                          backgroundColor: const Color(0xFF0D1B3E),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.9),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.add_shopping_cart_rounded,
+                        size: 14,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 8),

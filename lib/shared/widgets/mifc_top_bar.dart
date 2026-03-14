@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:markfc/core/theme/mifc_colors.dart';
+import '../../features/store/presentation/providers/cart_provider.dart';
 
 class MifcTopBar extends StatelessWidget implements PreferredSizeWidget {
   final double opacity;
@@ -103,6 +105,48 @@ class MifcTopBar extends StatelessWidget implements PreferredSizeWidget {
         IconButton(
           icon: const Icon(Icons.search_rounded, color: MifcColors.white, size: 24),
           onPressed: () {},
+        ),
+        // Cart Icon with Badge
+        Consumer(
+          builder: (context, ref, child) {
+            final cartCount = ref.watch(cartCountProvider);
+            return Stack(
+              alignment: Alignment.center,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.shopping_bag_outlined, color: MifcColors.white, size: 24),
+                  onPressed: () {
+                    // Navigate to cart or show summary
+                  },
+                ),
+                if (cartCount > 0)
+                  Positioned(
+                    right: 8,
+                    top: 8,
+                    child: Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFC9A84C),
+                        shape: BoxShape.circle,
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 14,
+                        minHeight: 14,
+                      ),
+                      child: Text(
+                        '$cartCount',
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 8,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+              ],
+            );
+          },
         ),
         Stack(
           alignment: Alignment.center,
