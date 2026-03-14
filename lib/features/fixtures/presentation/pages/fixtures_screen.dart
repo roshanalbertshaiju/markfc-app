@@ -47,6 +47,40 @@ class _FixturesScreenState extends State<FixturesScreen> with SingleTickerProvid
           icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
           onPressed: () => context.pop(),
         ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: InkWell(
+              onTap: () {},
+              borderRadius: BorderRadius.circular(8),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      'assets/images/calendar_icon.png',
+                      width: 24,
+                      height: 24,
+                      color: Colors.white,
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Calendar',
+                      style: GoogleFonts.outfit(
+                        fontSize: 8,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: MifcColors.navyBlue,
