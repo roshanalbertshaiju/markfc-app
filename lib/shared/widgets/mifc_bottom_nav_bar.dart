@@ -11,24 +11,13 @@ class MifcBottomNavBar extends StatelessWidget {
   });
 
   void _onTap(BuildContext context, int index) {
-    if (index == 4) {
-      _showMoreMenu(context);
-    } else {
-      navigationShell.goBranch(
-        index,
-        initialLocation: index == navigationShell.currentIndex,
-      );
-    }
-  }
-
-  void _showMoreMenu(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => const MifcMoreMenu(),
+    navigationShell.goBranch(
+      index,
+      initialLocation: index == navigationShell.currentIndex,
     );
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -57,60 +46,13 @@ class MifcBottomNavBar extends StatelessWidget {
           label: 'Store',
         ),
         NavigationDestination(
-          icon: Icon(Icons.more_horiz),
-          label: 'More',
+          icon: Icon(Icons.person_outline),
+          selectedIcon: Icon(Icons.person, color: Colors.white),
+          label: 'Profile',
         ),
       ],
     );
   }
 }
 
-class MifcMoreMenu extends StatelessWidget {
-  const MifcMoreMenu({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: MifcColors.white,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(24),
-          topRight: Radius.circular(24),
-        ),
-      ),
-      padding: const EdgeInsets.symmetric(vertical: 24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: MifcColors.muted.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          const SizedBox(height: 24),
-          _buildMenuItem(Icons.person_outline, 'Profile'),
-          _buildMenuItem(Icons.history, 'Your Activities'),
-          _buildMenuItem(Icons.settings_outlined, 'Settings'),
-          const SizedBox(height: 40),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMenuItem(IconData icon, String title) {
-    return ListTile(
-      leading: Icon(icon, color: MifcColors.navy),
-      title: Text(
-        title,
-        style: const TextStyle(
-          fontWeight: FontWeight.w600,
-          color: MifcColors.navyDark,
-        ),
-      ),
-      onTap: () {},
-    );
-  }
-}

@@ -9,6 +9,7 @@ import '../../features/splash/presentation/pages/splash_screen.dart';
 import '../../features/squad/presentation/pages/squad_screen.dart';
 import '../../features/store/presentation/pages/store_screen.dart';
 import '../../features/fixtures/presentation/pages/fixtures_screen.dart';
+import '../../features/profile/presentation/pages/profile_screen.dart';
 
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -71,8 +72,8 @@ final routerProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: '/more',
-                builder: (context, state) => const SizedBox.shrink(), // Opened via BottomSheet
+                path: '/profile',
+                builder: (context, state) => const ProfileScreen(),
               ),
             ],
           ),
