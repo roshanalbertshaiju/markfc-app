@@ -10,6 +10,7 @@ class MifcColors {
   static const Color crimson = Color(0xFF9D1C1E); // Sartorial Crimson
   static const Color navyBlue = Color(0xFF162460); // Elite Navy Blue
   static const Color palladium = Color(0xFFD1D1D1); // Palladium Silver
+  static const Color prestigeGold = Color(0xFFE2C48D); // Prestige Gold
 
   // Surface & Layout
   static const Color surface = Color(0xFFFFFFFF);

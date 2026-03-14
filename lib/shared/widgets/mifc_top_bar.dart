@@ -6,6 +6,7 @@ import 'package:markfc/core/theme/mifc_colors.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/store/presentation/providers/cart_provider.dart';
 import 'notification_center.dart';
+import '../../features/fixtures/presentation/widgets/match_calendar_popup.dart';
 
 class MifcTopBar extends StatelessWidget implements PreferredSizeWidget {
   final double opacity;
@@ -122,7 +123,7 @@ class MifcTopBar extends StatelessWidget implements PreferredSizeWidget {
             padding: const EdgeInsets.only(right: 8),
             child: Center(
               child: IconButton(
-                onPressed: () {},
+                onPressed: () => MatchCalendarPopup.show(context),
                 icon: const Icon(
                   Icons.calendar_today_rounded,
                   size: 20,
