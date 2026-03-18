@@ -35,58 +35,58 @@ class TopPlayersSection extends StatelessWidget {
   static final List<PlayerStats> _mockPlayers = [
     PlayerStats(
       id: '1',
-      name: 'M. UNITED',
+      name: 'MARCUS RASHFORD',
       position: 'FW',
       nationality: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
       shirtNumber: '10',
       goals: '18',
       assists: '7',
       rating: '8.4',
-      imageUrl: 'https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?w=400&auto=format&fit=crop&q=60',
+      imageUrl: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=800&q=80',
     ),
     PlayerStats(
       id: '2',
-      name: 'B. FERNAND',
+      name: 'BRUNO FERNANDES',
       position: 'MF',
       nationality: '🇵🇹',
       shirtNumber: '8',
       goals: '12',
       assists: '15',
       rating: '8.1',
-      imageUrl: 'https://images.unsplash.com/photo-1543353071-873f17a7a088?w=400&auto=format&fit=crop&q=60',
+      imageUrl: 'https://images.unsplash.com/photo-1543353071-873f17a7a088?w=800&q=80',
     ),
     PlayerStats(
       id: '3',
-      name: 'A. GARNACHO',
+      name: 'ALEJANDRO GARNACHO',
       position: 'FW',
       nationality: '🇦🇷',
       shirtNumber: '17',
       goals: '9',
       assists: '4',
       rating: '7.8',
-      imageUrl: 'https://images.unsplash.com/photo-1551958219-acbc608c6377?w=400&auto=format&fit=crop&q=60',
+      imageUrl: 'https://images.unsplash.com/photo-1551244072-5d12893278ab?w=800&q=80',
     ),
     PlayerStats(
       id: '4',
-      name: 'K. MAINOO',
+      name: 'KOBBIE MAINOO',
       position: 'MF',
       nationality: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
       shirtNumber: '37',
       goals: '4',
       assists: '3',
       rating: '7.9',
-      imageUrl: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=400&auto=format&fit=crop&q=60',
+      imageUrl: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=800&q=80',
     ),
     PlayerStats(
       id: '5',
-      name: 'D. DALOT',
+      name: 'DIOGO DALOT',
       position: 'DF',
       nationality: '🇵🇹',
       shirtNumber: '20',
       goals: '2',
       assists: '6',
       rating: '7.6',
-      imageUrl: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&auto=format&fit=crop&q=60',
+      imageUrl: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=80',
     ),
   ];
 
@@ -99,7 +99,7 @@ class TopPlayersSection extends StatelessWidget {
           actionLabel: 'SEE ALL',
         ),
         SizedBox(
-          height: 200, // Card height (180) + padding
+          height: 240, // Increased height for better card proportions
           child: ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             scrollDirection: Axis.horizontal,
@@ -119,95 +119,140 @@ class TopPlayersSection extends StatelessWidget {
   }
 
   Widget _buildPlayerCard(BuildContext context, PlayerStats player) {
-    return GestureDetector(
-      onTap: () => context.push('/squad/player/${player.id}'),
-      child: Container(
-        width: 140,
-        margin: const EdgeInsets.only(right: 16, top: 8, bottom: 12),
+    return Container(
+      width: 160, // Wider card
+      margin: const EdgeInsets.only(right: 16, top: 4, bottom: 12),
+      child: GestureDetector(
+        onTap: () => context.push('/squad/player/${player.id}'),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Player Image with subtle border
             Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: MifcColors.white.withValues(alpha: 0.1),
-                    width: 0.5,
-                  ),
-                  image: DecorationImage(
-                    image: NetworkImage(player.imageUrl),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.transparent,
-                        Colors.black.withValues(alpha: 0.8),
-                      ],
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  // Main Image Container with gradient
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(
+                        color: MifcColors.white.withValues(alpha: 0.1),
+                        width: 1,
+                      ),
+                      image: DecorationImage(
+                        image: NetworkImage(player.imageUrl),
+                        fit: BoxFit.cover,
+                        alignment: const Alignment(0, -0.2), // Adjust crop focus
+                      ),
                     ),
                   ),
-                  padding: const EdgeInsets.all(12),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
+                  // Darken & Info Overlay
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(24),
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.transparent,
+                          Colors.black.withValues(alpha: 0.2),
+                          Colors.black.withValues(alpha: 0.9),
+                        ],
+                        stops: const [0.0, 0.6, 1.0],
+                      ),
+                    ),
+                  ),
+                  // Shirt Number Floating Badge
+                  Positioned(
+                    top: 12,
+                    left: 12,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: MifcColors.navyBlue,
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.3),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Text(
                         player.shirtNumber,
                         style: GoogleFonts.outfit(
-                          color: MifcColors.navyBlue,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.5,
                         ),
                       ),
-                    ],
+                    ),
                   ),
-                ),
+                  // Bottom Info Overlay
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            player.name,
+                            style: GoogleFonts.outfit(
+                              color: MifcColors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: -0.2,
+                              height: 1.1,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.visible,
+                          ),
+                          const SizedBox(height: 6),
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: MifcColors.white.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  player.position,
+                                  style: GoogleFonts.inter(
+                                    color: Colors.white70,
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                              const Spacer(),
+                              const Icon(
+                                Icons.stars_rounded,
+                                color: MifcColors.prestigeGold,
+                                size: 10,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                player.rating,
+                                style: GoogleFonts.outfit(
+                                  color: MifcColors.prestigeGold,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(height: 12),
-            // Name
-            Text(
-              player.name,
-              style: GoogleFonts.outfit(
-                color: MifcColors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.2,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 4),
-            // Position & Rating
-            Row(
-              children: [
-                Text(
-                  player.position,
-                  style: GoogleFonts.inter(
-                    color: MifcColors.white.withValues(alpha: 0.5),
-                    fontSize: 11,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const Spacer(),
-                const Icon(Icons.star, color: MifcColors.navyBlue, size: 10),
-                const SizedBox(width: 4),
-                Text(
-                  player.rating,
-                  style: GoogleFonts.outfit(
-                    color: MifcColors.white,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
             ),
           ],
         ),
