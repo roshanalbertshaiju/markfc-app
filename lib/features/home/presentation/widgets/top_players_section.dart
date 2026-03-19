@@ -1,97 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'package:markfc/core/theme/mifc_colors.dart';
 import 'package:markfc/shared/widgets/section_header.dart';
 import 'package:markfc/shared/widgets/scroll_reveal.dart';
+import 'package:markfc/features/squad/data/repositories/squad_repository.dart';
+import 'package:markfc/features/squad/domain/models/player.dart';
 
-class PlayerStats {
-  final String id;
-  final String name;
-  final String position;
-  final String nationality;
-  final String shirtNumber;
-  final String goals;
-  final String assists;
-  final String rating;
-  final String imageUrl;
-
-  PlayerStats({
-    required this.id,
-    required this.name,
-    required this.position,
-    required this.nationality,
-    required this.shirtNumber,
-    required this.goals,
-    required this.assists,
-    required this.rating,
-    required this.imageUrl,
-  });
-}
-
-class TopPlayersSection extends StatelessWidget {
+class TopPlayersSection extends ConsumerWidget {
   const TopPlayersSection({super.key});
 
-  static final List<PlayerStats> _mockPlayers = [
-    PlayerStats(
-      id: '1',
-      name: 'MARCUS RASHFORD',
-      position: 'FW',
-      nationality: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
-      shirtNumber: '10',
-      goals: '18',
-      assists: '7',
-      rating: '8.4',
-      imageUrl: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=800&q=80',
-    ),
-    PlayerStats(
-      id: '2',
-      name: 'BRUNO FERNANDES',
-      position: 'MF',
-      nationality: '🇵🇹',
-      shirtNumber: '8',
-      goals: '12',
-      assists: '15',
-      rating: '8.1',
-      imageUrl: 'https://images.unsplash.com/photo-1543353071-873f17a7a088?w=800&q=80',
-    ),
-    PlayerStats(
-      id: '3',
-      name: 'ALEJANDRO GARNACHO',
-      position: 'FW',
-      nationality: '🇦🇷',
-      shirtNumber: '17',
-      goals: '9',
-      assists: '4',
-      rating: '7.8',
-      imageUrl: 'https://images.unsplash.com/photo-1551244072-5d12893278ab?w=800&q=80',
-    ),
-    PlayerStats(
-      id: '4',
-      name: 'KOBBIE MAINOO',
-      position: 'MF',
-      nationality: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
-      shirtNumber: '37',
-      goals: '4',
-      assists: '3',
-      rating: '7.9',
-      imageUrl: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=800&q=80',
-    ),
-    PlayerStats(
-      id: '5',
-      name: 'DIOGO DALOT',
-      position: 'DF',
-      nationality: '🇵🇹',
-      shirtNumber: '20',
-      goals: '2',
-      assists: '6',
-      rating: '7.6',
-      imageUrl: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=80',
-    ),
-  ];
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final topPlayersAsync = ref.watch(topPlayersStreamProvider);
+
     return Column(
       children: [
         const SectionHeader(
@@ -99,28 +22,35 @@ class TopPlayersSection extends StatelessWidget {
           actionLabel: 'SEE ALL',
         ),
         SizedBox(
-          height: 240, // Increased height for better card proportions
-          child: ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            scrollDirection: Axis.horizontal,
-            itemCount: _mockPlayers.length,
-            itemBuilder: (context, index) {
-              final player = _mockPlayers[index];
-              return ScrollReveal(
-                type: AnimationType.fade,
-                delay: Duration(milliseconds: index * 100),
-                child: _buildPlayerCard(context, player),
+          height: 240,
+          child: topPlayersAsync.when(
+            data: (players) {
+              if (players.isEmpty) return const SizedBox.shrink();
+              return ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                scrollDirection: Axis.horizontal,
+                itemCount: players.length,
+                itemBuilder: (context, index) {
+                  final player = players[index];
+                  return ScrollReveal(
+                    type: AnimationType.fade,
+                    delay: Duration(milliseconds: index * 100),
+                    child: _buildPlayerCard(context, player),
+                  );
+                },
               );
             },
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (err, stack) => const SizedBox.shrink(),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildPlayerCard(BuildContext context, PlayerStats player) {
+  Widget _buildPlayerCard(BuildContext context, Player player) {
     return Container(
-      width: 160, // Wider card
+      width: 160,
       margin: const EdgeInsets.only(right: 16, top: 4, bottom: 12),
       child: GestureDetector(
         onTap: () => context.push('/squad/player/${player.id}'),
@@ -130,7 +60,6 @@ class TopPlayersSection extends StatelessWidget {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  // Main Image Container with gradient
                   Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(24),
@@ -141,11 +70,10 @@ class TopPlayersSection extends StatelessWidget {
                       image: DecorationImage(
                         image: NetworkImage(player.imageUrl),
                         fit: BoxFit.cover,
-                        alignment: const Alignment(0, -0.2), // Adjust crop focus
+                        alignment: const Alignment(0, -0.2),
                       ),
                     ),
                   ),
-                  // Darken & Info Overlay
                   Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(24),
@@ -161,7 +89,6 @@ class TopPlayersSection extends StatelessWidget {
                       ),
                     ),
                   ),
-                  // Shirt Number Floating Badge
                   Positioned(
                     top: 12,
                     left: 12,
@@ -179,7 +106,7 @@ class TopPlayersSection extends StatelessWidget {
                         ],
                       ),
                       child: Text(
-                        player.shirtNumber,
+                        player.number,
                         style: GoogleFonts.outfit(
                           color: Colors.white,
                           fontSize: 10,
@@ -189,7 +116,6 @@ class TopPlayersSection extends StatelessWidget {
                       ),
                     ),
                   ),
-                  // Bottom Info Overlay
                   Positioned(
                     bottom: 0,
                     left: 0,
@@ -201,7 +127,7 @@ class TopPlayersSection extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            player.name,
+                            player.name.toUpperCase(),
                             style: GoogleFonts.outfit(
                               color: MifcColors.white,
                               fontSize: 12,
@@ -222,7 +148,7 @@ class TopPlayersSection extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
-                                  player.position,
+                                  _getPositionAbbr(player.position),
                                   style: GoogleFonts.inter(
                                     color: Colors.white70,
                                     fontSize: 9,
@@ -238,7 +164,7 @@ class TopPlayersSection extends StatelessWidget {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                player.rating,
+                                player.rating.toStringAsFixed(1),
                                 style: GoogleFonts.outfit(
                                   color: MifcColors.prestigeGold,
                                   fontSize: 11,
@@ -258,5 +184,14 @@ class TopPlayersSection extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _getPositionAbbr(PlayerPosition pos) {
+    switch (pos) {
+      case PlayerPosition.goalkeeper: return 'GK';
+      case PlayerPosition.defender: return 'DF';
+      case PlayerPosition.midfielder: return 'MF';
+      case PlayerPosition.forward: return 'FW';
+    }
   }
 }

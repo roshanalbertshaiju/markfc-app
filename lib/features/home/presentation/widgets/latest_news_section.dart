@@ -1,55 +1,60 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:markfc/core/theme/mifc_colors.dart';
 import 'package:markfc/shared/widgets/section_header.dart';
 import 'package:markfc/shared/widgets/mifc_card.dart';
 import 'package:markfc/shared/widgets/scroll_reveal.dart';
+import 'package:markfc/features/news/data/repositories/news_repository.dart';
+import 'package:markfc/features/news/domain/models/news_article.dart';
 
-class LatestNewsSection extends StatelessWidget {
+class LatestNewsSection extends ConsumerWidget {
   const LatestNewsSection({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Watch the latest 5 news articles
+    final newsAsyncValue = ref.watch(latestNewsProvider(5));
+
     return Column(
       children: [
         const SectionHeader(title: 'LATEST NEWS'),
         SizedBox(
           height: 240,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            children: const [
-              ScrollReveal(
-                type: AnimationType.fade,
-                delay: Duration(milliseconds: 100),
-                child: NewsCard(
-                  category: 'TRANSFER',
-                  title: 'Club Confirms Salah Contract Extension Until 2028',
-                  time: '2H AGO',
-                  imageUrl: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=500&q=80',
-                ),
+          child: newsAsyncValue.when(
+            data: (articles) {
+              if (articles.isEmpty) {
+                return Center(
+                  child: Text(
+                    'No news available',
+                    style: GoogleFonts.inter(color: Colors.white54),
+                  ),
+                );
+              }
+              return ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: articles.length,
+                itemBuilder: (context, index) {
+                  final article = articles[index];
+                  return ScrollReveal(
+                    type: AnimationType.fade,
+                    delay: Duration(milliseconds: (index + 1) * 100),
+                    child: NewsCard(article: article),
+                  );
+                },
+              );
+            },
+            loading: () => const Center(
+              child: CircularProgressIndicator(color: MifcColors.navyBlue),
+            ),
+            error: (err, stack) => Center(
+              child: Text(
+                'Failed to load news',
+                style: GoogleFonts.inter(color: MifcColors.crimson),
               ),
-              ScrollReveal(
-                type: AnimationType.fade,
-                delay: Duration(milliseconds: 200),
-                child: NewsCard(
-                  category: 'TEAM NEWS',
-                  title: 'Nunez Out 2 Weeks With Hamstring Strain',
-                  time: '3H AGO',
-                  imageUrl: 'https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?w=500&q=80',
-                ),
-              ),
-              ScrollReveal(
-                type: AnimationType.fade,
-                delay: Duration(milliseconds: 300),
-                child: NewsCard(
-                  category: 'ACADEMY',
-                  title: 'Academy Talents Secure U21 Cup Victory',
-                  time: '5H AGO',
-                  imageUrl: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=500&q=80',
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ],
@@ -58,18 +63,27 @@ class LatestNewsSection extends StatelessWidget {
 }
 
 class NewsCard extends StatelessWidget {
-  final String category;
-  final String title;
-  final String time;
-  final String imageUrl;
+  final NewsArticle article;
 
   const NewsCard({
     super.key,
-    required this.category,
-    required this.title,
-    required this.time,
-    required this.imageUrl,
+    required this.article,
   });
+
+  String _formatTime(DateTime timestamp) {
+    final now = DateTime.now();
+    final difference = now.difference(timestamp);
+
+    if (difference.inDays > 0) {
+      return '${difference.inDays}D AGO';
+    } else if (difference.inHours > 0) {
+      return '${difference.inHours}H AGO';
+    } else if (difference.inMinutes > 0) {
+      return '${difference.inMinutes}M AGO';
+    } else {
+      return 'JUST NOW';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,10 +100,16 @@ class NewsCard extends StatelessWidget {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  Image.network(
-                    imageUrl,
-                    fit: BoxFit.cover,
-                  ),
+                  article.imageUrl.isNotEmpty
+                      ? Image.network(
+                          article.imageUrl,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => Container(
+                            color: Colors.grey[900],
+                            child: const Icon(Icons.image_not_supported, color: Colors.white24),
+                          ),
+                        )
+                      : Container(color: Colors.grey[900]),
                   Positioned(
                     top: 12,
                     left: 12,
@@ -100,7 +120,7 @@ class NewsCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
-                        category,
+                        article.category.toUpperCase(),
                         style: GoogleFonts.outfit(
                           color: MifcColors.navyBlue,
                           fontSize: 10,
@@ -121,7 +141,7 @@ class NewsCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      title,
+                      article.title,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.outfit(
@@ -133,7 +153,7 @@ class NewsCard extends StatelessWidget {
                     ),
                     const Spacer(),
                     Text(
-                      time,
+                      _formatTime(article.timestamp),
                       style: GoogleFonts.inter(
                         fontSize: 10,
                         fontWeight: FontWeight.w500,

@@ -6,6 +6,8 @@ import 'package:markfc/core/theme/mifc_colors.dart';
 import 'package:markfc/shared/widgets/mifc_card.dart';
 import 'package:markfc/shared/widgets/section_header.dart';
 import 'package:markfc/shared/widgets/scroll_reveal.dart';
+import 'package:markfc/features/store/domain/models/product.dart';
+import 'package:markfc/features/store/data/repositories/shop_repository.dart';
 import '../providers/cart_provider.dart';
 import '../../data/models/cart_item.dart';
 
@@ -189,11 +191,13 @@ class _HeroBanner extends StatelessWidget {
 }
 // Private _SectionHeader removed in favor of shared SectionHeader
 
-class _SeasonKitSection extends StatelessWidget {
+class _SeasonKitSection extends ConsumerWidget {
   const _SeasonKitSection();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final kitsAsync = ref.watch(kitsStreamProvider);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -204,34 +208,16 @@ class _SeasonKitSection extends StatelessWidget {
         const SizedBox(height: 4),
         SizedBox(
           height: 220,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            children: [
-              _KitCard(
-                name: 'Home Kit',
-                price: '£85',
-                gradientColors: [Color(0xFF1A3070), Color(0xFF0D1B3E)],
-                emoji: '👕',
-                isNew: true,
-                hasGoldBorder: true,
-              ),
-              const SizedBox(width: 12),
-              _KitCard(
-                name: 'Away Kit',
-                price: '£80',
-                gradientColors: [Color(0xFFD4A840), Color(0xFF8A6820)],
-                emoji: '👕',
-              ),
-              const SizedBox(width: 12),
-              _KitCard(
-                name: 'Third Kit',
-                price: '£80',
-                gradientColors: [Color(0xFF2A0A2A), Color(0xFF8A1040)],
-                emoji: '👕',
-                isNew: true,
-              ),
-            ],
+          child: kitsAsync.when(
+            data: (kits) => ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: kits.length,
+              separatorBuilder: (context, index) => const SizedBox(width: 12),
+              itemBuilder: (context, index) => _KitCard(product: kits[index]),
+            ),
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (err, stack) => const Center(child: Text('Error loading kits', style: TextStyle(color: Colors.white70))),
           ),
         ),
       ],
@@ -240,21 +226,19 @@ class _SeasonKitSection extends StatelessWidget {
 }
 
 class _KitCard extends ConsumerWidget {
-  final String name;
-  final String price;
-  final List<Color> gradientColors;
-  final String emoji;
-  final bool isNew;
-  final bool hasGoldBorder;
+  final Product product;
 
   const _KitCard({
-    required this.name,
-    required this.price,
-    required this.gradientColors,
-    required this.emoji,
-    this.isNew = false,
-    this.hasGoldBorder = false,
+    required this.product,
   });
+
+  Color _parseHex(String hex) {
+    try {
+      return Color(int.parse(hex));
+    } catch (_) {
+      return Colors.grey;
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -273,13 +257,13 @@ class _KitCard extends ConsumerWidget {
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: gradientColors,
+                  colors: product.gradientHexColors.map((h) => _parseHex(h)).toList(),
                 ),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Stack(
                 children: [
-                  if (isNew)
+                  if (product.isNew)
                     Positioned(
                       top: 8,
                       right: 8,
@@ -301,7 +285,7 @@ class _KitCard extends ConsumerWidget {
                     ),
                   Center(
                     child: Text(
-                      emoji,
+                      product.emoji,
                       style: const TextStyle(fontSize: 50),
                     ),
                   ),
@@ -312,15 +296,15 @@ class _KitCard extends ConsumerWidget {
                       onTap: () {
                         ref.read(cartProvider.notifier).addItem(
                           CartItem(
-                            id: 'kit_$name',
-                            name: name,
-                            price: price,
-                            emoji: emoji,
+                            id: product.id,
+                            name: product.name,
+                            price: product.price,
+                            emoji: product.emoji,
                           ),
                         );
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('$name added to cart'),
+                            content: Text('${product.name} added to cart'),
                             duration: const Duration(seconds: 1),
                             backgroundColor: MifcColors.card,
                           ),
@@ -350,7 +334,7 @@ class _KitCard extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  name,
+                  product.name,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.outfit(
@@ -360,7 +344,7 @@ class _KitCard extends ConsumerWidget {
                   ),
                 ),
                 Text(
-                  price,
+                  product.price,
                   style: GoogleFonts.outfit(
                     color: MifcColors.navyBlue,
                     fontSize: 14,
@@ -376,11 +360,13 @@ class _KitCard extends ConsumerWidget {
   }
 }
 
-class _AccessoriesSection extends StatelessWidget {
+class _AccessoriesSection extends ConsumerWidget {
   const _AccessoriesSection();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final accAsync = ref.watch(accessoriesStreamProvider);
+
     return Column(
       children: [
         SectionHeader(
@@ -390,18 +376,16 @@ class _AccessoriesSection extends StatelessWidget {
         const SizedBox(height: 4),
         SizedBox(
           height: 140,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            children: [
-              const _AccessoryCard(name: 'Club Scarf', price: '£22', emoji: '🧣'),
-              const SizedBox(width: 10),
-              const _AccessoryCard(name: 'Snapback', price: '£28', emoji: '🧢'),
-              const SizedBox(width: 10),
-              const _AccessoryCard(name: 'Training Top', price: '£45', emoji: '👕'),
-              const SizedBox(width: 10),
-              const _AccessoryCard(name: 'Match Ball', price: '£35', emoji: '⚽'),
-            ],
+          child: accAsync.when(
+            data: (products) => ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: products.length,
+              separatorBuilder: (context, index) => const SizedBox(width: 10),
+              itemBuilder: (context, index) => _AccessoryCard(product: products[index]),
+            ),
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (err, stack) => const Center(child: Text('Error loading accessories', style: TextStyle(color: Colors.white70))),
           ),
         ),
       ],
@@ -410,14 +394,10 @@ class _AccessoriesSection extends StatelessWidget {
 }
 
 class _AccessoryCard extends ConsumerWidget {
-  final String name;
-  final String price;
-  final String emoji;
+  final Product product;
 
   const _AccessoryCard({
-    required this.name,
-    required this.price,
-    required this.emoji,
+    required this.product,
   });
 
   @override
@@ -448,7 +428,7 @@ class _AccessoryCard extends ConsumerWidget {
                 children: [
                   Center(
                     child: Text(
-                      emoji,
+                      product.emoji,
                       style: const TextStyle(fontSize: 30),
                     ),
                   ),
@@ -459,15 +439,15 @@ class _AccessoryCard extends ConsumerWidget {
                       onTap: () {
                         ref.read(cartProvider.notifier).addItem(
                           CartItem(
-                            id: 'acc_$name',
-                            name: name,
-                            price: price,
-                            emoji: emoji,
+                            id: product.id,
+                            name: product.name,
+                            price: product.price,
+                            emoji: product.emoji,
                           ),
                         );
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('$name added to cart'),
+                            content: Text('${product.name} added to cart'),
                             duration: const Duration(seconds: 1),
                             backgroundColor: MifcColors.card,
                           ),
@@ -497,7 +477,7 @@ class _AccessoryCard extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  name,
+                  product.name,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.outfit(
@@ -507,7 +487,7 @@ class _AccessoryCard extends ConsumerWidget {
                   ),
                 ),
                 Text(
-                  price,
+                  product.price,
                   style: GoogleFonts.outfit(
                     color: MifcColors.navyBlue,
                     fontSize: 11,
@@ -522,45 +502,29 @@ class _AccessoryCard extends ConsumerWidget {
     );
   }
 }
-class _TrainingWearSection extends StatelessWidget {
+class _TrainingWearSection extends ConsumerWidget {
   const _TrainingWearSection();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final trainingAsync = ref.watch(trainingWearStreamProvider);
+
     return Column(
       children: [
         const _TrainingSectionHeader(),
         const SizedBox(height: 4),
         SizedBox(
           height: 220,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            children: const [
-              _TrainingCard(
-                name: 'Training Jersey',
-                price: '£45',
-                emoji: '👕',
-              ),
-              SizedBox(width: 12),
-              _TrainingCard(
-                name: 'Training Shorts',
-                price: '£30',
-                emoji: '🩳',
-              ),
-              SizedBox(width: 12),
-              _TrainingCard(
-                name: 'Tracksuit',
-                price: '£75',
-                emoji: '👕',
-              ),
-              SizedBox(width: 12),
-              _TrainingCard(
-                name: 'Training Socks',
-                price: '£12',
-                emoji: '🧦',
-              ),
-            ],
+          child: trainingAsync.when(
+            data: (products) => ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: products.length,
+              separatorBuilder: (context, index) => const SizedBox(width: 12),
+              itemBuilder: (context, index) => _TrainingCard(product: products[index]),
+            ),
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (err, stack) => const Center(child: Text('Error loading training wear', style: TextStyle(color: Colors.white70))),
           ),
         ),
       ],
@@ -618,14 +582,10 @@ class _TrainingSectionHeader extends StatelessWidget {
 }
 
 class _TrainingCard extends ConsumerWidget {
-  final String name;
-  final String price;
-  final String emoji;
+  final Product product;
 
   const _TrainingCard({
-    required this.name,
-    required this.price,
-    required this.emoji,
+    required this.product,
   });
 
   @override
@@ -656,7 +616,7 @@ class _TrainingCard extends ConsumerWidget {
                 children: [
                   Center(
                     child: Text(
-                      emoji,
+                      product.emoji,
                       style: const TextStyle(fontSize: 50),
                     ),
                   ),
@@ -667,15 +627,15 @@ class _TrainingCard extends ConsumerWidget {
                       onTap: () {
                         ref.read(cartProvider.notifier).addItem(
                           CartItem(
-                            id: 'training_$name',
-                            name: name,
-                            price: price,
-                            emoji: emoji,
+                            id: product.id,
+                            name: product.name,
+                            price: product.price,
+                            emoji: product.emoji,
                           ),
                         );
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('$name added to cart'),
+                            content: Text('${product.name} added to cart'),
                             duration: const Duration(seconds: 1),
                             backgroundColor: MifcColors.card,
                           ),
@@ -705,7 +665,7 @@ class _TrainingCard extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  name,
+                  product.name,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.barlowCondensed(
@@ -716,7 +676,7 @@ class _TrainingCard extends ConsumerWidget {
                   ),
                 ),
                 Text(
-                  price,
+                  product.price,
                   style: GoogleFonts.bebasNeue(
                     color: const Color(0xFFD4A840),
                     fontSize: 16,

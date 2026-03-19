@@ -1,1 +1,31 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"markifootballclub","appId":"1:122320937038:android:c61bcc9d912508552f631f","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"markifootballclub","configurations":{"android":"1:122320937038:android:c61bcc9d912508552f631f","ios":"1:122320937038:ios:5db0e0ae43bd04762f631f","macos":"1:122320937038:ios:5db0e0ae43bd04762f631f","web":"1:122320937038:web:0fa90b1d531230ae2f631f","windows":"1:122320937038:web:0fa90b1d531230ae2f631f"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "markifootballclub",
+          "appId": "1:122320937038:android:c61bcc9d912508552f631f",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "markifootballclub",
+          "configurations": {
+            "android": "1:122320937038:android:c61bcc9d912508552f631f",
+            "ios": "1:122320937038:ios:5db0e0ae43bd04762f631f",
+            "macos": "1:122320937038:ios:5db0e0ae43bd04762f631f",
+            "web": "1:122320937038:web:0fa90b1d531230ae2f631f",
+            "windows": "1:122320937038:web:0fa90b1d531230ae2f631f"
+          }
+        }
+      }
+    }
+  },
+  "firestore": {
+    "rules": "firestore.rules"
+  },
+  "storage": {
+    "rules": "storage.rules"
+  }
+}

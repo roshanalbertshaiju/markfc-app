@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:markfc/core/theme/mifc_colors.dart';
 import 'package:markfc/shared/widgets/mifc_card.dart';
 import 'package:markfc/shared/widgets/scroll_reveal.dart';
 import 'package:markfc/shared/widgets/mifc_top_bar.dart';
+import 'package:markfc/features/fixtures/data/repositories/fixtures_repository.dart';
+import 'package:markfc/features/fixtures/domain/models/match_model.dart';
 
-class FixturesScreen extends StatefulWidget {
+class FixturesScreen extends ConsumerStatefulWidget {
   const FixturesScreen({super.key});
 
   @override
-  State<FixturesScreen> createState() => _FixturesScreenState();
+  ConsumerState<FixturesScreen> createState() => _FixturesScreenState();
 }
 
-class _FixturesScreenState extends State<FixturesScreen> with SingleTickerProviderStateMixin {
+class _FixturesScreenState extends ConsumerState<FixturesScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final ScrollController _scrollController = ScrollController();
   double _opacity = 0.0;
@@ -75,7 +77,7 @@ class _FixturesScreenState extends State<FixturesScreen> with SingleTickerProvid
               _buildHero(),
               _buildTabsHeader(),
               _activeTab == 0 
-                ? _buildMatchesList()
+                ? const _FixturesList()
                 : const Center(
                     child: Padding(
                       padding: EdgeInsets.symmetric(vertical: 100),
@@ -204,44 +206,63 @@ class _FixturesScreenState extends State<FixturesScreen> with SingleTickerProvid
       ),
     );
   }
+}
 
-  Widget _buildMatchesList() {
+class _FixturesList extends ConsumerWidget {
+  const _FixturesList();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final fixturesAsync = ref.watch(fixturesStreamProvider);
+    final resultsAsync = ref.watch(resultsStreamProvider);
+
     return Column(
       children: [
-        const _MatchGroupHeader(title: 'SEPTEMBER 2025'),
-        const _MatchCard(
-          date: 'Sat 13 Sep | English Premier League',
-          homeTeam: 'Grimsby',
-          awayTeam: 'Mark Intl',
-          homeScore: '2',
-          awayScore: '2',
-          isReviewAvailable: true,
+        resultsAsync.when(
+          data: (results) => _buildGroupedMatches(results, 'COMPLETED MATCHES'),
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (err, stack) => const SizedBox.shrink(),
         ),
-        const _MatchCard(
-          date: 'Sat 20 Sep | English Premier League',
-          homeTeam: 'Mark Intl',
-          awayTeam: 'Burnley',
-          homeScore: '3',
-          awayScore: '2',
-          isReviewAvailable: true,
+        fixturesAsync.when(
+          data: (fixtures) => _buildGroupedMatches(fixtures, 'UPCOMING FIXTURES'),
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (err, stack) => const SizedBox.shrink(),
         ),
-        const _MatchGroupHeader(title: 'OCTOBER 2025'),
-        const _MatchCard(
-          date: 'Sun 04 Oct | English Premier League',
-          homeTeam: 'Man City',
-          awayTeam: 'Mark Intl',
-          homeScore: '3',
-          awayScore: '0',
-          isReviewAvailable: true,
+      ],
+    );
+  }
+
+  Widget _buildGroupedMatches(List<MatchModel> matches, String title) {
+    if (matches.isEmpty) return const SizedBox.shrink();
+
+    // Group by Month
+    final Map<String, List<MatchModel>> grouped = {};
+    for (var m in matches) {
+      final month = DateFormat('MMMM yyyy').format(m.timestamp).toUpperCase();
+      grouped.putIfAbsent(month, () => []).add(m);
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(24, 32, 24, 8),
+          child: Text(
+            title,
+            style: GoogleFonts.outfit(
+              fontSize: 14,
+              fontWeight: FontWeight.w900,
+              color: MifcColors.navyBlue,
+              letterSpacing: 2.0,
+            ),
+          ),
         ),
-        const _MatchCard(
-          date: 'Sat 10 Oct | English Premier League',
-          homeTeam: 'Mark Intl',
-          awayTeam: 'Chelsea',
-          homeScore: '2',
-          awayScore: '1',
-          isReviewAvailable: true,
-        ),
+        ...grouped.entries.map((entry) => Column(
+          children: [
+            _MatchGroupHeader(title: entry.key),
+            ...entry.value.map((m) => _MatchCard(match: m)),
+          ],
+        )),
       ],
     );
   }
@@ -269,24 +290,14 @@ class _MatchGroupHeader extends StatelessWidget {
 }
 
 class _MatchCard extends StatelessWidget {
-  final String date;
-  final String homeTeam;
-  final String awayTeam;
-  final String homeScore;
-  final String awayScore;
-  final bool isReviewAvailable;
+  final MatchModel match;
 
-  const _MatchCard({
-    required this.date,
-    required this.homeTeam,
-    required this.awayTeam,
-    required this.homeScore,
-    required this.awayScore,
-    this.isReviewAvailable = false,
-  });
+  const _MatchCard({required this.match});
 
   @override
   Widget build(BuildContext context) {
+    final dateStr = DateFormat('EEE d MMM | ').format(match.timestamp) + match.competition;
+    
     return ScrollReveal(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -294,7 +305,6 @@ class _MatchCard extends StatelessWidget {
           padding: EdgeInsets.zero,
           child: Column(
             children: [
-              // Header with Date & Table button
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
@@ -308,7 +318,7 @@ class _MatchCard extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        date,
+                        dateStr,
                         style: GoogleFonts.inter(
                           fontSize: 11,
                           color: Colors.white.withValues(alpha: 0.4),
@@ -323,7 +333,7 @@ class _MatchCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
-                        'Table',
+                        'Match Info',
                         style: GoogleFonts.outfit(
                           fontSize: 10,
                           fontWeight: FontWeight.w600,
@@ -334,7 +344,6 @@ class _MatchCard extends StatelessWidget {
                   ],
                 ),
               ),
-              // Main Match Info
               Padding(
                 padding: const EdgeInsets.all(20),
                 child: Row(
@@ -344,16 +353,16 @@ class _MatchCard extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Text(
-                            homeTeam,
+                            match.homeTeam.toUpperCase(),
                             style: GoogleFonts.outfit(
-                              fontSize: 15,
+                              fontSize: 14,
                               fontWeight: FontWeight.w700,
                               color: Colors.white,
                             ),
                             textAlign: TextAlign.right,
                           ),
                           const SizedBox(width: 12),
-                          _buildCrest(homeTeam),
+                          _buildCrest(match.homeCode),
                         ],
                       ),
                     ),
@@ -365,12 +374,14 @@ class _MatchCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
-                        '$homeScore - $awayScore',
+                        match.status == MatchStatus.upcoming 
+                          ? DateFormat('HH:mm').format(match.timestamp)
+                          : '${match.homeScore} - ${match.awayScore}',
                         style: GoogleFonts.outfit(
                           fontSize: 16,
                           fontWeight: FontWeight.w900,
                           color: Colors.white,
-                          letterSpacing: 2,
+                          letterSpacing: 1,
                         ),
                       ),
                     ),
@@ -378,12 +389,12 @@ class _MatchCard extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          _buildCrest(awayTeam),
+                          _buildCrest(match.awayCode),
                           const SizedBox(width: 12),
                           Text(
-                            awayTeam,
+                            match.awayTeam.toUpperCase(),
                             style: GoogleFonts.outfit(
-                              fontSize: 15,
+                              fontSize: 14,
                               fontWeight: FontWeight.w700,
                               color: Colors.white,
                             ),
@@ -394,29 +405,17 @@ class _MatchCard extends StatelessWidget {
                   ],
                 ),
               ),
-              // Review Link
-              if (isReviewAvailable)
+              if (match.status == MatchStatus.finished && match.scorers.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'MATCH REVIEW',
-                        style: GoogleFonts.outfit(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white.withValues(alpha: 0.8),
-                          letterSpacing: 1.0,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      const Icon(
-                        Icons.trending_flat_rounded,
-                        color: MifcColors.crimson,
-                        size: 18,
-                      ),
-                    ],
+                  child: Text(
+                    match.scorers.join(', '),
+                    style: GoogleFonts.inter(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white.withValues(alpha: 0.4),
+                      letterSpacing: 0.5,
+                    ),
                   ),
                 ),
             ],
@@ -426,17 +425,26 @@ class _MatchCard extends StatelessWidget {
     );
   }
 
-  Widget _buildCrest(String team) {
-    // Mock crests using icons for now
+  Widget _buildCrest(String code) {
     return Container(
       width: 32,
       height: 32,
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.05),
         shape: BoxShape.circle,
+        border: Border.all(
+          color: code.toUpperCase().contains('MIFC') ? MifcColors.crimson.withValues(alpha: 0.3) : Colors.white10,
+        ),
       ),
-      child: const Center(
-        child: Icon(Icons.shield, color: Colors.white24, size: 18),
+      child: Center(
+        child: Text(
+          code.substring(0, code.length > 3 ? 3 : code.length),
+          style: GoogleFonts.outfit(
+            fontSize: 10,
+            fontWeight: FontWeight.w800,
+            color: Colors.white,
+          ),
+        ),
       ),
     );
   }

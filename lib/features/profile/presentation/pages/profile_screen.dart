@@ -1,65 +1,81 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
+import 'package:markfc/features/profile/domain/models/mifc_user.dart';
+import 'package:markfc/features/profile/domain/models/user_activity.dart';
+import 'package:markfc/features/profile/data/repositories/profile_repository.dart';
 import 'package:markfc/core/theme/mifc_colors.dart';
 import 'package:markfc/shared/widgets/scroll_reveal.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final userAsync = ref.watch(currentUserProvider);
+
     return Scaffold(
       backgroundColor: MifcColors.black,
-      body: CustomScrollView(
-        slivers: [
-          _buildAppBar(),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 20),
-                  const ScrollReveal(child: _MemberCard()),
-                  const SizedBox(height: 32),
-                  const ScrollReveal(delay: Duration(milliseconds: 100), child: _MemberStats()),
-                  const SizedBox(height: 40),
-                  Text(
-                    'YOUR ACTIVITIES',
-                    style: GoogleFonts.outfit(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w900,
-                      color: MifcColors.prestigeGold,
-                      letterSpacing: 2,
-                    ),
+      body: userAsync.when(
+        data: (user) {
+          if (user == null) {
+            return const _UnauthenticatedView();
+          }
+          return CustomScrollView(
+            slivers: [
+              _buildAppBar(),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 20),
+                      ScrollReveal(child: _MemberCard(user: user)),
+                      const SizedBox(height: 32),
+                      ScrollReveal(delay: const Duration(milliseconds: 100), child: _MemberStats(user: user)),
+                      const SizedBox(height: 40),
+                      Text(
+                        'YOUR ACTIVITIES',
+                        style: GoogleFonts.outfit(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w900,
+                          color: MifcColors.prestigeGold,
+                          letterSpacing: 2,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      _ActivityList(uid: user.uid),
+                      const SizedBox(height: 40),
+                      _buildSectionHeader('ACCOUNT'),
+                      _buildAccountItem(
+                        Icons.settings_outlined,
+                        'Settings',
+                        onTap: () => context.push('/profile/settings'),
+                      ),
+                      _buildAccountItem(
+                        Icons.help_outline_rounded,
+                        'Help & Support',
+                        onTap: () => context.push('/profile/help'),
+                      ),
+                      _buildAccountItem(
+                        Icons.logout_rounded,
+                        'Logout',
+                        isDestructive: true,
+                        onTap: () => _showLogoutDialog(context),
+                      ),
+                      const SizedBox(height: 120),
+                    ],
                   ),
-                  const SizedBox(height: 20),
-                  const _ActivityList(),
-                  const SizedBox(height: 40),
-                  _buildSectionHeader('ACCOUNT'),
-                  _buildAccountItem(
-                    Icons.settings_outlined, 
-                    'Settings',
-                    onTap: () => context.push('/profile/settings'),
-                  ),
-                  _buildAccountItem(
-                    Icons.help_outline_rounded, 
-                    'Help & Support',
-                    onTap: () => context.push('/profile/help'),
-                  ),
-                  _buildAccountItem(
-                    Icons.logout_rounded, 
-                    'Logout', 
-                    isDestructive: true,
-                    onTap: () => _showLogoutDialog(context),
-                  ),
-                  const SizedBox(height: 120),
-                ],
+                ),
               ),
-            ),
-          ),
-        ],
+            ],
+          );
+        },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, stack) => Center(child: Text('Error loading profile: $err', style: const TextStyle(color: Colors.white70))),
       ),
     );
   }
@@ -177,7 +193,8 @@ class ProfileScreen extends StatelessWidget {
 }
 
 class _MemberCard extends StatelessWidget {
-  const _MemberCard();
+  final MifcUser user;
+  const _MemberCard({required this.user});
 
   @override
   Widget build(BuildContext context) {
@@ -243,7 +260,7 @@ class _MemberCard extends StatelessWidget {
                 ),
                 const Spacer(),
                 Text(
-                  'ROSHAN ALBERT',
+                  user.name.toUpperCase(),
                   style: GoogleFonts.outfit(
                     color: Colors.white,
                     fontSize: 24,
@@ -253,7 +270,7 @@ class _MemberCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'MEMBER SINCE 2021',
+                  'MEMBER SINCE ${user.joinDate.year}',
                   style: GoogleFonts.inter(
                     color: MifcColors.prestigeGold.withValues(alpha: 0.6),
                     fontSize: 12,
@@ -271,16 +288,17 @@ class _MemberCard extends StatelessWidget {
 }
 
 class _MemberStats extends StatelessWidget {
-  const _MemberStats();
+  final MifcUser user;
+  const _MemberStats({required this.user});
 
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _buildStatItem('MATCHES', '12'),
-        _buildStatItem('LOYALTY', '450'),
-        _buildStatItem('YEARS', '3'),
+        _buildStatItem('MATCHES', user.matchesAttended.toString()),
+        _buildStatItem('LOYALTY', user.loyaltyPoints.toString()),
+        _buildStatItem('YEARS', (DateTime.now().year - user.joinDate.year).toString()),
       ],
     );
   }
@@ -311,35 +329,80 @@ class _MemberStats extends StatelessWidget {
   }
 }
 
-class _ActivityList extends StatelessWidget {
-  const _ActivityList();
+class _ActivityList extends ConsumerWidget {
+  final String uid;
+  const _ActivityList({required this.uid});
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        _buildActivityItem(
-          Icons.shopping_bag_rounded,
-          'Kit Purchase',
-          'Purchased 24/25 Home Kit',
-          '2 days ago',
-        ),
-        _buildDivider(),
-        _buildActivityItem(
-          Icons.how_to_vote_rounded,
-          'Fan Vote',
-          'Voted for Player of the Month',
-          '5 days ago',
-        ),
-        _buildDivider(),
-        _buildActivityItem(
-          Icons.confirmation_num_rounded,
-          'Match Ticket',
-          'Booked tickets for vs City',
-          '1 week ago',
-        ),
-      ],
+  Widget build(BuildContext context, WidgetRef ref) {
+    final activitiesAsync = ref.watch(userActivitiesProvider(uid));
+
+    return activitiesAsync.when(
+      data: (activities) {
+        if (activities.isEmpty) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 24),
+            child: Center(
+              child: Text(
+                'NO RECENT ACTIVITIES',
+                style: GoogleFonts.outfit(
+                  color: Colors.white24,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 1,
+                ),
+              ),
+            ),
+          );
+        }
+        return Column(
+          children: activities.map((activity) {
+            final isLast = activities.last == activity;
+            return Column(
+              children: [
+                _buildActivityItem(
+                  _getIconForType(activity.type),
+                  activity.title,
+                  activity.subtitle,
+                  _formatTime(activity.timestamp),
+                ),
+                if (!isLast) _buildDivider(),
+              ],
+            );
+          }).toList(),
+        );
+      },
+      loading: () => const LinearProgressIndicator(),
+      error: (err, stack) => const Text('Error loading activities', style: TextStyle(color: Colors.white38)),
     );
+  }
+
+  IconData _getIconForType(ActivityType type) {
+    switch (type) {
+      case ActivityType.purchase:
+        return Icons.shopping_bag_rounded;
+      case ActivityType.vote:
+        return Icons.how_to_vote_rounded;
+      case ActivityType.ticket:
+        return Icons.confirmation_num_rounded;
+      case ActivityType.other:
+        return Icons.info_outline_rounded;
+    }
+  }
+
+  String _formatTime(DateTime timestamp) {
+    final now = DateTime.now();
+    final difference = now.difference(timestamp);
+
+    if (difference.inDays > 7) {
+      return DateFormat('dd MMM').format(timestamp).toUpperCase();
+    } else if (difference.inDays >= 1) {
+      return '${difference.inDays}D AGO';
+    } else if (difference.inHours >= 1) {
+      return '${difference.inHours}H AGO';
+    } else {
+      return 'JUST NOW';
+    }
   }
 
   Widget _buildActivityItem(IconData icon, String title, String subtitle, String time) {
@@ -392,5 +455,57 @@ class _ActivityList extends StatelessWidget {
 
   Widget _buildDivider() {
     return Divider(color: Colors.white.withValues(alpha: 0.05), height: 1);
+  }
+}
+class _UnauthenticatedView extends StatelessWidget {
+  const _UnauthenticatedView();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(40),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.lock_person_rounded, size: 80, color: MifcColors.prestigeGold.withValues(alpha: 0.3)),
+            const SizedBox(height: 24),
+            Text(
+              'ELITE ACCESS ONLY',
+              style: GoogleFonts.outfit(
+                fontSize: 24,
+                fontWeight: FontWeight.w900,
+                color: Colors.white,
+                letterSpacing: 2,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Please log in to your account to access your personalized Member Hub and rewards.',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.inter(
+                color: Colors.white38,
+                fontSize: 14,
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 40),
+            ElevatedButton(
+              onPressed: () => context.push('/login'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: MifcColors.prestigeGold,
+                foregroundColor: Colors.black,
+                padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              child: Text(
+                'LOG IN',
+                style: GoogleFonts.outfit(fontWeight: FontWeight.w900, letterSpacing: 1),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

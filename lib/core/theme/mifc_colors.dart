@@ -23,14 +23,15 @@ class MifcColors {
   static const Color border = Color(0x0FFFFFFF); // 6% white
   static const Color white = Color(0xFFFFFFFF);
 
-  static Color mutedOpacity = Colors.white.withValues(alpha: 0.3);
+  // Utility
+  static Color mutedOpacity = white.withValues(alpha: 0.3);
 
-  // Legacy Mappings (Temporary to keep app building during migration)
+  // Legacy Mappings (Maintained for backward compatibility but corrected where possible)
   static const Color navyDark = black;
-  static const Color navy = charcoal;
+  static const Color navy = navyBlue;
   static const Color red = crimson;
-  static const Color gold = navyBlue;
-  static const Color champagne = navyBlue;
+  static const Color gold = prestigeGold; 
+  static const Color champagne = prestigeGold;
   static const Color eliteBlue = navyBlue;
   static const Color dartsurface = darkSurface;
   static const Color cardLight = charcoal;

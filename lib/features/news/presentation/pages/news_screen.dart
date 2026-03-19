@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import '../../../../shared/widgets/mifc_top_bar.dart';
 import '../../../../shared/widgets/chat_fab.dart';
 import '../../../../core/theme/mifc_colors.dart';
 import '../../../../shared/widgets/mifc_card.dart';
 import '../../../../shared/widgets/scroll_reveal.dart';
+import 'package:markfc/features/news/data/repositories/news_repository.dart';
+import 'package:markfc/features/news/domain/models/video_content.dart';
+import 'package:markfc/features/news/data/repositories/video_repository.dart';
+import 'package:markfc/features/news/domain/models/news_article.dart';
 
 class NewsScreen extends StatefulWidget {
   const NewsScreen({super.key});
@@ -144,92 +150,109 @@ class ArticlesVideosToggle extends StatelessWidget {
   }
 }
 
-class NewsScrollBody extends StatelessWidget {
+class NewsScrollBody extends ConsumerWidget {
   const NewsScrollBody({super.key});
 
+  String _formatTime(DateTime timestamp) {
+    final now = DateTime.now();
+    final difference = now.difference(timestamp);
+
+    if (difference.inDays > 0) {
+      return '${difference.inDays} DAYS AGO';
+    } else if (difference.inHours > 0) {
+      return '${difference.inHours} HOURS AGO';
+    } else if (difference.inMinutes > 0) {
+      return '${difference.inMinutes} MINUTES AGO';
+    } else {
+      return 'JUST NOW';
+    }
+  }
+
   @override
-  Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.only(bottom: 40),
-      physics: const BouncingScrollPhysics(),
-      children: [
-        const ScrollReveal(
-          type: AnimationType.fade,
-          child: FeaturedHeroCard(),
-        ),
-        _buildLatestUpdatesHeader(),
-        const ScrollReveal(
-          type: AnimationType.fade,
-          delay: Duration(milliseconds: 100),
-          child: HorizontalNewsCard(
-            category: 'TRANSFER NEWS',
-            categoryColor: MifcColors.crimson,
-            title: 'CLUB IN TALKS OVER SUMMER MIDFIELD SIGNING',
-            time: '2 HOURS AGO',
-            emoji: '🤝',
-          ),
-        ),
-        const ScrollReveal(
-          type: AnimationType.fade,
-          delay: Duration(milliseconds: 200),
-          child: HorizontalNewsCard(
-            category: 'TEAM NEWS',
-            categoryColor: Colors.greenAccent,
-            title: 'INJURY UPDATE: BELLINGHAM RETURNS TO FULL TRAINING',
-            time: '4 HOURS AGO',
-            emoji: '🤕',
-          ),
-        ),
-        const ScrollReveal(
-          type: AnimationType.fade,
-          delay: Duration(milliseconds: 300),
-          child: FullWidthNewsCard(
-            category: 'ACADEMY UPDATES',
-            categoryColor: MifcColors.navyBlue,
-            title: 'U18S CONTINUE UNBEATEN RUN WITH DOMINANT 4-0 WIN',
-            excerpt: 'The young Reds showcased their talent with a four-goal display against traditional rivals at the academy grounds this morning...',
-            time: '6 HOURS AGO',
-            imageUrl: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=800',
-          ),
-        ),
-        const ScrollReveal(
-          type: AnimationType.fade,
-          delay: Duration(milliseconds: 400),
-          child: HorizontalNewsCard(
-            category: 'INTERVIEW',
-            categoryColor: Colors.white70,
-            title: 'BELLINGHAM: "THIS SQUAD HAS THE HUNGER TO GO ALL THE WAY"',
-            time: '8 HOURS AGO',
-            emoji: '🎙️',
-          ),
-        ),
-        const ScrollReveal(
-          type: AnimationType.fade,
-          delay: Duration(milliseconds: 500),
-          child: HorizontalNewsCard(
-            category: 'MATCH REPORT',
-            categoryColor: Colors.purpleAccent,
-            title: 'MIFC 3-1 ARSENAL: PLAYER RATINGS & ANALYSIS',
-            time: 'YESTERDAY',
-            emoji: '📊',
-          ),
-        ),
-        const ScrollReveal(
-          type: AnimationType.fade,
-          delay: Duration(milliseconds: 600),
-          child: FullWidthNewsCard(
-            category: 'CLUB NEWS',
-            categoryColor: Colors.white70,
-            title: 'NEW 2025-26 AWAY KIT OFFICIALLY UNVEILED',
-            excerpt: 'The club has pulled back the curtain on the new away strip for next season, featuring a bold monochrome aesthetic...',
-            time: '2 DAYS AGO',
-            imageUrl: 'https://images.unsplash.com/photo-1543351611-58f88d736768?q=80&w=800',
-          ),
-        ),
-        const SizedBox(height: 16),
-        _buildLoadMoreButton(),
-      ],
+  Widget build(BuildContext context, WidgetRef ref) {
+    final newsAsyncValue = ref.watch(latestNewsProvider(20));
+
+    return newsAsyncValue.when(
+      data: (articles) {
+        if (articles.isEmpty) {
+          return Center(
+            child: Text(
+              'NO NEWS ARTICLES FOUND',
+              style: GoogleFonts.outfit(color: Colors.white54, letterSpacing: 1.5),
+            ),
+          );
+        }
+
+        return ListView.builder(
+          padding: const EdgeInsets.only(bottom: 40),
+          physics: const BouncingScrollPhysics(),
+          itemCount: articles.length + 2, // + Featured Hero + Header
+          itemBuilder: (context, index) {
+            if (index == 0) {
+              return ScrollReveal(
+                type: AnimationType.fade,
+                child: FeaturedHeroCard(article: articles[0]),
+              );
+            }
+            if (index == 1) {
+              return _buildLatestUpdatesHeader();
+            }
+
+            final articleIndex = index - 1; // Adjust for Hero card at 0
+            if (articleIndex >= articles.length) {
+                // This could be the load more button if we implement pagination
+                return _buildLoadMoreButton();
+            }
+            
+            final article = articles[articleIndex];
+            final displayTime = _formatTime(article.timestamp);
+
+            // Alternate between HorizontalNewsCard and FullWidthNewsCard for variety
+            if (articleIndex % 3 == 0 && articleIndex != 0) {
+              return ScrollReveal(
+                type: AnimationType.fade,
+                delay: const Duration(milliseconds: 100),
+                child: FullWidthNewsCard(
+                  article: article,
+                  displayTime: displayTime,
+                ),
+              );
+            }
+
+            return ScrollReveal(
+              type: AnimationType.fade,
+              delay: const Duration(milliseconds: 100),
+              child: HorizontalNewsCard(
+                article: article,
+                displayTime: displayTime,
+                emoji: _getEmojiForCategory(article.category),
+              ),
+            );
+          },
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator(color: MifcColors.navyBlue)),
+      error: (err, stack) => Center(child: Text('Error loading news: $err')),
     );
+  }
+
+  String _getEmojiForCategory(String category) {
+    switch (category.toUpperCase()) {
+      case 'TRANSFER':
+      case 'TRANSFERS':
+        return '🤝';
+      case 'TEAM':
+      case 'TEAM NEWS':
+        return '🤕';
+      case 'ACADEMY':
+        return '🏆';
+      case 'INTERVIEW':
+        return '🎙️';
+      case 'MATCH REPORT':
+        return '📊';
+      default:
+        return '🗞️';
+    }
   }
 
   Widget _buildLatestUpdatesHeader() {
@@ -269,16 +292,16 @@ class NewsScrollBody extends StatelessWidget {
 
   Widget _buildLoadMoreButton() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       child: MifcCard(
         padding: const EdgeInsets.symmetric(vertical: 16),
         child: Center(
           child: Text(
-            'LOAD OLDER STORIES',
+            'END OF NEWS FEED',
             style: GoogleFonts.outfit(
               fontSize: 12,
               fontWeight: FontWeight.w700,
-              color: MifcColors.white,
+              color: MifcColors.white.withValues(alpha: 0.5),
               letterSpacing: 1.0,
             ),
           ),
@@ -288,92 +311,91 @@ class NewsScrollBody extends StatelessWidget {
   }
 }
 
-class VideoListTab extends StatelessWidget {
+class VideoListTab extends ConsumerWidget {
   const VideoListTab({super.key});
 
+  String _formatViews(int views) {
+    if (views >= 1000000) {
+      return '${(views / 1000000).toStringAsFixed(1)}M VIEWS';
+    } else if (views >= 1000) {
+      return '${(views / 1000).toStringAsFixed(1)}K VIEWS';
+    } else {
+      return '$views VIEWS';
+    }
+  }
+
+  String _formatTime(DateTime timestamp) {
+    final now = DateTime.now();
+    final difference = now.difference(timestamp);
+
+    if (difference.inDays > 7) {
+      return DateFormat('dd MMM yyyy').format(timestamp).toUpperCase();
+    } else if (difference.inDays >= 1) {
+      return '${difference.inDays} DAYS AGO';
+    } else if (difference.inHours >= 1) {
+      return '${difference.inHours} HOURS AGO';
+    } else if (difference.inMinutes >= 1) {
+      return '${difference.inMinutes} MINUTES AGO';
+    } else {
+      return 'JUST NOW';
+    }
+  }
+
   @override
-  Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: const [
-        ScrollReveal(
-          type: AnimationType.fade,
-          delay: Duration(milliseconds: 100),
-          child: VideoCard(
-            title: 'SALAH POST-MATCH: "WE BELIEVE IN THE TITLE"',
-            category: 'INTERVIEW',
-            categoryColor: MifcColors.crimson,
-            duration: '04:20',
-            views: '12K VIEWS',
-            date: '2 HOURS AGO',
-            imageUrl: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=400',
-          ),
-        ),
-        ScrollReveal(
-          type: AnimationType.fade,
-          delay: Duration(milliseconds: 200),
-          child: VideoCard(
-            title: 'HIGHLIGHTS: MIFC 3-1 ARSENAL',
-            category: 'HIGHLIGHTS',
-            categoryColor: Colors.blueAccent,
-            duration: '10:15',
-            views: '45K VIEWS',
-            date: 'YESTERDAY',
-            imageUrl: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=400',
-          ),
-        ),
-        ScrollReveal(
-          type: AnimationType.fade,
-          delay: Duration(milliseconds: 300),
-          child: VideoCard(
-            title: 'BEHIND THE SCENES: TRAINING GROUND FOCUS',
-            category: 'BTS',
-            categoryColor: Colors.tealAccent,
-            duration: '06:45',
-            views: '8K VIEWS',
-            date: '2 DAYS AGO',
-            imageUrl: 'https://images.unsplash.com/photo-1543351611-58f88d736768?q=80&w=400',
-          ),
-        ),
-        ScrollReveal(
-          type: AnimationType.fade,
-          delay: Duration(milliseconds: 400),
-          child: VideoCard(
-            title: 'MANAGER PRESS CONFERENCE: LIVERPOOL PREVIEW',
-            category: 'PRESS',
-            categoryColor: Colors.purpleAccent,
-            duration: '15:30',
-            views: '15K VIEWS',
-            date: '3 DAYS AGO',
-            imageUrl: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?q=80&w=400',
-          ),
-        ),
-      ],
+  Widget build(BuildContext context, WidgetRef ref) {
+    final videosAsync = ref.watch(allVideosProvider);
+
+    return videosAsync.when(
+      data: (videos) {
+        if (videos.isEmpty) {
+          return const Center(child: Text('Coming Soon', style: TextStyle(color: Colors.white70)));
+        }
+        return ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: videos.length,
+          itemBuilder: (context, index) {
+            final video = videos[index];
+            return ScrollReveal(
+              type: AnimationType.fade,
+              delay: Duration(milliseconds: 100 + (index * 50)),
+              child: VideoCard(
+                video: video,
+                displayViews: _formatViews(video.views),
+                displayTime: _formatTime(video.timestamp),
+              ),
+            );
+          },
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (err, stack) => const Center(child: Text('Error loading videos', style: TextStyle(color: Colors.white70))),
     );
   }
 }
 
 class FeaturedHeroCard extends StatelessWidget {
-  const FeaturedHeroCard({super.key});
+  final NewsArticle article;
+  const FeaturedHeroCard({super.key, required this.article});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => context.push('/news/article/1'),
+      onTap: () => context.push('/news/article/${article.id}'),
       child: Container(
         height: 280,
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: Stack(
           children: [
             Hero(
-              tag: 'article_image_1',
+              tag: 'article_image_${article.id}',
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(24),
                 child: CachedNetworkImage(
-                  imageUrl: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1000',
+                  imageUrl: article.imageUrl,
                   fit: BoxFit.cover,
                   width: double.infinity,
                   height: 280,
+                  errorWidget: (context, url, error) => Container(color: Colors.grey[900]),
                 ),
               ),
             ),
@@ -404,7 +426,7 @@ class FeaturedHeroCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
-                          'EXCLUSIVE',
+                          'FEATURED',
                           style: GoogleFonts.outfit(
                             fontSize: 9,
                             fontWeight: FontWeight.w700,
@@ -415,7 +437,7 @@ class FeaturedHeroCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        'TRANSFER NEWS',
+                        article.category.toUpperCase(),
                         style: GoogleFonts.outfit(
                           fontSize: 9,
                           fontWeight: FontWeight.w600,
@@ -427,22 +449,12 @@ class FeaturedHeroCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    'SALAH SIGNS NEW DEAL: STAYING UNTIL 2028',
+                    article.title.toUpperCase(),
                     style: GoogleFonts.outfit(
                       fontSize: 24,
                       fontWeight: FontWeight.w700,
                       color: MifcColors.white,
                       height: 1.1,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '45 MINUTES AGO',
-                    style: GoogleFonts.inter(
-                      fontSize: 9,
-                      color: MifcColors.white.withValues(alpha: 0.3),
-                      fontWeight: FontWeight.w600,
                       letterSpacing: 0.5,
                     ),
                   ),
@@ -457,25 +469,21 @@ class FeaturedHeroCard extends StatelessWidget {
 }
 
 class HorizontalNewsCard extends StatelessWidget {
-  final String category;
-  final Color categoryColor;
-  final String title;
-  final String time;
+  final NewsArticle article;
+  final String displayTime;
   final String emoji;
 
   const HorizontalNewsCard({
     super.key,
-    required this.category,
-    required this.categoryColor,
-    required this.title,
-    required this.time,
+    required this.article,
+    required this.displayTime,
     required this.emoji,
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => context.push('/news/article/pending'),
+      onTap: () => context.push('/news/article/${article.id}'),
       child: MifcCard(
         margin: const EdgeInsets.fromLTRB(16, 0, 16, 12),
         padding: const EdgeInsets.all(16),
@@ -500,17 +508,17 @@ class HorizontalNewsCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    category,
+                    article.category.toUpperCase(),
                     style: GoogleFonts.outfit(
                       fontSize: 9,
                       fontWeight: FontWeight.w700,
-                      color: categoryColor.withValues(alpha: 0.8),
+                      color: MifcColors.navyBlue.withValues(alpha: 0.8),
                       letterSpacing: 1.0,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    title,
+                    article.title.toUpperCase(),
                     style: GoogleFonts.outfit(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
@@ -522,7 +530,7 @@ class HorizontalNewsCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    time,
+                    displayTime,
                     style: GoogleFonts.inter(
                       fontSize: 9,
                       fontWeight: FontWeight.w500,
@@ -541,27 +549,19 @@ class HorizontalNewsCard extends StatelessWidget {
 }
 
 class FullWidthNewsCard extends StatelessWidget {
-  final String category;
-  final Color categoryColor;
-  final String title;
-  final String excerpt;
-  final String time;
-  final String imageUrl;
+  final NewsArticle article;
+  final String displayTime;
 
   const FullWidthNewsCard({
     super.key,
-    required this.category,
-    required this.categoryColor,
-    required this.title,
-    required this.excerpt,
-    required this.time,
-    required this.imageUrl,
+    required this.article,
+    required this.displayTime,
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => context.push('/news/article/pending'),
+      onTap: () => context.push('/news/article/${article.id}'),
       child: MifcCard(
         margin: const EdgeInsets.fromLTRB(16, 8, 16, 16),
         padding: EdgeInsets.zero,
@@ -571,10 +571,11 @@ class FullWidthNewsCard extends StatelessWidget {
             ClipRRect(
               borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
               child: CachedNetworkImage(
-                imageUrl: imageUrl,
+                imageUrl: article.imageUrl,
                 height: 180,
                 width: double.infinity,
                 fit: BoxFit.cover,
+                errorWidget: (context, url, error) => Container(color: Colors.grey[900]),
               ),
             ),
             Padding(
@@ -583,17 +584,17 @@ class FullWidthNewsCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    category,
+                    article.category.toUpperCase(),
                     style: GoogleFonts.outfit(
                       fontSize: 9,
                       fontWeight: FontWeight.w700,
-                      color: categoryColor,
+                      color: MifcColors.crimson,
                       letterSpacing: 1.0,
                     ),
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    title,
+                    article.title.toUpperCase(),
                     style: GoogleFonts.outfit(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
@@ -601,24 +602,12 @@ class FullWidthNewsCard extends StatelessWidget {
                       height: 1.2,
                     ),
                   ),
-                  const SizedBox(height: 12),
-                  Text(
-                    excerpt,
-                    style: GoogleFonts.inter(
-                      fontSize: 13,
-                      color: MifcColors.white.withValues(alpha: 0.4),
-                      height: 1.6,
-                      fontWeight: FontWeight.w400,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
                   const SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        time,
+                        displayTime,
                         style: GoogleFonts.inter(
                           fontSize: 9,
                           fontWeight: FontWeight.w600,
@@ -658,24 +647,29 @@ class FullWidthNewsCard extends StatelessWidget {
 }
 
 class VideoCard extends StatelessWidget {
-  final String title;
-  final String category;
-  final Color categoryColor;
-  final String duration;
-  final String views;
-  final String date;
-  final String imageUrl;
+  final VideoContent video;
+  final String displayViews;
+  final String displayTime;
 
   const VideoCard({
     super.key,
-    required this.title,
-    required this.category,
-    required this.categoryColor,
-    required this.duration,
-    required this.views,
-    required this.date,
-    required this.imageUrl,
+    required this.video,
+    required this.displayViews,
+    required this.displayTime,
   });
+
+  Color _getCategoryColor(String category) {
+    switch (category.toUpperCase()) {
+      case 'INTERVIEW':
+        return MifcColors.crimson;
+      case 'HIGHLIGHTS':
+        return MifcColors.navyBlue;
+      case 'TRAINING':
+        return MifcColors.prestigeGold;
+      default:
+        return MifcColors.white.withValues(alpha: 0.5);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -691,10 +685,11 @@ class VideoCard extends StatelessWidget {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
                   child: CachedNetworkImage(
-                    imageUrl: imageUrl,
+                    imageUrl: video.imageUrl,
                     width: 140,
                     height: 90,
                     fit: BoxFit.cover,
+                    errorWidget: (context, url, err) => Container(color: Colors.white10),
                   ),
                 ),
                 Positioned.fill(
@@ -719,7 +714,7 @@ class VideoCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
-                      duration,
+                      video.duration,
                       style: GoogleFonts.outfit(
                         color: MifcColors.white,
                         fontSize: 9,
@@ -737,17 +732,17 @@ class VideoCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    category,
+                    video.category.toUpperCase(),
                     style: GoogleFonts.outfit(
                       fontSize: 8,
                       fontWeight: FontWeight.w700,
-                      color: categoryColor,
+                      color: _getCategoryColor(video.category),
                       letterSpacing: 1.0,
                     ),
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    title,
+                    video.title.toUpperCase(),
                     style: GoogleFonts.outfit(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
@@ -759,7 +754,7 @@ class VideoCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    '$views · $date',
+                    '$displayViews · $displayTime',
                     style: GoogleFonts.inter(
                       fontSize: 9,
                       fontWeight: FontWeight.w500,

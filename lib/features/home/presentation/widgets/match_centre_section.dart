@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:markfc/core/theme/mifc_colors.dart';
 import 'package:markfc/shared/widgets/section_header.dart';
 import 'package:markfc/shared/widgets/mifc_card.dart';
 import 'package:markfc/shared/widgets/scroll_reveal.dart';
+import 'package:markfc/features/fixtures/data/repositories/fixtures_repository.dart';
+import 'package:markfc/features/fixtures/domain/models/match_model.dart';
 
-class MatchCentreSection extends StatelessWidget {
+class MatchCentreSection extends ConsumerWidget {
   const MatchCentreSection({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final liveMatchAsync = ref.watch(liveMatchStreamProvider);
+    final resultsAsync = ref.watch(resultsStreamProvider);
+
     return Column(
       children: [
         const SectionHeader(title: 'MATCH CENTRE', actionLabel: 'ALL RESULTS'),
@@ -17,28 +24,46 @@ class MatchCentreSection extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Column(
             children: [
-              ScrollReveal(
-                type: AnimationType.fade,
-                delay: const Duration(milliseconds: 100),
-                child: _buildLiveScoreCard(),
+              liveMatchAsync.when(
+                data: (match) {
+                  if (match == null) return const SizedBox.shrink();
+                  return ScrollReveal(
+                    type: AnimationType.fade,
+                    delay: const Duration(milliseconds: 100),
+                    child: _buildLiveScoreCard(match),
+                  );
+                },
+                loading: () => const SizedBox(height: 100, child: Center(child: CircularProgressIndicator())),
+                error: (err, stack) => const SizedBox.shrink(),
               ),
               const SizedBox(height: 12),
-              ScrollReveal(
-                type: AnimationType.fade,
-                delay: const Duration(milliseconds: 200),
-                child: _buildPreviousResult('08 MAR', 'Mark International FC', 'Arsenal FC', '3 - 1', 'W'),
-              ),
-              const SizedBox(height: 8),
-              ScrollReveal(
-                type: AnimationType.fade,
-                delay: const Duration(milliseconds: 300),
-                child: _buildPreviousResult('02 MAR', 'Chelsea FC', 'Mark International FC', '2 - 2', 'D'),
-              ),
-              const SizedBox(height: 8),
-              ScrollReveal(
-                type: AnimationType.fade,
-                delay: const Duration(milliseconds: 400),
-                child: _buildPreviousResult('24 FEB', 'Mark International FC', 'Everton FC', '4 - 0', 'W'),
+              resultsAsync.when(
+                data: (results) {
+                  if (results.isEmpty) return const SizedBox.shrink();
+                  return ListView.separated(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: results.length > 3 ? 3 : results.length,
+                    separatorBuilder: (context, index) => const SizedBox(height: 8),
+                    itemBuilder: (context, index) {
+                      final match = results[index];
+                      final resultChar = _getResultChar(match);
+                      return ScrollReveal(
+                        type: AnimationType.fade,
+                        delay: Duration(milliseconds: 200 + (index * 100)),
+                        child: _buildPreviousResult(
+                          DateFormat('dd MMM').format(match.timestamp),
+                          match.homeTeam,
+                          match.awayTeam,
+                          '${match.homeScore} - ${match.awayScore}',
+                          resultChar,
+                        ),
+                      );
+                    },
+                  );
+                },
+                loading: () => const SizedBox(height: 50, child: Center(child: CircularProgressIndicator())),
+                error: (err, stack) => const SizedBox.shrink(),
               ),
             ],
           ),
@@ -47,7 +72,20 @@ class MatchCentreSection extends StatelessWidget {
     );
   }
 
-  Widget _buildLiveScoreCard() {
+  String _getResultChar(MatchModel match) {
+    // Assuming 'MARK International FC' is always the team we track
+    const ourTeam = 'MARK INTERNATIONAL FC';
+    final bool isHome = match.homeTeam.toUpperCase() == ourTeam;
+    
+    if (match.homeScore == match.awayScore) return 'D';
+    if (isHome) {
+      return match.homeScore > match.awayScore ? 'W' : 'L';
+    } else {
+      return match.awayScore > match.homeScore ? 'W' : 'L';
+    }
+  }
+
+  Widget _buildLiveScoreCard(MatchModel match) {
     return MifcCard(
       padding: EdgeInsets.zero,
       child: Column(
@@ -66,7 +104,7 @@ class MatchCentreSection extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'PREMIER LEAGUE · MATCHWEEK 28',
+                  match.competition.toUpperCase(),
                   style: GoogleFonts.outfit(
                     color: MifcColors.white.withValues(alpha: 0.5),
                     fontSize: 10,
@@ -87,15 +125,17 @@ class MatchCentreSection extends StatelessWidget {
                         letterSpacing: 1.0,
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Text(
-                      "72'",
-                      style: GoogleFonts.outfit(
-                        color: MifcColors.navyBlue,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
+                    if (match.liveMinute != null) ...[
+                      const SizedBox(width: 12),
+                      Text(
+                        "${match.liveMinute}'",
+                        style: GoogleFonts.outfit(
+                          color: MifcColors.navyBlue,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
-                    ),
+                    ],
                   ],
                 ),
               ],
@@ -106,11 +146,11 @@ class MatchCentreSection extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildTeamInfo('MIFC', 'MARK FC', true),
+                _buildTeamInfo(match.homeCode, match.homeTeam, match.homeTeam.toUpperCase().contains('MARK')),
                 Column(
                   children: [
                     Text(
-                      '3 - 1',
+                      '${match.homeScore} - ${match.awayScore}',
                       style: GoogleFonts.outfit(
                         fontSize: 42,
                         fontWeight: FontWeight.w300,
@@ -118,17 +158,20 @@ class MatchCentreSection extends StatelessWidget {
                         letterSpacing: 4,
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        _buildScorerChip('Salah 12\', 71\''),
-                        const SizedBox(width: 8),
-                        _buildScorerChip('Ekitike 47\''),
-                      ],
-                    ),
+                    if (match.scorers.isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        match.scorers.join(', '),
+                        style: GoogleFonts.inter(
+                          fontSize: 9,
+                          fontWeight: FontWeight.w400,
+                          color: MifcColors.white.withValues(alpha: 0.4),
+                        ),
+                      ),
+                    ],
                   ],
                 ),
-                _buildTeamInfo('ARS', 'ARSENAL', false),
+                _buildTeamInfo(match.awayCode, match.awayTeam, match.awayTeam.toUpperCase().contains('MARK')),
               ],
             ),
           ),
@@ -165,7 +208,7 @@ class MatchCentreSection extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         Text(
-          name,
+          name.toUpperCase(),
           style: GoogleFonts.outfit(
             fontSize: 11,
             fontWeight: FontWeight.w600,
@@ -174,17 +217,6 @@ class MatchCentreSection extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildScorerChip(String text) {
-    return Text(
-      text,
-      style: GoogleFonts.inter(
-        fontSize: 9,
-        fontWeight: FontWeight.w400,
-        color: MifcColors.white.withValues(alpha: 0.4),
-      ),
     );
   }
 

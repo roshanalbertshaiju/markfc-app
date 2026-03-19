@@ -1,11 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'core/theme/mifc_theme.dart';
 import 'core/router/app_router.dart';
+import 'core/utils/firebase_seeder.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // TODO: Add Firebase.initializeApp() when firebase_options is verified
+  
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  // SEED DATA ONCE
+  try {
+    await FirebaseSeeder.seedData();
+  } catch (e) {
+    debugPrint('Firebase Seeding failed: $e');
+  }
+
   runApp(
     const ProviderScope(
       child: MifcApp(),
