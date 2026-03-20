@@ -29,10 +29,16 @@ class VideoContent {
       category: data['category']?.toString() ?? 'MIFC TV',
       duration: data['duration']?.toString() ?? '00:00',
       views: data['views'] as int? ?? 0,
-      timestamp: (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      timestamp: _parseDateTime(data['timestamp']),
       imageUrl: data['imageUrl']?.toString() ?? '',
       videoUrl: data['videoUrl']?.toString() ?? '',
     );
+  }
+
+  static DateTime _parseDateTime(dynamic field) {
+    if (field is Timestamp) return field.toDate();
+    if (field is int) return DateTime.fromMillisecondsSinceEpoch(field);
+    return DateTime.now();
   }
 
   Map<String, dynamic> toFirestore() {

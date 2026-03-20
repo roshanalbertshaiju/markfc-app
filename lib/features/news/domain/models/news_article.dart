@@ -27,8 +27,14 @@ class NewsArticle {
       content: data['content']?.toString() ?? '',
       imageUrl: data['imageUrl']?.toString() ?? '',
       category: data['category']?.toString() ?? 'GENERAL',
-      timestamp: (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      timestamp: _parseDateTime(data['timestamp']),
     );
+  }
+
+  static DateTime _parseDateTime(dynamic field) {
+    if (field is Timestamp) return field.toDate();
+    if (field is int) return DateTime.fromMillisecondsSinceEpoch(field);
+    return DateTime.now();
   }
 
   Map<String, dynamic> toFirestore() {

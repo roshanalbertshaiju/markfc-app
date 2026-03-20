@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/models/match_model.dart';
 import '../../../news/data/repositories/news_repository.dart'; // To reuse firestoreProvider
@@ -11,11 +12,17 @@ class FixturesRepository {
   Stream<List<MatchModel>> watchFixtures() {
     return _firestore
         .collection('fixtures')
-        .orderBy('timestamp', descending: false)
+        .orderBy('date', descending: false) // Changed from 'timestamp' to 'date'
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => MatchModel.fromFirestore(doc))
-            .toList());
+        .timeout(const Duration(seconds: 10), onTimeout: (sink) {
+          debugPrint('Firestore Connection Timeout: Fixtures collection');
+          sink.addError('Connection Timeout');
+        })
+        .map((snapshot) {
+      return snapshot.docs
+          .map((doc) => MatchModel.fromFirestore(doc))
+          .toList();
+    });
   }
 
   Stream<List<MatchModel>> watchResults() {

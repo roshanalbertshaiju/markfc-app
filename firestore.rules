@@ -8,7 +8,7 @@ service cloud.firestore {
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.admin == "true";
     }
 
-    // Public Collections (Read-only for all)
+    // Public Collections (Read-only for all, Write-open TEMPORARILY for seeding)
     match /fixtures/{fixtureId} {
       allow read: if true;
       allow write: if isAdmin();

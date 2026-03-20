@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/models/player.dart';
 import '../../../news/data/repositories/news_repository.dart'; // To reuse firestoreProvider
@@ -15,7 +16,13 @@ class SquadRepository {
       query = query.where('category', isEqualTo: category.name);
     }
     
-    return query.snapshots().map((snapshot) => snapshot.docs
+    return query
+        .snapshots()
+        .timeout(const Duration(seconds: 10), onTimeout: (sink) {
+          debugPrint('Firestore Connection Timeout: Players collection');
+          sink.addError('Connection Timeout');
+        })
+        .map((snapshot) => snapshot.docs
         .map((doc) => Player.fromFirestore(doc))
         .toList()
       ..sort((a, b) => int.parse(a.number).compareTo(int.parse(b.number))));
@@ -27,6 +34,10 @@ class SquadRepository {
         .orderBy('rating', descending: true)
         .limit(limit)
         .snapshots()
+        .timeout(const Duration(seconds: 10), onTimeout: (sink) {
+          debugPrint('Firestore Connection Timeout: Top Players collection');
+          sink.addError('Connection Timeout');
+        })
         .map((snapshot) => snapshot.docs
             .map((doc) => Player.fromFirestore(doc))
             .toList());

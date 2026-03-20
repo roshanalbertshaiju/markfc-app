@@ -28,9 +28,15 @@ class UserActivity {
       id: doc.id,
       title: data['title'] ?? '',
       subtitle: data['subtitle'] ?? '',
-      timestamp: (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      timestamp: _parseDateTime(data['timestamp']),
       type: _parseType(data['type']),
     );
+  }
+
+  static DateTime _parseDateTime(dynamic field) {
+    if (field is Timestamp) return field.toDate();
+    if (field is int) return DateTime.fromMillisecondsSinceEpoch(field);
+    return DateTime.now();
   }
 
   static ActivityType _parseType(String? type) {

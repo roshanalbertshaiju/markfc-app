@@ -28,11 +28,17 @@ class MifcUser {
       name: data['name'] ?? 'User',
       email: data['email'] ?? '',
       memberStatus: data['memberStatus'] ?? 'MEMBER',
-      joinDate: (data['joinDate'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      joinDate: _parseDateTime(data['joinDate']),
       matchesAttended: data['matchesAttended'] ?? 0,
       loyaltyPoints: data['loyaltyPoints'] ?? 0,
       photoUrl: data['photoUrl'],
     );
+  }
+
+  static DateTime _parseDateTime(dynamic field) {
+    if (field is Timestamp) return field.toDate();
+    if (field is int) return DateTime.fromMillisecondsSinceEpoch(field);
+    return DateTime.now();
   }
 
   Map<String, dynamic> toFirestore() {

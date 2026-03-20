@@ -43,7 +43,7 @@ class MatchModel {
       awayCode: data['awayCode']?.toString() ?? '',
       homeScore: data['homeScore'] as int? ?? 0,
       awayScore: data['awayScore'] as int? ?? 0,
-      timestamp: (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      timestamp: _parseDateTime(data['timestamp']),
       competition: data['competition']?.toString() ?? 'PREMIER LEAGUE',
       venue: data['venue']?.toString() ?? '',
       status: _parseStatus(data['status']?.toString()),
@@ -62,6 +62,12 @@ class MatchModel {
       default:
         return MatchStatus.upcoming;
     }
+  }
+
+  static DateTime _parseDateTime(dynamic field) {
+    if (field is Timestamp) return field.toDate();
+    if (field is int) return DateTime.fromMillisecondsSinceEpoch(field);
+    return DateTime.now();
   }
 
   Map<String, dynamic> toFirestore() {

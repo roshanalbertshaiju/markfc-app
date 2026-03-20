@@ -14,11 +14,11 @@ void main() async {
   );
 
   // SEED DATA ONCE
-  try {
-    await FirebaseSeeder.seedData();
-  } catch (e) {
-    debugPrint('Firebase Seeding failed: $e');
-  }
+  // try {
+  //   await FirebaseSeeder.seedData(force: true);
+  // } catch (e) {
+  //   debugPrint('Firebase Seeding failed: $e');
+  // }
 
   runApp(
     const ProviderScope(

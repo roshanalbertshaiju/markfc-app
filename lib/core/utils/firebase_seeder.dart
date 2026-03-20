@@ -8,14 +8,20 @@ import 'package:markfc/features/store/domain/models/product.dart';
 import 'package:markfc/features/profile/domain/models/mifc_user.dart';
 
 class FirebaseSeeder {
-  static Future<void> seedData() async {
+  static Future<void> seedData({bool force = false}) async {
     final firestore = FirebaseFirestore.instance;
 
-    // GUARD: Only seed if news is empty
-    final existingNews = await firestore.collection('news').limit(1).get();
-    if (existingNews.docs.isNotEmpty) {
-      debugPrint('Firebase Seeding skipped: Data already exists.');
-      return;
+    // GUARD: Only seed if news is empty (unless forced)
+    if (!force) {
+      final newsCheck = await firestore
+        .collection('news')
+        .limit(1)
+        .get()
+        .timeout(const Duration(seconds: 5));
+      if (newsCheck.docs.isNotEmpty) {
+        debugPrint('Firebase Seeding skipped: Data already exists.');
+        return;
+      }
     }
 
     // 1. Seed News
@@ -27,15 +33,23 @@ class FirebaseSeeder {
         content: 'A night to remember at the Prestige Arena as MarkFC dominated from start to finish...',
         imageUrl: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1000',
         category: 'MATCH REPORT',
-        timestamp: DateTime.now(),
+        timestamp: DateTime.now().subtract(const Duration(hours: 1)),
       ),
       NewsArticle(
         id: 'news_2',
-        title: 'TRANSFER ALERT: NEW STRIKER JOINS THE ELITE',
-        content: 'MarkFC is delighted to announce the signing of international superstar...',
-        imageUrl: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?q=80&w=1000',
-        category: 'TRANSFER',
-        timestamp: DateTime.now().subtract(const Duration(hours: 5)),
+        title: 'EXCLUSIVE: ROSHAN ALBERT ON SEASON GOALS',
+        content: 'Our star striker speaks exclusively about his ambitions for the upcoming trophy hunt...',
+        imageUrl: 'https://images.unsplash.com/photo-1543351611-58f69d7c1781?q=80&w=1000',
+        category: 'INTERVIEW',
+        timestamp: DateTime.now().subtract(const Duration(hours: 4)),
+      ),
+      NewsArticle(
+        id: 'news_3',
+        title: 'NEW TRAINING FACILITY UNVEILED',
+        content: 'The club marks a milestone with the opening of our state-of-the-art training complex...',
+        imageUrl: 'https://images.unsplash.com/photo-1526232761682-d26e03ac148e?q=80&w=1000',
+        category: 'CLUB NEWS',
+        timestamp: DateTime.now().subtract(const Duration(days: 1)),
       ),
     ];
     for (var n in news) {

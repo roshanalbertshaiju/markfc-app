@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/models/video_content.dart';
 import '../../../news/data/repositories/news_repository.dart'; // To reuse firestoreProvider
@@ -13,6 +14,10 @@ class VideoRepository {
         .collection('video')
         .orderBy('timestamp', descending: true)
         .snapshots()
+        .timeout(const Duration(seconds: 10), onTimeout: (sink) {
+          debugPrint('Firestore Connection Timeout: Video collection');
+          sink.addError('Connection Timeout');
+        })
         .map((snapshot) => snapshot.docs
             .map((doc) => VideoContent.fromFirestore(doc))
             .toList());
