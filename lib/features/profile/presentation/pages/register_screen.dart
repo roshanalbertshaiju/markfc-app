@@ -3,56 +3,77 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../../core/theme/mifc_colors.dart';
 import '../../../../shared/widgets/mifc_card.dart';
+import '../../domain/models/mifc_user.dart';
 
-class LoginScreen extends ConsumerStatefulWidget {
-  const LoginScreen({super.key});
+class RegisterScreen extends ConsumerStatefulWidget {
+  const RegisterScreen({super.key});
 
   @override
-  ConsumerState<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _LoginScreenState extends ConsumerState<LoginScreen> {
+class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   bool _isLoading = false;
+  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
 
-  Future<void> _signInAnonymously() async {
-    setState(() => _isLoading = true);
-    try {
-      await FirebaseAuth.instance.signInAnonymously();
-      if (mounted) context.pop();
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Login failed: $e')),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
-  }
-
-  Future<void> _signInEmail() async {
-    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+  Future<void> _register() async {
+    if (_nameController.text.isEmpty || 
+        _emailController.text.isEmpty || 
+        _passwordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter email and password')),
+        const SnackBar(content: Text('Please fill in all fields')),
+      );
+      return;
+    }
+
+    if (_passwordController.text != _confirmPasswordController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Passwords do not match')),
       );
       return;
     }
 
     setState(() => _isLoading = true);
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
+      // 1. Create Firebase User
+      final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-      if (mounted) context.pop();
+
+      final user = userCredential.user;
+      if (user != null) {
+        // 2. Create MifcUser Model
+        final mifcUser = MifcUser(
+          uid: user.uid,
+          name: _nameController.text.trim(),
+          email: _emailController.text.trim(),
+          memberStatus: 'ELITE MEMBER', // Default to ELITE for this demo
+          joinDate: DateTime.now(),
+          matchesAttended: 0,
+          loyaltyPoints: 50, // Welcome points
+        );
+
+        // 3. Save to Firestore
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .set(mifcUser.toFirestore());
+            
+        if (mounted) {
+          context.go('/profile'); // Go to profile after successful registration
+        }
+      }
     } on FirebaseAuthException catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.message ?? 'Login failed')),
+          SnackBar(content: Text(e.message ?? 'Registration failed')),
         );
       }
     } catch (e) {
@@ -68,8 +89,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   void dispose() {
+    _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -92,7 +115,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           children: [
             const SizedBox(height: 20),
             Text(
-              'ELITE ACCESS',
+              'JOIN THE CLUB',
               style: GoogleFonts.outfit(
                 fontSize: 32,
                 fontWeight: FontWeight.w900,
@@ -102,7 +125,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Sign in to unlock your professional profile, loyalty rewards, and exclusive club content.',
+              'Create your professional profile and start your journey with MarkFC Elite.',
               style: GoogleFonts.inter(
                 fontSize: 14,
                 color: Colors.white60,
@@ -115,6 +138,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               child: Column(
                 children: [
                   _buildTextField(
+                    controller: _nameController,
+                    label: 'FULL NAME',
+                    icon: Icons.person_outline_rounded,
+                  ),
+                  const SizedBox(height: 20),
+                  _buildTextField(
                     controller: _emailController,
                     label: 'EMAIL ADDRESS',
                     icon: Icons.email_outlined,
@@ -126,11 +155,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     icon: Icons.lock_outline_rounded,
                     isPassword: true,
                   ),
+                  const SizedBox(height: 20),
+                  _buildTextField(
+                    controller: _confirmPasswordController,
+                    label: 'CONFIRM PASSWORD',
+                    icon: Icons.lock_clock_outlined,
+                    isPassword: true,
+                  ),
                   const SizedBox(height: 32),
                   ElevatedButton(
-                    onPressed: _isLoading ? null : _signInEmail,
+                    onPressed: _isLoading ? null : _register,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: MifcColors.navyBlue,
+                      backgroundColor: MifcColors.crimson,
                       foregroundColor: Colors.white,
                       minimumSize: const Size(double.infinity, 56),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -139,7 +175,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     child: _isLoading 
                       ? const CircularProgressIndicator(color: Colors.white)
                       : Text(
-                          'SIGN IN',
+                          'REGISTER NOW',
                           style: GoogleFonts.outfit(
                             fontWeight: FontWeight.w900,
                             letterSpacing: 1,
@@ -151,50 +187,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ),
             const SizedBox(height: 32),
             Center(
-              child: Text(
-                'OR CONTINUE AS',
-                style: GoogleFonts.outfit(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white24,
-                  letterSpacing: 1,
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-            OutlinedButton(
-              onPressed: _isLoading ? null : _signInAnonymously,
-              style: OutlinedButton.styleFrom(
-                side: BorderSide(color: MifcColors.white.withValues(alpha: 0.1)),
-                minimumSize: const Size(double.infinity, 56),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                foregroundColor: Colors.white,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.person_outline_rounded, size: 20),
-                  const SizedBox(width: 12),
-                  Text(
-                    'PROVISIONAL ACCESS (GUEST)',
-                    style: GoogleFonts.outfit(
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 48),
-            Center(
               child: TextButton(
-                onPressed: () => context.push('/register'),
+                onPressed: () => context.pop(),
                 child: Text(
-                  'NOT A MEMBER YET? JOIN THE CLUB',
+                  'ALREADY A MEMBER? SIGN IN',
                   style: GoogleFonts.outfit(
                     fontSize: 12,
                     fontWeight: FontWeight.w800,
-                    color: MifcColors.crimson,
+                    color: MifcColors.white.withValues(alpha: 0.5),
                     letterSpacing: 1,
                   ),
                 ),

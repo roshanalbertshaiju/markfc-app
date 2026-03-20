@@ -70,25 +70,37 @@ class _FixturesScreenState extends ConsumerState<FixturesScreen> with SingleTick
       extendBodyBehindAppBar: true,
       body: Stack(
         children: [
-          ListView(
-            controller: _scrollController,
-            padding: EdgeInsets.zero,
-            children: [
-              _buildHero(),
-              _buildTabsHeader(),
-              _activeTab == 0 
-                ? const _FixturesList()
-                : const Center(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(vertical: 100),
-                      child: Text(
-                        'All Teams Fixtures Coming Soon', 
-                        style: TextStyle(color: Colors.white70)
+          RefreshIndicator(
+            onRefresh: () async {
+              ref.invalidate(fixturesStreamProvider);
+              ref.invalidate(resultsStreamProvider);
+              // Wait a bit to show the animation
+              await Future.delayed(const Duration(milliseconds: 500));
+            },
+            color: MifcColors.crimson,
+            backgroundColor: const Color(0xFF0F172A),
+            displacement: 100, // Displace below the transparent top bar
+            child: ListView(
+              controller: _scrollController,
+              padding: EdgeInsets.zero,
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                _buildHero(),
+                _buildTabsHeader(),
+                _activeTab == 0 
+                  ? const _FixturesList()
+                  : const Center(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 100),
+                        child: Text(
+                          'All Teams Fixtures Coming Soon', 
+                          style: TextStyle(color: Colors.white70)
+                        ),
                       ),
                     ),
-                  ),
-              const SizedBox(height: 100),
-            ],
+                const SizedBox(height: 100),
+              ],
+            ),
           ),
           Positioned(
             top: 0,
@@ -98,6 +110,7 @@ class _FixturesScreenState extends ConsumerState<FixturesScreen> with SingleTick
               opacity: _opacity,
               showBackButton: true,
               showCalendar: true,
+              hideLogo: false,
             ),
           ),
         ],
@@ -170,6 +183,30 @@ class _FixturesScreenState extends ConsumerState<FixturesScreen> with SingleTick
                     color: Colors.white.withValues(alpha: 0.6),
                     fontWeight: FontWeight.w500,
                   ),
+                ),
+              ],
+            ),
+          ),
+          Positioned(
+            top: 60,
+            right: 20,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  'OFFICIAL GLOBAL PARTNER',
+                  style: GoogleFonts.outfit(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white.withValues(alpha: 0.6),
+                    letterSpacing: 0.8,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Image.asset(
+                  'assets/images/mark_international_logo.png',
+                  height: 35,
+                  fit: BoxFit.contain,
                 ),
               ],
             ),
@@ -298,6 +335,16 @@ class _MatchCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final dateStr = DateFormat('EEE d MMM | ').format(match.timestamp) + match.competition;
     
+    // Handle specific team name request
+    String homeName = match.homeTeam.toUpperCase();
+    String awayName = match.awayTeam.toUpperCase();
+    if (match.homeCode.toUpperCase().contains('MIFC') || homeName.contains('MARKFC')) {
+      homeName = "MARK INT FC";
+    }
+    if (match.awayCode.toUpperCase().contains('MIFC') || awayName.contains('MARKFC')) {
+      awayName = "MARK INT FC";
+    }
+
     return ScrollReveal(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -348,27 +395,33 @@ class _MatchCard extends StatelessWidget {
                 padding: const EdgeInsets.all(20),
                 child: Row(
                   children: [
+                    // Home Team
                     Expanded(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          Text(
-                            match.homeTeam.toUpperCase(),
-                            style: GoogleFonts.outfit(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
+                          Flexible(
+                            child: Text(
+                              homeName,
+                              style: GoogleFonts.outfit(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                              ),
+                              textAlign: TextAlign.right,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            textAlign: TextAlign.right,
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: 8),
                           _buildCrest(match.homeCode),
                         ],
                       ),
                     ),
+                    
+                    // Score / Time
                     Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 16),
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      margin: const EdgeInsets.symmetric(horizontal: 12),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                       decoration: BoxDecoration(
                         color: const Color(0xFF1E1E1E),
                         borderRadius: BorderRadius.circular(4),
@@ -378,25 +431,30 @@ class _MatchCard extends StatelessWidget {
                           ? DateFormat('HH:mm').format(match.timestamp)
                           : '${match.homeScore} - ${match.awayScore}',
                         style: GoogleFonts.outfit(
-                          fontSize: 16,
+                          fontSize: 15,
                           fontWeight: FontWeight.w900,
                           color: Colors.white,
-                          letterSpacing: 1,
+                          letterSpacing: 0.5,
                         ),
                       ),
                     ),
+                    
+                    // Away Team
                     Expanded(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           _buildCrest(match.awayCode),
-                          const SizedBox(width: 12),
-                          Text(
-                            match.awayTeam.toUpperCase(),
-                            style: GoogleFonts.outfit(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
+                          const SizedBox(width: 8),
+                          Flexible(
+                            child: Text(
+                              awayName,
+                              style: GoogleFonts.outfit(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                              ),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],
@@ -426,6 +484,8 @@ class _MatchCard extends StatelessWidget {
   }
 
   Widget _buildCrest(String code) {
+    final bool isMifc = code.toUpperCase().contains('MIFC');
+    
     return Container(
       width: 32,
       height: 32,
@@ -433,18 +493,29 @@ class _MatchCard extends StatelessWidget {
         color: Colors.white.withValues(alpha: 0.05),
         shape: BoxShape.circle,
         border: Border.all(
-          color: code.toUpperCase().contains('MIFC') ? MifcColors.crimson.withValues(alpha: 0.3) : Colors.white10,
+          color: isMifc ? MifcColors.crimson.withValues(alpha: 0.5) : Colors.white10,
+          width: isMifc ? 1.5 : 1.0,
         ),
       ),
-      child: Center(
-        child: Text(
-          code.substring(0, code.length > 3 ? 3 : code.length),
-          style: GoogleFonts.outfit(
-            fontSize: 10,
-            fontWeight: FontWeight.w800,
-            color: Colors.white,
-          ),
-        ),
+      child: ClipOval(
+        child: isMifc 
+          ? Padding(
+              padding: const EdgeInsets.all(4),
+              child: Image.asset(
+                'assets/images/mifc_logo.png',
+                fit: BoxFit.contain,
+              ),
+            )
+          : Center(
+              child: Text(
+                code.substring(0, code.length > 3 ? 3 : code.length),
+                style: GoogleFonts.outfit(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                ),
+              ),
+            ),
       ),
     );
   }

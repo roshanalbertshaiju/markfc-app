@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:markfc/core/theme/mifc_colors.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:markfc/shared/widgets/mifc_top_bar.dart';
 import '../widgets/hero_carousel.dart';
 import '../widgets/latest_news_section.dart';
@@ -12,15 +13,20 @@ import '../widgets/league_table_section.dart';
 import '../widgets/mifc_tv_section.dart';
 import '../widgets/fan_of_the_month_section.dart';
 import '../widgets/sponsor_strip_section.dart';
+import 'package:markfc/features/news/data/repositories/news_repository.dart';
+import 'package:markfc/features/home/data/repositories/hero_repository.dart';
+import 'package:markfc/features/fixtures/data/repositories/fixtures_repository.dart';
+import 'package:markfc/features/home/data/repositories/league_repository.dart';
+import 'package:markfc/features/squad/data/repositories/squad_repository.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  ConsumerState<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends ConsumerState<HomePage> {
   final ScrollController _scrollController = ScrollController();
   double _opacity = 0.0;
 
@@ -62,32 +68,50 @@ class _HomePageState extends State<HomePage> {
       extendBodyBehindAppBar: true,
       body: Stack(
         children: [
-          ListView(
-            controller: _scrollController,
-            padding: EdgeInsets.zero,
-            children: [
-              const HeroCarousel(),
-              const LatestNewsSection(),
-              _buildDivider(),
-              const MatchCentreSection(),
-              _buildDivider(),
-              const MotmPollSection(),
-              _buildDivider(),
-              const FixtureCountdownSection(), 
-              _buildDivider(),
-              const PlayerOfTheMonthSection(),
-              _buildDivider(),
-              const TopPlayersSection(), 
-              _buildDivider(),
-              const LeagueTableSection(),
-              _buildDivider(),
-              const MifcTvSection(),
-              _buildDivider(),
-              const FanOfTheMonthSection(),
-              _buildDivider(),
-              const SponsorStripSection(),
-              const SizedBox(height: 100), 
-            ],
+          RefreshIndicator(
+            onRefresh: () async {
+              // Invalidate all main home page providers
+              ref.invalidate(heroSlidesStreamProvider);
+              ref.invalidate(latestNewsProvider);
+              ref.invalidate(liveMatchStreamProvider);
+              ref.invalidate(resultsStreamProvider);
+              ref.invalidate(leagueTableStreamProvider);
+              ref.invalidate(topPlayersStreamProvider);
+              
+              // Wait a bit to show the animation
+              await Future.delayed(const Duration(milliseconds: 800));
+            },
+            color: MifcColors.crimson,
+            backgroundColor: const Color(0xFF0F172A),
+            displacement: 100,
+            child: ListView(
+              controller: _scrollController,
+              padding: EdgeInsets.zero,
+              physics: const AlwaysScrollableScrollPhysics(), // Ensure it's scrollable for pull-to-refresh
+              children: [
+                const HeroCarousel(),
+                const LatestNewsSection(),
+                _buildDivider(),
+                const MatchCentreSection(),
+                _buildDivider(),
+                const MotmPollSection(),
+                _buildDivider(),
+                const FixtureCountdownSection(), 
+                _buildDivider(),
+                const PlayerOfTheMonthSection(),
+                _buildDivider(),
+                const TopPlayersSection(), 
+                _buildDivider(),
+                const LeagueTableSection(),
+                _buildDivider(),
+                const MifcTvSection(),
+                _buildDivider(),
+                const FanOfTheMonthSection(),
+                _buildDivider(),
+                const SponsorStripSection(),
+                const SizedBox(height: 100), 
+              ],
+            ),
           ),
           Positioned(
             top: 0,

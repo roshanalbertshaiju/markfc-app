@@ -331,7 +331,7 @@ class _MemberCard extends StatelessWidget {
                 ),
                 const Spacer(),
                 Text(
-                  user.displayName.toUpperCase(),
+                  user.name.toUpperCase(),
                   style: GoogleFonts.outfit(
                     color: Colors.white,
                     fontSize: 28,
@@ -341,7 +341,7 @@ class _MemberCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  user.uid == 'guest' ? 'JOIN THE ELITE' : 'SINCE ${DateFormat('yyyy').format(user.createdAt)}',
+                  user.uid == 'guest' ? 'JOIN THE ELITE' : 'SINCE ${DateFormat('yyyy').format(user.joinDate)}',
                   style: GoogleFonts.outfit(
                     color: Colors.white.withValues(alpha: 0.5),
                     fontSize: 12,
@@ -444,9 +444,9 @@ class _MemberStats extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _StatItem(label: 'MATCHES', value: user.matchCount),
+          _StatItem(label: 'MATCHES', value: user.matchesAttended),
           _StatItem(label: 'LOYALTY', value: user.loyaltyPoints),
-          _StatItem(label: 'YEARS', value: DateTime.now().year - user.createdAt.year),
+          _StatItem(label: 'YEARS', value: DateTime.now().year - user.joinDate.year),
         ],
       ),
     );
@@ -630,13 +630,114 @@ class _ActivityList extends ConsumerWidget {
   }
 }
 
+class _BlurredActivityPreview extends StatelessWidget {
+  const _BlurredActivityPreview();
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: Stack(
+        children: [
+          // Blurred background
+          _ActivityListStub(),
+          Positioned.fill(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.transparent,
+                      MifcColors.black.withValues(alpha: 0.8),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          // CTA Content
+          Positioned.fill(
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.lock_rounded, color: MifcColors.navyBlue, size: 40),
+                  const SizedBox(height: 16),
+                  Text(
+                    'MEMBERS ONLY',
+                    style: GoogleFonts.outfit(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 2,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Sign in to see your history',
+                    style: GoogleFonts.inter(
+                      color: Colors.white60,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ActivityListStub extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: List.generate(4, (index) => _buildStubItem()),
+    );
+  }
+
+  Widget _buildStubItem() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: const BoxDecoration(
+              color: Colors.white10,
+              shape: BoxShape.circle,
+            ),
+            child: const SizedBox(width: 18, height: 18),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(height: 12, width: 100, color: Colors.white10),
+                const SizedBox(height: 8),
+                Container(height: 10, width: 150, color: Colors.white10),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _StaggeredReveal extends StatefulWidget {
   final Widget child;
-  final Duration delay;
+  final int delay; // delay in milliseconds
 
   const _StaggeredReveal({
     required this.child,
-    this.delay = Duration.zero,
+    this.delay = 0,
   });
 
   @override
@@ -669,7 +770,7 @@ class _StaggeredRevealState extends State<_StaggeredReveal> with SingleTickerPro
       curve: const Interval(0.0, 1.0, curve: Curves.easeOutQuart),
     ));
 
-    Future.delayed(widget.delay, () {
+    Future.delayed(Duration(milliseconds: widget.delay), () {
       if (mounted) _controller.forward();
     });
   }
@@ -738,7 +839,7 @@ class _PulseButtonState extends State<_PulseButton> with SingleTickerProviderSta
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: MifcColors.crimson.withValues(alpha: 0.3 * (_animation.value - 1.0) * 10),
+                color: MifcColors.crimson.withValues(alpha: (0.3 * (_animation.value - 1.0) * 10).clamp(0.0, 1.0)),
                 blurRadius: 20 * (_animation.value - 1.0) * 10,
                 spreadRadius: 2 * (_animation.value - 1.0) * 10,
               ),

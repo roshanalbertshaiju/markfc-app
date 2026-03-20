@@ -276,28 +276,37 @@ class FirebaseSeeder {
     // 9. Seed Hero Section
     debugPrint('Seeding Hero Section...');
     final heroCol = firestore.collection('hero-sec');
-    final slides = [
-      HeroSlide(
-        tag: 'MATCH TICKETS',
-        date: 'MARCH 25, 2026',
-        headline: 'DERBY TICKETS NOW ON SALE',
-        body: 'Secure your seat for the biggest game of the season against City United.',
-        buttons: [
-          HeroSlideButton(label: 'BUY TICKETS', link: '/tickets'),
-          HeroSlideButton(label: 'VIEW FIXTURES', link: '/fixtures'),
-        ],
-        imageUrl: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1000',
-        timestamp: DateTime.now(),
-      ),
-    ];
-    for (var s in slides) {
-      try {
-        await heroCol.add(s.toFirestore()).timeout(const Duration(seconds: 5));
-      } catch (e) {
-        debugPrint('Failed to seed hero slide: $e');
+
+    // Check if hero slides already exist
+    try {
+      final snapshot = await heroCol.limit(1).get().timeout(const Duration(seconds: 5));
+      if (snapshot.docs.isNotEmpty) {
+        debugPrint('Hero Section already seeded.');
+      } else {
+        final slides = [
+          HeroSlide(
+            tag: 'MATCH TICKETS',
+            date: 'MARCH 25, 2026',
+            headline: 'DERBY TICKETS NOW ON SALE',
+            body: 'Secure your seat for the biggest game of the season against City United.',
+            buttons: [
+              HeroSlideButton(label: 'BUY TICKETS', link: '/tickets'),
+              HeroSlideButton(label: 'VIEW FIXTURES', link: '/fixtures'),
+            ],
+            imageUrl: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1000',
+            timestamp: DateTime.now(),
+          ),
+        ];
+        
+        // Use set with fixed ID to doubly ensure no duplicates
+        for (int i = 0; i < slides.length; i++) {
+          await heroCol.doc('slide_${i + 1}').set(slides[i].toFirestore()).timeout(const Duration(seconds: 5));
+        }
+        debugPrint('Seeded Hero Section.');
       }
+    } catch (e) {
+      debugPrint('Failed to seed hero slides: $e');
     }
-    debugPrint('Seeded Hero Section.');
 
     debugPrint('Firebase Seeding Complete! 🚀');
   }

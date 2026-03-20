@@ -1,0 +1,4 @@
+Analyzing markfc...                                             
+
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\profile\presentation\pages\profile_screen.dart:41:38 - deprecated_member_use
+

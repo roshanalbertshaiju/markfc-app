@@ -12,6 +12,7 @@ import '../../features/fixtures/presentation/pages/fixtures_screen.dart';
 import '../../features/profile/presentation/pages/profile_screen.dart';
 import '../../features/profile/presentation/pages/account_detail_screen.dart';
 import '../../features/profile/presentation/pages/login_screen.dart';
+import '../../features/profile/presentation/pages/register_screen.dart';
 
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -28,6 +29,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/login',
         builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: '/register',
+        builder: (context, state) => const RegisterScreen(), // Will create this file next
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
