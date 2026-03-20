@@ -73,9 +73,9 @@ class MatchCentreSection extends ConsumerWidget {
   }
 
   String _getResultChar(MatchModel match) {
-    // Assuming 'MARK International FC' is always the team we track
-    const ourTeam = 'MARK INTERNATIONAL FC';
-    final bool isHome = match.homeTeam.toUpperCase() == ourTeam;
+    // Standardizing on 'MARK INT FC'
+    const ourTeamNames = ['MARK INTERNATIONAL FC', 'MARK INT FC', 'MARKFC'];
+    final bool isHome = ourTeamNames.any((name) => match.homeTeam.toUpperCase().contains(name));
     
     if (match.homeScore == match.awayScore) return 'D';
     if (isHome) {
@@ -146,7 +146,7 @@ class MatchCentreSection extends ConsumerWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildTeamInfo(match.homeCode, match.homeTeam, match.homeTeam.toUpperCase().contains('MARK')),
+                _buildTeamInfo(match.homeCode, match.homeTeam),
                 Column(
                   children: [
                     Text(
@@ -171,7 +171,7 @@ class MatchCentreSection extends ConsumerWidget {
                     ],
                   ],
                 ),
-                _buildTeamInfo(match.awayCode, match.awayTeam, match.awayTeam.toUpperCase().contains('MARK')),
+                _buildTeamInfo(match.awayCode, match.awayTeam),
               ],
             ),
           ),
@@ -180,7 +180,10 @@ class MatchCentreSection extends ConsumerWidget {
     );
   }
 
-  Widget _buildTeamInfo(String code, String name, bool isHome) {
+  Widget _buildTeamInfo(String code, String name) {
+    final bool isMifc = code.toUpperCase().contains('MIFC') || name.toUpperCase().contains('MARK');
+    final String displayName = isMifc ? "MARK INT FC" : name.toUpperCase();
+
     return Column(
       children: [
         Container(
@@ -190,25 +193,33 @@ class MatchCentreSection extends ConsumerWidget {
             color: MifcColors.card.withValues(alpha: 0.5),
             shape: BoxShape.circle,
             border: Border.all(
-              color: (isHome ? MifcColors.crimson : MifcColors.white).withValues(alpha: 0.2),
+              color: (isMifc ? MifcColors.crimson : MifcColors.white).withValues(alpha: 0.2),
               width: 1,
             ),
           ),
           child: Center(
-            child: Text(
-              code,
-              style: GoogleFonts.outfit(
-                color: MifcColors.white,
-                fontWeight: FontWeight.w700,
-                fontSize: 14,
-                letterSpacing: 1,
-              ),
-            ),
+            child: isMifc 
+              ? Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Image.asset(
+                    'assets/images/mifc_logo.png',
+                    fit: BoxFit.contain,
+                  ),
+                )
+              : Text(
+                  code.substring(0, code.length > 3 ? 3 : code.length),
+                  style: GoogleFonts.outfit(
+                    color: MifcColors.white,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                    letterSpacing: 1,
+                  ),
+                ),
           ),
         ),
         const SizedBox(height: 12),
         Text(
-          name.toUpperCase(),
+          displayName,
           style: GoogleFonts.outfit(
             fontSize: 11,
             fontWeight: FontWeight.w600,
@@ -224,6 +235,9 @@ class MatchCentreSection extends ConsumerWidget {
     Color resultColor = MifcColors.white.withValues(alpha: 0.4);
     if (result == 'W') resultColor = const Color(0xFF4CAF50);
     if (result == 'L') resultColor = MifcColors.crimson;
+
+    final String displayHome = home.toUpperCase().contains('MARK') ? "MARK INT FC" : home.toUpperCase();
+    final String displayAway = away.toUpperCase().contains('MARK') ? "MARK INT FC" : away.toUpperCase();
 
     return MifcCard(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -247,7 +261,7 @@ class MatchCentreSection extends ConsumerWidget {
               children: [
                 Expanded(
                   child: Text(
-                    home.toUpperCase(),
+                    displayHome,
                     textAlign: TextAlign.right,
                     style: GoogleFonts.outfit(
                       fontSize: 12,
@@ -270,7 +284,7 @@ class MatchCentreSection extends ConsumerWidget {
                 ),
                 Expanded(
                   child: Text(
-                    away.toUpperCase(),
+                    displayAway,
                     textAlign: TextAlign.left,
                     style: GoogleFonts.outfit(
                       fontSize: 12,

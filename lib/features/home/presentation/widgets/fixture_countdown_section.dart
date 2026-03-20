@@ -104,11 +104,22 @@ class _FixtureCountdownSectionState extends ConsumerState<FixtureCountdownSectio
                   ),
                   const SizedBox(height: 40),
                   Text(
-                    '${match.homeTeam.toUpperCase()} v ${match.awayTeam.toUpperCase()}',
+                    'UNITED MATCH · ${match.competition.toUpperCase()}',
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.outfit(
+                      color: MifcColors.crimson,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 2.0,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    '${match.homeTeam.toUpperCase().contains('MARK') ? "MARK INT FC" : match.homeTeam.toUpperCase()} v ${match.awayTeam.toUpperCase().contains('MARK') ? "MARK INT FC" : match.awayTeam.toUpperCase()}',
                     textAlign: TextAlign.center,
                     style: GoogleFonts.outfit(
                       color: MifcColors.white,
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 1.5,
                     ),

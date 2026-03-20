@@ -277,33 +277,60 @@ class FirebaseSeeder {
     debugPrint('Seeding Hero Section...');
     final heroCol = firestore.collection('hero-sec');
 
-    // Check if hero slides already exist
     try {
-      final snapshot = await heroCol.limit(1).get().timeout(const Duration(seconds: 5));
-      if (snapshot.docs.isNotEmpty) {
-        debugPrint('Hero Section already seeded.');
-      } else {
-        final slides = [
-          HeroSlide(
-            tag: 'MATCH TICKETS',
-            date: 'MARCH 25, 2026',
-            headline: 'DERBY TICKETS NOW ON SALE',
-            body: 'Secure your seat for the biggest game of the season against City United.',
-            buttons: [
-              HeroSlideButton(label: 'BUY TICKETS', link: '/tickets'),
-              HeroSlideButton(label: 'VIEW FIXTURES', link: '/fixtures'),
-            ],
-            imageUrl: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1000',
-            timestamp: DateTime.now(),
-          ),
-        ];
-        
-        // Use set with fixed ID to doubly ensure no duplicates
-        for (int i = 0; i < slides.length; i++) {
-          await heroCol.doc('slide_${i + 1}').set(slides[i].toFirestore()).timeout(const Duration(seconds: 5));
+      // CLEANUP: Delete all existing documents in hero-sec to start fresh and remove duplicates
+      final existingSlides = await heroCol.get().timeout(const Duration(seconds: 15));
+      for (var doc in existingSlides.docs) {
+        try {
+          await doc.reference.delete().timeout(const Duration(seconds: 10));
+        } catch (e) {
+          debugPrint('Failed to delete slide ${doc.id}: $e');
         }
-        debugPrint('Seeded Hero Section.');
       }
+      debugPrint('Cleaned up existing hero slides.');
+
+      final slides = [
+        HeroSlide(
+          tag: 'MATCH TICKETS',
+          date: 'MARCH 25, 2026',
+          headline: 'DERBY TICKETS NOW ON SALE',
+          body: 'Secure your seat for the biggest game of the season against City United.',
+          buttons: [
+            HeroSlideButton(label: 'BUY TICKETS', link: '/tickets'),
+            HeroSlideButton(label: 'VIEW FIXTURES', link: '/fixtures'),
+          ],
+          imageUrl: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1000',
+          timestamp: DateTime.now(),
+        ),
+        HeroSlide(
+          tag: 'ELITE HUB',
+          date: 'NEW FEATURE',
+          headline: 'JOIN THE ELITE HUB',
+          body: 'Experience the premium fan community with exclusive stats and activities.',
+          buttons: [
+            HeroSlideButton(label: 'JOIN NOW', link: '/profile'),
+          ],
+          imageUrl: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=1000',
+          timestamp: DateTime.now().subtract(const Duration(minutes: 5)),
+        ),
+        HeroSlide(
+          tag: 'STORE',
+          date: 'NEW ARRIVALS',
+          headline: 'OFFICIAL 2026 KIT AVAILABLE',
+          body: 'Get the latest Mark International FC home and away kits.',
+          buttons: [
+            HeroSlideButton(label: 'SHOP NOW', link: '/store'),
+          ],
+          imageUrl: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?q=80&w=1000',
+          timestamp: DateTime.now().subtract(const Duration(minutes: 10)),
+        ),
+      ];
+      
+      // Use set with fixed ID to doubly ensure no duplicates
+      for (int i = 0; i < slides.length; i++) {
+        await heroCol.doc('slide_${i + 1}').set(slides[i].toFirestore()).timeout(const Duration(seconds: 15));
+      }
+      debugPrint('Seeded Hero Section with ${slides.length} fresh slides.');
     } catch (e) {
       debugPrint('Failed to seed hero slides: $e');
     }

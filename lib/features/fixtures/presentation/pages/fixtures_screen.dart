@@ -335,15 +335,12 @@ class _MatchCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final dateStr = DateFormat('EEE d MMM | ').format(match.timestamp) + match.competition;
     
-    // Handle specific team name request
-    String homeName = match.homeTeam.toUpperCase();
-    String awayName = match.awayTeam.toUpperCase();
-    if (match.homeCode.toUpperCase().contains('MIFC') || homeName.contains('MARKFC')) {
-      homeName = "MARK INT FC";
-    }
-    if (match.awayCode.toUpperCase().contains('MIFC') || awayName.contains('MARKFC')) {
-      awayName = "MARK INT FC";
-    }
+    // Unified name handling
+    final bool isHomeMifc = match.homeCode.toUpperCase().contains('MIFC') || match.homeTeam.toUpperCase().contains('MARK');
+    final bool isAwayMifc = match.awayCode.toUpperCase().contains('MIFC') || match.awayTeam.toUpperCase().contains('MARK');
+    
+    final String homeName = isHomeMifc ? "MARK INT FC" : match.homeTeam.toUpperCase();
+    final String awayName = isAwayMifc ? "MARK INT FC" : match.awayTeam.toUpperCase();
 
     return ScrollReveal(
       child: Padding(
@@ -365,11 +362,12 @@ class _MatchCard extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        dateStr,
+                        "UNITED MATCH · ${dateStr.toUpperCase()}",
                         style: GoogleFonts.inter(
-                          fontSize: 11,
-                          color: Colors.white.withValues(alpha: 0.4),
-                          fontWeight: FontWeight.w500,
+                          fontSize: 10,
+                          color: MifcColors.crimson,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.5,
                         ),
                       ),
                     ),
@@ -413,7 +411,7 @@ class _MatchCard extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: 8),
-                          _buildCrest(match.homeCode),
+                          _buildCrest(match.homeCode, isHomeMifc),
                         ],
                       ),
                     ),
@@ -444,7 +442,7 @@ class _MatchCard extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          _buildCrest(match.awayCode),
+                          _buildCrest(match.awayCode, isAwayMifc),
                           const SizedBox(width: 8),
                           Flexible(
                             child: Text(
@@ -483,9 +481,7 @@ class _MatchCard extends StatelessWidget {
     );
   }
 
-  Widget _buildCrest(String code) {
-    final bool isMifc = code.toUpperCase().contains('MIFC');
-    
+  Widget _buildCrest(String code, bool isMifc) {
     return Container(
       width: 32,
       height: 32,
@@ -508,7 +504,7 @@ class _MatchCard extends StatelessWidget {
             )
           : Center(
               child: Text(
-                code.substring(0, code.length > 3 ? 3 : code.length),
+                code.length > 3 ? code.substring(0, 3) : code,
                 style: GoogleFonts.outfit(
                   fontSize: 10,
                   fontWeight: FontWeight.w800,
