@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
@@ -8,7 +10,8 @@ import 'package:markfc/features/profile/domain/models/mifc_user.dart';
 import 'package:markfc/features/profile/domain/models/user_activity.dart';
 import 'package:markfc/features/profile/data/repositories/profile_repository.dart';
 import 'package:markfc/core/theme/mifc_colors.dart';
-import 'package:markfc/shared/widgets/scroll_reveal.dart';
+import 'package:markfc/shared/widgets/glass_card.dart';
+import 'package:markfc/shared/widgets/tilt_widget.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -19,12 +22,35 @@ class ProfileScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: MifcColors.black,
-      body: userAsync.when(
-        data: (rawUser) {
-          final user = rawUser ?? MifcUser.guest();
-          final isGuest = user.uid == 'guest';
+      body: Stack(
+        children: [
+          // Ambient Background
+          Positioned.fill(
+            child: Image.file(
+              File('C:\\Users\\rosha\\.gemini\\antigravity\\brain\\a77022cc-93cb-4a0a-aa1a-4b50cc7c820b\\stadium_ambient_bg_1774024132780.png'),
+              fit: BoxFit.cover,
+            ),
+          ),
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    MifcColors.black.withValues(alpha: 0.8),
+                    MifcColors.black,
+                  ],
+                ),
+              ),
+            ),
+          ),
+          userAsync.when(
+            data: (rawUser) {
+              final user = rawUser ?? MifcUser.guest();
+              final isGuest = user.uid == 'guest';
 
-          return CustomScrollView(
+              return CustomScrollView(
             slivers: [
               _buildAppBar(),
               SliverToBoxAdapter(
@@ -34,90 +60,107 @@ class ProfileScreen extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 20),
-                      ScrollReveal(child: _MemberCard(user: user)),
+                      _StaggeredReveal(
+                        delay: 0,
+                        child: TiltWidget(
+                          child: GlassCard(
+                            opacity: 0.15,
+                            blur: 15,
+                            child: _MemberCard(user: user),
+                          ),
+                        ),
+                      ),
                       const SizedBox(height: 32),
-                      ScrollReveal(delay: const Duration(milliseconds: 100), child: _MemberStats(user: user)),
+                      _StaggeredReveal(
+                        delay: 100,
+                        child: _MemberStats(user: user),
+                      ),
                       const SizedBox(height: 40),
                       if (isGuest)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 40),
-                          child: Container(
-                            padding: const EdgeInsets.all(24),
-                            decoration: BoxDecoration(
-                              color: MifcColors.navyBlue.withValues(alpha: 0.05),
-                              borderRadius: BorderRadius.circular(24),
-                              border: Border.all(color: MifcColors.navyBlue.withValues(alpha: 0.1)),
-                            ),
-                            child: Column(
-                              children: [
-                                Text(
-                                  'UNLOCK ELITE BENEFITS',
-                                  style: GoogleFonts.outfit(
-                                    color: MifcColors.navyBlue,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w900,
-                                    letterSpacing: 1,
+                        _StaggeredReveal(
+                          delay: 200,
+                          child: Padding(
+                            padding: const EdgeInsets.only(bottom: 40),
+                            child: GlassCard(
+                              opacity: 0.05,
+                              padding: const EdgeInsets.all(24),
+                              child: Column(
+                                children: [
+                                  Text(
+                                    'UNLOCK ELITE BENEFITS',
+                                    style: GoogleFonts.outfit(
+                                      color: MifcColors.navyBlue,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w900,
+                                      letterSpacing: 1,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(height: 12),
-                                Text(
-                                  'Join the Elite to earn loyalty points, access exclusive content, and more.',
-                                  textAlign: TextAlign.center,
-                                  style: GoogleFonts.inter(
-                                    color: Colors.white70,
-                                    fontSize: 13,
-                                    height: 1.5,
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    'Join the Elite to earn loyalty points, access exclusive content, and more.',
+                                    textAlign: TextAlign.center,
+                                    style: GoogleFonts.inter(
+                                      color: Colors.white70,
+                                      fontSize: 13,
+                                      height: 1.5,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(height: 24),
-                                ElevatedButton(
-                                  onPressed: () => context.push('/login'),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: MifcColors.navyBlue,
-                                    foregroundColor: Colors.white,
-                                    minimumSize: const Size(double.infinity, 50),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                    elevation: 0,
+                                  const SizedBox(height: 24),
+                                  _PulseButton(
+                                    onPressed: () => context.push('/login'),
+                                    label: 'LOG IN / REGISTER',
                                   ),
-                                  child: Text(
-                                    'LOG IN / REGISTER',
-                                    style: GoogleFonts.outfit(fontWeight: FontWeight.w900, letterSpacing: 0.5),
-                                  ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ),
-                      Text(
-                        'YOUR ACTIVITIES',
-                        style: GoogleFonts.outfit(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w900,
-                          color: MifcColors.navyBlue,
-                          letterSpacing: 2,
+                      _StaggeredReveal(
+                        delay: 300,
+                        child: Text(
+                          'YOUR ACTIVITIES',
+                          style: GoogleFonts.outfit(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w900,
+                            color: MifcColors.navyBlue.withValues(alpha: 0.6),
+                            letterSpacing: 2,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 20),
-                      _ActivityList(uid: user.uid),
+                      _StaggeredReveal(
+                        delay: 400,
+                        child: _ActivityList(uid: user.uid),
+                      ),
                       const SizedBox(height: 40),
-                      _buildSectionHeader('ACCOUNT'),
-                      _buildAccountItem(
-                        Icons.settings_outlined,
-                        'Settings',
-                        onTap: () => context.push('/profile/settings'),
+                      _StaggeredReveal(
+                        delay: 500,
+                        child: _buildSectionHeader('ACCOUNT'),
                       ),
-                      _buildAccountItem(
-                        Icons.help_outline_rounded,
-                        'Help & Support',
-                        onTap: () => context.push('/profile/help'),
-                      ),
-                      if (!isGuest)
-                        _buildAccountItem(
-                          Icons.logout_rounded,
-                          'Logout',
-                          isDestructive: true,
-                          onTap: () => _showLogoutDialog(context),
+                      _StaggeredReveal(
+                        delay: 600,
+                        child: Column(
+                          children: [
+                            _buildAccountItem(
+                              Icons.settings_outlined,
+                              'Settings',
+                              onTap: () => context.push('/profile/settings'),
+                            ),
+                            _buildAccountItem(
+                              Icons.help_outline_rounded,
+                              'Help & Support',
+                              onTap: () => context.push('/profile/help'),
+                            ),
+                            if (!isGuest)
+                              _buildAccountItem(
+                                Icons.logout_rounded,
+                                'Logout',
+                                isDestructive: true,
+                                onTap: () => _showLogoutDialog(context),
+                              ),
+                          ],
                         ),
+                      ),
                       const SizedBox(height: 120),
                     ],
                   ),
@@ -125,9 +168,11 @@ class ProfileScreen extends ConsumerWidget {
               ),
             ],
           );
-        },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('Error loading profile: $err', style: const TextStyle(color: Colors.white70))),
+            },
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (err, stack) => Center(child: Text('Error loading profile: $err', style: const TextStyle(color: Colors.white70))),
+          ),
+        ],
       ),
     );
   }
@@ -250,28 +295,9 @@ class _MemberCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
+    return SizedBox(
       height: 200,
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            MifcColors.navyBlue,
-            MifcColors.black,
-          ],
-        ),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1), width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: MifcColors.navyBlue.withValues(alpha: 0.2),
-            blurRadius: 20,
-            spreadRadius: 2,
-          ),
-        ],
-      ),
+      width: double.infinity,
       child: Stack(
         children: [
           Positioned(
@@ -291,48 +317,36 @@ class _MemberCard extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: user.uid == 'guest' ? Colors.white.withValues(alpha: 0.1) : MifcColors.crimson,
-                        borderRadius: BorderRadius.circular(30),
-                        border: user.uid == 'guest' ? Border.all(color: Colors.white24, width: 1) : null,
-                      ),
-                      child: Text(
-                        user.uid == 'guest' ? 'GUEST' : 'ELITE',
-                        style: GoogleFonts.outfit(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w900,
-                          fontSize: 12,
-                          letterSpacing: 1,
-                        ),
-                      ),
+                    _ShimmerTag(
+                      label: user.uid == 'guest' ? 'GUEST' : 'ELITE MEMBER',
+                      color: user.uid == 'guest' ? Colors.white.withValues(alpha: 0.1) : MifcColors.crimson,
+                      isGuest: user.uid == 'guest',
                     ),
                     Icon(
-                      user.uid == 'guest' ? Icons.lock_outline_rounded : Icons.qr_code_2_rounded, 
-                      color: Colors.white, 
-                      size: 28
+                      user.uid == 'guest' ? Icons.lock_outline_rounded : Icons.verified_user_rounded,
+                      color: Colors.white.withValues(alpha: 0.3),
+                      size: 20,
                     ),
                   ],
                 ),
                 const Spacer(),
                 Text(
-                  user.uid == 'guest' ? 'JOIN THE ELITE' : user.name.toUpperCase(),
+                  user.displayName.toUpperCase(),
                   style: GoogleFonts.outfit(
                     color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1,
+                    fontSize: 28,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 2,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  user.uid == 'guest' ? 'CREATE AN ACCOUNT TO START' : 'MEMBER SINCE ${user.joinDate.year}',
-                  style: GoogleFonts.inter(
+                  user.uid == 'guest' ? 'JOIN THE ELITE' : 'SINCE ${DateFormat('yyyy').format(user.createdAt)}',
+                  style: GoogleFonts.outfit(
                     color: Colors.white.withValues(alpha: 0.5),
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    letterSpacing: 1,
+                    letterSpacing: 2,
                   ),
                 ),
               ],
@@ -344,40 +358,133 @@ class _MemberCard extends StatelessWidget {
   }
 }
 
+class _ShimmerTag extends StatefulWidget {
+  final String label;
+  final Color color;
+  final bool isGuest;
+
+  const _ShimmerTag({
+    required this.label,
+    required this.color,
+    required this.isGuest,
+  });
+
+  @override
+  State<_ShimmerTag> createState() => _ShimmerTagState();
+}
+
+class _ShimmerTagState extends State<_ShimmerTag> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: widget.color,
+            borderRadius: BorderRadius.circular(30),
+            border: widget.isGuest ? Border.all(color: Colors.white24, width: 1) : null,
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              stops: [
+                _controller.value - 0.2,
+                _controller.value,
+                _controller.value + 0.2,
+              ],
+              colors: [
+                Colors.white.withValues(alpha: 0),
+                Colors.white.withValues(alpha: 0.2),
+                Colors.white.withValues(alpha: 0),
+              ],
+            ),
+          ),
+          child: Text(
+            widget.label,
+            style: GoogleFonts.outfit(
+              color: Colors.white,
+              fontSize: 10,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1,
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
 class _MemberStats extends StatelessWidget {
   final MifcUser user;
   const _MemberStats({required this.user});
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        _buildStatItem('MATCHES', user.matchesAttended.toString()),
-        _buildStatItem('LOYALTY', user.loyaltyPoints.toString()),
-        _buildStatItem('YEARS', (DateTime.now().year - user.joinDate.year).toString()),
-      ],
+    return GlassCard(
+      opacity: 0.05,
+      padding: const EdgeInsets.symmetric(vertical: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _StatItem(label: 'MATCHES', value: user.matchCount),
+          _StatItem(label: 'LOYALTY', value: user.loyaltyPoints),
+          _StatItem(label: 'YEARS', value: DateTime.now().year - user.createdAt.year),
+        ],
+      ),
     );
   }
+}
 
-  Widget _buildStatItem(String label, String value) {
+class _StatItem extends StatelessWidget {
+  final String label;
+  final int value;
+
+  const _StatItem({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(
-          value,
-          style: GoogleFonts.outfit(
-            color: Colors.white,
-            fontSize: 24,
-            fontWeight: FontWeight.w800,
-          ),
+        TweenAnimationBuilder<double>(
+          tween: Tween(begin: 0, end: value.toDouble()),
+          duration: const Duration(seconds: 2),
+          curve: Curves.easeOutExpo,
+          builder: (context, value, child) {
+            return Text(
+              value.toInt().toString(),
+              style: GoogleFonts.outfit(
+                fontSize: 24,
+                fontWeight: FontWeight.w900,
+                color: Colors.white,
+              ),
+            );
+          },
         ),
         const SizedBox(height: 4),
         Text(
           label,
-          style: GoogleFonts.inter(
-            color: Colors.white.withValues(alpha: 0.3),
-            fontSize: 11,
+          style: GoogleFonts.outfit(
+            fontSize: 10,
             fontWeight: FontWeight.w700,
+            color: Colors.white.withValues(alpha: 0.3),
             letterSpacing: 1,
           ),
         ),
@@ -393,44 +500,30 @@ class _ActivityList extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (uid == 'guest') {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 24),
-        child: Center(
-          child: Column(
-            children: [
-              Icon(Icons.lock_person_rounded, color: Colors.white.withValues(alpha: 0.05), size: 40),
-              const SizedBox(height: 12),
-              Text(
-                'LOGIN TO VIEW YOUR ACTIVITY',
-                style: GoogleFonts.outfit(
-                  color: Colors.white10,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 1,
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
+      return const _BlurredActivityPreview();
     }
 
     final activitiesAsync = ref.watch(userActivitiesProvider(uid));
+
     return activitiesAsync.when(
       data: (activities) {
         if (activities.isEmpty) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 24),
-            child: Center(
-              child: Text(
-                'NO RECENT ACTIVITIES',
-                style: GoogleFonts.outfit(
-                  color: Colors.white24,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 1,
+          return Center(
+            child: Column(
+              children: [
+                const SizedBox(height: 40),
+                Icon(Icons.history_rounded, size: 48, color: Colors.white.withValues(alpha: 0.1)),
+                const SizedBox(height: 16),
+                Text(
+                  'NO RECENT ACTIVITY',
+                  style: GoogleFonts.outfit(
+                    color: Colors.white24,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1,
+                  ),
                 ),
-              ),
+              ],
             ),
           );
         }
@@ -536,4 +629,143 @@ class _ActivityList extends ConsumerWidget {
     return Divider(color: Colors.white.withValues(alpha: 0.05), height: 1);
   }
 }
-// Removed _UnauthenticatedView as it's now integrated into the main profile view
+
+class _StaggeredReveal extends StatefulWidget {
+  final Widget child;
+  final Duration delay;
+
+  const _StaggeredReveal({
+    required this.child,
+    this.delay = Duration.zero,
+  });
+
+  @override
+  State<_StaggeredReveal> createState() => _StaggeredRevealState();
+}
+
+class _StaggeredRevealState extends State<_StaggeredReveal> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+
+    _fadeAnimation = CurvedAnimation(
+      parent: _controller,
+      curve: const Interval(0.0, 1.0, curve: Curves.easeOut),
+    );
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.1),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: const Interval(0.0, 1.0, curve: Curves.easeOutQuart),
+    ));
+
+    Future.delayed(widget.delay, () {
+      if (mounted) _controller.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _fadeAnimation,
+      child: SlideTransition(
+        position: _slideAnimation,
+        child: widget.child,
+      ),
+    );
+  }
+}
+
+class _PulseButton extends StatefulWidget {
+  final VoidCallback onPressed;
+  final String label;
+
+  const _PulseButton({
+    required this.onPressed,
+    required this.label,
+  });
+
+  @override
+  State<_PulseButton> createState() => _PulseButtonState();
+}
+
+class _PulseButtonState extends State<_PulseButton> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2000),
+    )..repeat(reverse: true);
+
+    _animation = Tween<double>(begin: 1.0, end: 1.1).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _animation,
+      builder: (context, child) {
+        return Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: MifcColors.crimson.withValues(alpha: 0.3 * (_animation.value - 1.0) * 10),
+                blurRadius: 20 * (_animation.value - 1.0) * 10,
+                spreadRadius: 2 * (_animation.value - 1.0) * 10,
+              ),
+            ],
+          ),
+          child: ElevatedButton(
+            onPressed: widget.onPressed,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: MifcColors.crimson,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              elevation: 0,
+            ),
+            child: Text(
+              widget.label,
+              style: GoogleFonts.outfit(
+                fontSize: 14,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1.5,
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
