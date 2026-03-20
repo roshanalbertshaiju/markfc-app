@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+// import 'package:intl/intl.dart'; // Unused
 import 'package:markfc/core/theme/mifc_colors.dart';
 import 'package:markfc/shared/widgets/section_header.dart';
 import 'package:markfc/shared/widgets/mifc_card.dart';
@@ -50,9 +51,26 @@ class LatestNewsSection extends ConsumerWidget {
               child: CircularProgressIndicator(color: MifcColors.navyBlue),
             ),
             error: (err, stack) => Center(
-              child: Text(
-                'Failed to load news',
-                style: GoogleFonts.inter(color: MifcColors.crimson),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Failed to load news',
+                    style: GoogleFonts.inter(color: MifcColors.crimson),
+                  ),
+                  const SizedBox(height: 8),
+                  TextButton.icon(
+                    onPressed: () => ref.refresh(latestNewsProvider(5)),
+                    icon: const Icon(Icons.refresh, size: 16, color: Colors.white70),
+                    label: Text(
+                      'Retry',
+                      style: GoogleFonts.inter(
+                        color: Colors.white70,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -100,16 +118,42 @@ class NewsCard extends StatelessWidget {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  article.imageUrl.isNotEmpty
-                      ? Image.network(
-                          article.imageUrl,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => Container(
-                            color: Colors.grey[900],
-                            child: const Icon(Icons.image_not_supported, color: Colors.white24),
+                  CachedNetworkImage(
+                    imageUrl: article.imageUrl,
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: double.infinity,
+                    placeholder: (context, url) => Container(
+                      color: Colors.grey[900],
+                      child: const Center(
+                        child: SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: MifcColors.navyBlue,
                           ),
-                        )
-                      : Container(color: Colors.grey[900]),
+                        ),
+                      ),
+                    ),
+                    errorWidget: (context, url, error) => Container(
+                      color: Colors.grey[900],
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.image_not_supported, 
+                            color: Colors.white24, size: 24),
+                          const SizedBox(height: 4),
+                          Image.asset(
+                        'assets/images/mifc_logo.png',
+                        height: 20,
+                        color: Colors.white.withValues(alpha: 0.5),
+                        errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
+                      ),
+                        ],
+                      ),
+                    ),
+                  ),
                   Positioned(
                     top: 12,
                     left: 12,

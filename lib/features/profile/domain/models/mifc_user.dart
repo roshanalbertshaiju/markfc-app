@@ -52,4 +52,16 @@ class MifcUser {
       'photoUrl': photoUrl,
     };
   }
+
+  factory MifcUser.guest() {
+    return MifcUser(
+      uid: 'guest',
+      name: 'GUEST USER',
+      email: '',
+      memberStatus: 'GUEST',
+      joinDate: DateTime.now(),
+      matchesAttended: 0,
+      loyaltyPoints: 0,
+    );
+  }
 }

@@ -1,45 +1,74 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:markfc/core/theme/mifc_colors.dart';
 import 'package:markfc/shared/widgets/section_header.dart';
+import 'package:markfc/features/news/domain/models/video_content.dart';
+import 'package:markfc/features/news/data/repositories/video_repository.dart';
 
-class MifcTvSection extends StatelessWidget {
+class MifcTvSection extends ConsumerWidget {
   const MifcTvSection({super.key});
 
+  String _formatViews(int views) {
+    if (views >= 1000000) {
+      return '${(views / 1000000).toStringAsFixed(1)}M VIEWS';
+    } else if (views >= 1000) {
+      return '${(views / 1000).toStringAsFixed(1)}K VIEWS';
+    } else {
+      return '$views VIEWS';
+    }
+  }
+
+  String _formatTime(DateTime timestamp) {
+    final now = DateTime.now();
+    final difference = now.difference(timestamp);
+
+    if (difference.inDays > 7) {
+      return DateFormat('dd MMM yyyy').format(timestamp).toUpperCase();
+    } else if (difference.inDays >= 1) {
+      return '${difference.inDays} DAYS AGO';
+    } else if (difference.inHours >= 1) {
+      return '${difference.inHours} HOURS AGO';
+    } else if (difference.inMinutes >= 1) {
+      return '${difference.inMinutes} MINUTES AGO';
+    } else {
+      return 'JUST NOW';
+    }
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final videosAsync = ref.watch(allVideosProvider);
+
     return Column(
       children: [
         const SectionHeader(title: 'MIFC TV', actionLabel: 'WATCH ALL'),
         SizedBox(
-          height: 260,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            physics: const BouncingScrollPhysics(),
-            children: const [
-              VideoCard(
-                category: 'HIGHLIGHTS',
-                duration: '06:32',
-                title: 'MIFC 3-1 ARSENAL: THE FULL MATCH STORY',
-                views: '142K VIEWS',
-                timeAgo: 'YESTERDAY',
-              ),
-              VideoCard(
-                category: 'EXCLUSIVE',
-                duration: '18:47',
-                title: 'PRE-MATCH ANALYSIS: THE CITY SHOWDOWN',
-                views: '38K VIEWS',
-                timeAgo: 'TODAY',
-              ),
-              VideoCard(
-                category: 'INSIDE',
-                duration: '12:15',
-                title: 'BEHIND THE SCENES: SHOOTING PRACTICE',
-                views: '28K VIEWS',
-                timeAgo: '2 DAYS AGO',
-              ),
-            ],
+          height: 280, // Slightly increased to fit content
+          child: videosAsync.when(
+            data: (videos) {
+              if (videos.isEmpty) {
+                return const Center(child: Text('Coming Soon', style: TextStyle(color: Colors.white30)));
+              }
+              return ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                physics: const BouncingScrollPhysics(),
+                itemCount: videos.length > 5 ? 5 : videos.length,
+                itemBuilder: (context, index) {
+                  final video = videos[index];
+                  return VideoCard(
+                    video: video,
+                    displayViews: _formatViews(video.views),
+                    displayTime: _formatTime(video.timestamp),
+                  );
+                },
+              );
+            },
+            loading: () => const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+            error: (err, stack) => Center(child: Text('Error: $err', style: const TextStyle(color: Colors.white30))),
           ),
         ),
       ],
@@ -48,20 +77,31 @@ class MifcTvSection extends StatelessWidget {
 }
 
 class VideoCard extends StatelessWidget {
-  final String category;
-  final String duration;
-  final String title;
-  final String views;
-  final String timeAgo;
+  final VideoContent video;
+  final String displayViews;
+  final String displayTime;
 
   const VideoCard({
     super.key,
-    required this.category,
-    required this.duration,
-    required this.title,
-    required this.views,
-    required this.timeAgo,
+    required this.video,
+    required this.displayViews,
+    required this.displayTime,
   });
+
+  Color _getCategoryColor(String category) {
+    switch (category.toUpperCase()) {
+      case 'HIGHLIGHTS':
+        return MifcColors.navyBlue;
+      case 'EXCLUSIVE':
+      case 'INTERVIEW':
+        return MifcColors.crimson;
+      case 'INSIDE':
+      case 'TRAINING':
+        return MifcColors.prestigeGold;
+      default:
+        return MifcColors.white.withValues(alpha: 0.8);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,18 +123,24 @@ class VideoCard extends StatelessWidget {
             ),
             child: Stack(
               children: [
-                // Subtle gradient representation of a video thumbnail
+                // Actual video thumbnail using CachedNetworkImage
                 Positioned.fill(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          MifcColors.white.withValues(alpha: 0.02),
-                          MifcColors.white.withValues(alpha: 0.05),
-                        ],
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: CachedNetworkImage(
+                      imageUrl: video.imageUrl,
+                      fit: BoxFit.cover,
+                      errorWidget: (context, url, error) => Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              MifcColors.white.withValues(alpha: 0.02),
+                              MifcColors.white.withValues(alpha: 0.05),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -109,9 +155,9 @@ class VideoCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
-                      category,
+                      video.category,
                       style: GoogleFonts.outfit(
-                        color: MifcColors.white.withValues(alpha: 0.8),
+                        color: _getCategoryColor(video.category),
                         fontSize: 8,
                         fontWeight: FontWeight.w700,
                         letterSpacing: 1.0,
@@ -133,9 +179,9 @@ class VideoCard extends StatelessWidget {
                   bottom: 12,
                   right: 12,
                   child: Text(
-                    duration,
+                    video.duration,
                     style: GoogleFonts.outfit(
-                      color: MifcColors.white.withValues(alpha: 0.6),
+                      color: MifcColors.white,
                       fontSize: 10,
                       fontWeight: FontWeight.w600,
                       letterSpacing: 0.5,
@@ -147,7 +193,7 @@ class VideoCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            title,
+            video.title.toUpperCase(),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.outfit(
@@ -160,7 +206,7 @@ class VideoCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            '$views · $timeAgo',
+            '$displayViews · $displayTime',
             style: GoogleFonts.inter(
               fontSize: 9,
               fontWeight: FontWeight.w500,

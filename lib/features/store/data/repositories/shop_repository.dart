@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:markfc/core/providers/firebase_providers.dart';
 import '../../domain/models/product.dart';
-import '../../../news/data/repositories/news_repository.dart'; // To reuse firestoreProvider
 
 class ShopRepository {
   final FirebaseFirestore _firestore;

@@ -55,7 +55,13 @@ class _NewsScreenState extends State<NewsScreen> with SingleTickerProviderStateM
             onChanged: (val) => setState(() => _showVideos = val),
           ),
           Expanded(
-            child: _showVideos ? const VideoListTab() : const NewsScrollBody(),
+            child: IndexedStack(
+              index: _showVideos ? 1 : 0,
+              children: const [
+                NewsScrollBody(),
+                VideoListTab(),
+              ],
+            ),
           ),
         ],
       ),
@@ -184,6 +190,7 @@ class NewsScrollBody extends ConsumerWidget {
         }
 
         return ListView.builder(
+          key: const PageStorageKey('news_list'),
           padding: const EdgeInsets.only(bottom: 40),
           physics: const BouncingScrollPhysics(),
           itemCount: articles.length + 2, // + Featured Hero + Header
@@ -351,6 +358,7 @@ class VideoListTab extends ConsumerWidget {
           return const Center(child: Text('Coming Soon', style: TextStyle(color: Colors.white70)));
         }
         return ListView.builder(
+          key: const PageStorageKey('video_list'),
           padding: const EdgeInsets.all(16),
           itemCount: videos.length,
           itemBuilder: (context, index) {

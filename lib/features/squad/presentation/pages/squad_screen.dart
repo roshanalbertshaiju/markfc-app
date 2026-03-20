@@ -5,7 +5,7 @@ import 'package:markfc/core/theme/mifc_colors.dart';
 import 'package:markfc/shared/widgets/mifc_top_bar.dart';
 import 'package:markfc/features/squad/data/repositories/squad_repository.dart';
 import 'package:markfc/features/squad/domain/models/player.dart';
-import '../widgets/player_card.dart';
+import 'package:markfc/features/squad/presentation/widgets/player_card.dart';
 
 class SquadScreen extends ConsumerStatefulWidget {
   const SquadScreen({super.key});

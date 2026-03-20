@@ -1,8 +1,9 @@
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/models/match_model.dart';
-import '../../../news/data/repositories/news_repository.dart'; // To reuse firestoreProvider
+import 'package:markfc/core/providers/firebase_providers.dart';
 
 class FixturesRepository {
   final FirebaseFirestore _firestore;
@@ -12,11 +13,11 @@ class FixturesRepository {
   Stream<List<MatchModel>> watchFixtures() {
     return _firestore
         .collection('fixtures')
-        .orderBy('date', descending: false) // Changed from 'timestamp' to 'date'
+        // .orderBy('date', descending: false)
         .snapshots()
-        .timeout(const Duration(seconds: 10), onTimeout: (sink) {
+        .timeout(const Duration(seconds: 30), onTimeout: (sink) {
           debugPrint('Firestore Connection Timeout: Fixtures collection');
-          sink.addError('Connection Timeout');
+          sink.addError(TimeoutException('Firestore Connection Timeout: Fixtures collection'));
         })
         .map((snapshot) {
       return snapshot.docs
@@ -28,11 +29,17 @@ class FixturesRepository {
   Stream<List<MatchModel>> watchResults() {
     return _firestore
         .collection('results')
-        .orderBy('timestamp', descending: true)
+        // .orderBy('timestamp', descending: true)
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => MatchModel.fromFirestore(doc))
-            .toList());
+        .timeout(const Duration(seconds: 30), onTimeout: (sink) {
+          debugPrint('Firestore Connection Timeout: Results collection');
+          sink.addError(TimeoutException('Firestore Connection Timeout: Results collection'));
+        })
+        .map((snapshot) {
+      return snapshot.docs
+          .map((doc) => MatchModel.fromFirestore(doc))
+          .toList();
+    });
   }
 
   Stream<MatchModel?> watchLiveMatch() {
@@ -41,6 +48,10 @@ class FixturesRepository {
         .where('status', isEqualTo: 'live')
         .limit(1)
         .snapshots()
+        .timeout(const Duration(seconds: 30), onTimeout: (sink) {
+          debugPrint('Firestore Connection Timeout: Live Match query');
+          sink.addError(TimeoutException('Firestore Connection Timeout: Live Match query'));
+        })
         .map((snapshot) => snapshot.docs.isNotEmpty 
             ? MatchModel.fromFirestore(snapshot.docs.first) 
             : null);

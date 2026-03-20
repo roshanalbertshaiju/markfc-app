@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/models/mifc_user.dart';
 import '../../domain/models/user_activity.dart';
-import '../../../news/data/repositories/news_repository.dart'; // To reuse firestoreProvider
+import 'package:markfc/core/providers/firebase_providers.dart';
 
 class ProfileRepository {
   final FirebaseFirestore _firestore;

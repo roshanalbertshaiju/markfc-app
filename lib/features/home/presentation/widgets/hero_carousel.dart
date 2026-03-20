@@ -1,78 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:markfc/core/theme/mifc_colors.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:markfc/features/home/domain/models/hero_slide.dart' as model;
+import 'package:markfc/features/home/data/repositories/hero_repository.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'dart:async';
 
-class HeroSlide {
-  final String tag;
-  final String date;
-  final String headline;
-  final String body;
-  final String primaryButtonLabel;
-  final String secondaryButtonLabel;
-  final String imageUrl;
-
-  HeroSlide({
-    required this.tag,
-    required this.date,
-    required this.headline,
-    required this.body,
-    required this.primaryButtonLabel,
-    required this.secondaryButtonLabel,
-    required this.imageUrl,
-  });
-}
-
-class HeroCarousel extends StatefulWidget {
+class HeroCarousel extends ConsumerStatefulWidget {
   const HeroCarousel({super.key});
 
   @override
-  State<HeroCarousel> createState() => _HeroCarouselState();
+  ConsumerState<HeroCarousel> createState() => _HeroCarouselState();
 }
 
-class _HeroCarouselState extends State<HeroCarousel> {
+class _HeroCarouselState extends ConsumerState<HeroCarousel> {
   int _currentIndex = 0;
   late PageController _pageController;
   Timer? _timer;
 
-  final List<HeroSlide> _slides = [
-    HeroSlide(
-      tag: 'MATCH REPORT',
-      date: '04 MAR 2026',
-      headline: 'THE REDS SECURE ANOTHER MASSIVE WIN…',
-      body: 'A commanding performance at Old Trafford keeps the title dream very much alive heading into March.',
-      primaryButtonLabel: 'READ REPORT',
-      secondaryButtonLabel: 'VIEW GALLERY',
-      imageUrl: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=2000',
-    ),
-    HeroSlide(
-      tag: 'NEXT FIXTURE',
-      date: 'SAT 14 MAR 2026 · 15:00',
-      headline: 'MIFC VS MANCHESTER CITY',
-      body: "Old Trafford · Premier League GW29 · Don't miss out",
-      primaryButtonLabel: 'BOOK TICKETS',
-      secondaryButtonLabel: 'KICK-OFF INFO',
-      imageUrl: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?q=80&w=2000',
-    ),
-    HeroSlide(
-      tag: 'MEMBERSHIP',
-      date: '2025–26 SEASON',
-      headline: 'BE PART OF SOMETHING BIGGER',
-      body: 'Join thousands of passionate fans. Access exclusive content, priority tickets and loyalty rewards.',
-      primaryButtonLabel: 'BECOME A MEMBER',
-      secondaryButtonLabel: 'LEARN MORE',
-      imageUrl: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?q=80&w=2000',
-    ),
-    HeroSlide(
-      tag: 'NEW KIT DROP',
-      date: 'AVAILABLE NOW',
-      headline: 'THE NEW 2025–26 HOME KIT IS HERE',
-      body: 'Wear your colours with pride. Limited stock available — order yours today.',
-      primaryButtonLabel: 'SHOP NOW',
-      secondaryButtonLabel: 'VIEW COLLECTION',
-      imageUrl: 'https://images.unsplash.com/photo-1575361204480-aadea25e6e68?q=80&w=2000',
-    ),
-  ];
+  // Remove hardcoded slides
 
   @override
   void initState() {
@@ -84,7 +31,12 @@ class _HeroCarouselState extends State<HeroCarousel> {
   void _startTimer() {
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 5), (Timer timer) {
-      if (_currentIndex < _slides.length - 1) {
+      final slidesAsync = ref.read(heroSlidesStreamProvider);
+      final slidesCount = slidesAsync.value?.length ?? 0;
+      
+      if (slidesCount == 0) return;
+
+      if (_currentIndex < slidesCount - 1) {
         _currentIndex++;
       } else {
         _currentIndex = 0;
@@ -109,50 +61,92 @@ class _HeroCarouselState extends State<HeroCarousel> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    final slidesAsync = ref.watch(heroSlidesStreamProvider);
+
+    return slidesAsync.when(
+      data: (slides) {
+        if (slides.isEmpty) return const SizedBox.shrink();
+
+        return SizedBox(
+          height: 480,
+          child: Stack(
+            children: [
+              PageView.builder(
+                controller: _pageController,
+                onPageChanged: (index) {
+                  setState(() {
+                    _currentIndex = index;
+                  });
+                  _startTimer();
+                },
+                itemCount: slides.length,
+                itemBuilder: (context, index) {
+                  return HeroSlideWidget(slide: slides[index]);
+                },
+              ),
+              Positioned(
+                bottom: 32,
+                left: 24,
+                child: Row(
+                  children: List.generate(slides.length, (index) {
+                    return Container(
+                      width: index == _currentIndex ? 32 : 8,
+                      height: 2,
+                      margin: const EdgeInsets.only(right: 6),
+                      decoration: BoxDecoration(
+                        color: index == _currentIndex
+                            ? MifcColors.navyBlue
+                            : MifcColors.white.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    );
+                  }),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+      loading: () => const _HeroShimmer(),
+      error: (err, stack) => const _HeroErrorState(),
+    );
+  }
+}
+
+class _HeroShimmer extends StatelessWidget {
+  const _HeroShimmer();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
       height: 480,
-      child: Stack(
-        children: [
-          PageView.builder(
-            controller: _pageController,
-            onPageChanged: (index) {
-              setState(() {
-                _currentIndex = index;
-              });
-              _startTimer();
-            },
-            itemCount: _slides.length,
-            itemBuilder: (context, index) {
-              return HeroSlideWidget(slide: _slides[index]);
-            },
-          ),
-          Positioned(
-            bottom: 32,
-            left: 24,
-            child: Row(
-              children: List.generate(_slides.length, (index) {
-                return Container(
-                  width: index == _currentIndex ? 32 : 8,
-                  height: 2,
-                  margin: const EdgeInsets.only(right: 6),
-                  decoration: BoxDecoration(
-                    color: index == _currentIndex
-                        ? MifcColors.navyBlue
-                        : MifcColors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                );
-              }),
-            ),
-          ),
-        ],
+      width: double.infinity,
+      color: MifcColors.navyBlue.withValues(alpha: 0.05),
+      child: const Center(
+        child: CircularProgressIndicator(color: MifcColors.navyBlue),
+      ),
+    );
+  }
+}
+
+class _HeroErrorState extends StatelessWidget {
+  const _HeroErrorState();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 480,
+      width: double.infinity,
+      color: MifcColors.navyBlue.withValues(alpha: 0.1),
+      child: const Center(
+        child: Icon(Icons.error_outline, color: MifcColors.navyBlue),
       ),
     );
   }
 }
 
 class HeroSlideWidget extends StatelessWidget {
-  final HeroSlide slide;
+  final model.HeroSlide slide;
 
   const HeroSlideWidget({super.key, required this.slide});
 
@@ -161,10 +155,35 @@ class HeroSlideWidget extends StatelessWidget {
     return Stack(
       fit: StackFit.expand,
       children: [
-        // Background Image with sophisticated overlay
-        Image.network(
-          slide.imageUrl,
+        // Background Image with sophisticated overlay and fallbacks
+        CachedNetworkImage(
+          imageUrl: slide.imageUrl,
           fit: BoxFit.cover,
+          placeholder: (context, url) => Container(
+            color: MifcColors.navyBlue.withValues(alpha: 0.1),
+            child: const Center(
+              child: CircularProgressIndicator(color: MifcColors.white),
+            ),
+          ),
+          errorWidget: (context, url, error) => Container(
+            color: MifcColors.navyBlue,
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: Opacity(
+                    opacity: 0.3,
+                    child: Image.asset(
+                      'assets/images/launcher_icon.png', // Fallback to logo
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
+                const Center(
+                  child: Icon(Icons.broken_image_outlined, color: MifcColors.white, size: 48),
+                ),
+              ],
+            ),
+          ),
         ),
         Container(
           decoration: BoxDecoration(
@@ -220,11 +239,14 @@ class HeroSlideWidget extends StatelessWidget {
               ),
               const SizedBox(height: 32),
               Row(
-                children: [
-                  _PrimaryButton(label: slide.primaryButtonLabel),
-                  const SizedBox(width: 12),
-                  _SecondaryButton(label: slide.secondaryButtonLabel),
-                ],
+                children: slide.buttons.isNotEmpty 
+                  ? slide.buttons.map((btn) => Padding(
+                      padding: const EdgeInsets.only(right: 12),
+                      child: _PrimaryButton(label: btn.label, link: btn.link),
+                    )).toList()
+                  : [
+                      const _PrimaryButton(label: 'LEARN MORE', link: ''),
+                    ],
               ),
             ],
           ),
@@ -236,7 +258,8 @@ class HeroSlideWidget extends StatelessWidget {
 
 class _PrimaryButton extends StatelessWidget {
   final String label;
-  const _PrimaryButton({required this.label});
+  final String link;
+  const _PrimaryButton({required this.label, required this.link});
 
   @override
   Widget build(BuildContext context) {
@@ -247,34 +270,6 @@ class _PrimaryButton extends StatelessWidget {
         foregroundColor: MifcColors.black,
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(100),
-        ),
-      ),
-      child: Text(
-        label.toUpperCase(),
-        style: GoogleFonts.outfit(
-          fontSize: 12,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 1.0,
-        ),
-      ),
-    );
-  }
-}
-
-class _SecondaryButton extends StatelessWidget {
-  final String label;
-  const _SecondaryButton({required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return OutlinedButton(
-      onPressed: () {},
-      style: OutlinedButton.styleFrom(
-        foregroundColor: MifcColors.white,
-        side: BorderSide(color: MifcColors.white.withValues(alpha: 0.3)),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(100),
         ),

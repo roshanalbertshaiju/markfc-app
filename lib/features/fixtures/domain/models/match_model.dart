@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 
 enum MatchStatus { upcoming, live, finished }
 
@@ -65,8 +66,21 @@ class MatchModel {
   }
 
   static DateTime _parseDateTime(dynamic field) {
+    if (field == null) return DateTime.now();
     if (field is Timestamp) return field.toDate();
     if (field is int) return DateTime.fromMillisecondsSinceEpoch(field);
+    if (field is String) {
+      try {
+        // Handle "January 26, 2026"
+        return DateFormat('MMMM d, yyyy').parse(field);
+      } catch (e) {
+        try {
+          return DateTime.parse(field);
+        } catch (_) {
+          return DateTime.now();
+        }
+      }
+    }
     return DateTime.now();
   }
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:markfc/core/theme/mifc_colors.dart';
-import '../../domain/models/player.dart';
+import 'package:markfc/features/squad/domain/models/player.dart';
 
 
 class PlayerCard extends StatelessWidget {

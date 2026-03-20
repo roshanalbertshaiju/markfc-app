@@ -14,11 +14,21 @@ void main() async {
   );
 
   // SEED DATA ONCE
-  // try {
-  //   await FirebaseSeeder.seedData(force: true);
-  // } catch (e) {
-  //   debugPrint('Firebase Seeding failed: $e');
-  // }
+  debugPrint('DEBUG: Calling FirebaseSeeder.seedData(force: true)');
+  try {
+    // We don't await indefinitely to prevent hanging main
+    FirebaseSeeder.seedData(force: true).timeout(
+      const Duration(seconds: 20),
+      onTimeout: () {
+        debugPrint('Firebase Seeding Timed Out (20s) - App will continue anyway.');
+      },
+    ).catchError((e) {
+      debugPrint('Firebase Seeding Background Error: $e');
+    });
+  } catch (e) {
+    debugPrint('Firebase Seeding Initial Failure: $e');
+  }
+  debugPrint('DEBUG: Proceeding to runApp');
 
   runApp(
     const ProviderScope(

@@ -1,77 +1,94 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:markfc/core/theme/mifc_colors.dart';
+import 'package:markfc/features/home/data/repositories/league_repository.dart';
+// import 'package:markfc/features/home/domain/models/league_row.dart'; // Unused
 import 'package:markfc/shared/widgets/section_header.dart';
 import 'package:markfc/shared/widgets/mifc_card.dart';
 import 'package:markfc/shared/widgets/scroll_reveal.dart';
 
-class LeagueTableSection extends StatelessWidget {
+class LeagueTableSection extends ConsumerWidget {
   const LeagueTableSection({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final leagueAsync = ref.watch(leagueTableStreamProvider);
+
     return Column(
       children: [
         const SectionHeader(title: 'LEAGUE TABLE', actionLabel: 'FULL TABLE'),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: ScrollReveal(
-            type: AnimationType.fade,
-            child: MifcCard(
-              padding: EdgeInsets.zero,
-              child: Column(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(
-                          color: MifcColors.white.withValues(alpha: 0.05),
-                          width: 1,
+          child: leagueAsync.when(
+            data: (rows) {
+              if (rows.isEmpty) return const SizedBox.shrink();
+              
+              return ScrollReveal(
+                type: AnimationType.fade,
+                child: MifcCard(
+                  padding: EdgeInsets.zero,
+                  child: Column(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          border: Border(
+                            bottom: BorderSide(
+                              color: MifcColors.white.withValues(alpha: 0.05),
+                              width: 1,
+                            ),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Text(
+                              'PREMIER LEAGUE 2025-26',
+                              style: GoogleFonts.outfit(
+                                color: MifcColors.white.withValues(alpha: 0.5),
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 1.5,
+                              ),
+                            ),
+                            const Spacer(),
+                            Text(
+                              'LIVE',
+                              style: GoogleFonts.outfit(
+                                color: MifcColors.navyBlue,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 1.0,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ),
-                    child: Row(
-                      children: [
-                        Text(
-                          'PREMIER LEAGUE 2025-26',
-                          style: GoogleFonts.outfit(
-                            color: MifcColors.white.withValues(alpha: 0.5),
-                            fontSize: 10,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 1.5,
-                          ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: Column(
+                          children: [
+                            _buildHeader(),
+                            ...rows.map((row) => _buildRow(
+                              row.position, 
+                              row.teamCode, 
+                              row.teamName, 
+                              row.played, 
+                              row.points, 
+                              row.form, 
+                              isHighlighted: row.isMifc
+                            )),
+                            const SizedBox(height: 8),
+                          ],
                         ),
-                        const Spacer(),
-                        Text(
-                          'WEEK 28',
-                          style: GoogleFonts.outfit(
-                            color: MifcColors.navyBlue,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 1.0,
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: Column(
-                      children: [
-                        _buildHeader(),
-                        _buildRow(1, 'LIV', 'LIVERPOOL', 28, 59, ['W', 'W', 'W', 'D', 'L']),
-                        _buildRow(2, 'MIFC', 'MARK INTERNATIONAL', 28, 56, ['W', 'W', 'W', 'D', 'W'], isHighlighted: true),
-                        _buildRow(3, 'MNC', 'MANCHESTER CITY', 28, 54, ['D', 'W', 'L', 'W', 'W']),
-                        _buildRow(4, 'ARS', 'ARSENAL', 28, 52, ['W', 'W', 'D', 'W', 'W']),
-                        _buildRow(5, 'CHE', 'CHELSEA', 28, 48, ['W', 'W', 'W', 'W', 'D']),
-                        const SizedBox(height: 8),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
+                ),
+              );
+            },
+            loading: () => const SizedBox(height: 200, child: Center(child: CircularProgressIndicator(color: MifcColors.navyBlue))),
+            error: (err, stack) => const SizedBox.shrink(),
           ),
         ),
       ],
@@ -113,7 +130,7 @@ class LeagueTableSection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: isHighlighted ? MifcColors.crimson.withValues(alpha: 0.05) : null,
+        color: isHighlighted ? MifcColors.navyBlue.withValues(alpha: 0.05) : null,
       ),
       child: Row(
         children: [
@@ -124,13 +141,13 @@ class LeagueTableSection extends StatelessWidget {
               style: GoogleFonts.outfit(
                 fontSize: 12,
                 fontWeight: isHighlighted ? FontWeight.w800 : FontWeight.w400,
-                color: isHighlighted ? MifcColors.crimson : MifcColors.white.withValues(alpha: 0.4),
+                color: isHighlighted ? MifcColors.navyBlue : MifcColors.white.withValues(alpha: 0.4),
               ),
             ),
           ),
           Expanded(
             child: Text(
-              name,
+              name.toUpperCase(),
               style: GoogleFonts.outfit(
                 fontSize: 12,
                 fontWeight: isHighlighted ? FontWeight.w700 : FontWeight.w500,
@@ -186,3 +203,4 @@ class LeagueTableSection extends StatelessWidget {
     );
   }
 }
+

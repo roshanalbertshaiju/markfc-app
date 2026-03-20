@@ -106,7 +106,7 @@ class _FixturesScreenState extends ConsumerState<FixturesScreen> with SingleTick
   }
 
   Widget _buildHero() {
-    return Container(
+    return SizedBox(
       height: 340,
       width: double.infinity,
       child: Stack(
@@ -151,7 +151,7 @@ class _FixturesScreenState extends ConsumerState<FixturesScreen> with SingleTick
                     ),
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 24),
                 Text(
                   'MATCHES & FIXTURES',
                   style: GoogleFonts.outfit(

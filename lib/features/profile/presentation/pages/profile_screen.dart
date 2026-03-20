@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:markfc/features/profile/domain/models/mifc_user.dart';
 import 'package:markfc/features/profile/domain/models/user_activity.dart';
 import 'package:markfc/features/profile/data/repositories/profile_repository.dart';
@@ -19,10 +20,10 @@ class ProfileScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: MifcColors.black,
       body: userAsync.when(
-        data: (user) {
-          if (user == null) {
-            return const _UnauthenticatedView();
-          }
+        data: (rawUser) {
+          final user = rawUser ?? MifcUser.guest();
+          final isGuest = user.uid == 'guest';
+
           return CustomScrollView(
             slivers: [
               _buildAppBar(),
@@ -37,12 +38,62 @@ class ProfileScreen extends ConsumerWidget {
                       const SizedBox(height: 32),
                       ScrollReveal(delay: const Duration(milliseconds: 100), child: _MemberStats(user: user)),
                       const SizedBox(height: 40),
+                      if (isGuest)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 40),
+                          child: Container(
+                            padding: const EdgeInsets.all(24),
+                            decoration: BoxDecoration(
+                              color: MifcColors.navyBlue.withValues(alpha: 0.05),
+                              borderRadius: BorderRadius.circular(24),
+                              border: Border.all(color: MifcColors.navyBlue.withValues(alpha: 0.1)),
+                            ),
+                            child: Column(
+                              children: [
+                                Text(
+                                  'UNLOCK ELITE BENEFITS',
+                                  style: GoogleFonts.outfit(
+                                    color: MifcColors.navyBlue,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: 1,
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  'Join the Elite to earn loyalty points, access exclusive content, and more.',
+                                  textAlign: TextAlign.center,
+                                  style: GoogleFonts.inter(
+                                    color: Colors.white70,
+                                    fontSize: 13,
+                                    height: 1.5,
+                                  ),
+                                ),
+                                const SizedBox(height: 24),
+                                ElevatedButton(
+                                  onPressed: () => context.push('/login'),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: MifcColors.navyBlue,
+                                    foregroundColor: Colors.white,
+                                    minimumSize: const Size(double.infinity, 50),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                    elevation: 0,
+                                  ),
+                                  child: Text(
+                                    'LOG IN / REGISTER',
+                                    style: GoogleFonts.outfit(fontWeight: FontWeight.w900, letterSpacing: 0.5),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                       Text(
                         'YOUR ACTIVITIES',
                         style: GoogleFonts.outfit(
                           fontSize: 14,
                           fontWeight: FontWeight.w900,
-                          color: MifcColors.prestigeGold,
+                          color: MifcColors.navyBlue,
                           letterSpacing: 2,
                         ),
                       ),
@@ -60,12 +111,13 @@ class ProfileScreen extends ConsumerWidget {
                         'Help & Support',
                         onTap: () => context.push('/profile/help'),
                       ),
-                      _buildAccountItem(
-                        Icons.logout_rounded,
-                        'Logout',
-                        isDestructive: true,
-                        onTap: () => _showLogoutDialog(context),
-                      ),
+                      if (!isGuest)
+                        _buildAccountItem(
+                          Icons.logout_rounded,
+                          'Logout',
+                          isDestructive: true,
+                          onTap: () => _showLogoutDialog(context),
+                        ),
                       const SizedBox(height: 120),
                     ],
                   ),
@@ -103,9 +155,9 @@ class ProfileScreen extends ConsumerWidget {
             ),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(context);
-              // Handle actual logout logic here
+              await FirebaseAuth.instance.signOut();
             },
             child: Text(
               'Logout',
@@ -206,15 +258,15 @@ class _MemberCard extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Color(0xFF1A1A1A),
-            Color(0xFF0A0A0A),
+            MifcColors.navyBlue,
+            MifcColors.black,
           ],
         ),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: MifcColors.prestigeGold.withValues(alpha: 0.2), width: 1),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1), width: 1),
         boxShadow: [
           BoxShadow(
-            color: MifcColors.prestigeGold.withValues(alpha: 0.05),
+            color: MifcColors.navyBlue.withValues(alpha: 0.2),
             blurRadius: 20,
             spreadRadius: 2,
           ),
@@ -228,7 +280,7 @@ class _MemberCard extends StatelessWidget {
             child: Icon(
               Icons.stars_rounded,
               size: 200,
-              color: MifcColors.prestigeGold.withValues(alpha: 0.03),
+              color: Colors.white.withValues(alpha: 0.03),
             ),
           ),
           Padding(
@@ -242,25 +294,30 @@ class _MemberCard extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: MifcColors.prestigeGold,
+                        color: user.uid == 'guest' ? Colors.white.withValues(alpha: 0.1) : MifcColors.crimson,
                         borderRadius: BorderRadius.circular(30),
+                        border: user.uid == 'guest' ? Border.all(color: Colors.white24, width: 1) : null,
                       ),
                       child: Text(
-                        'ELITE',
+                        user.uid == 'guest' ? 'GUEST' : 'ELITE',
                         style: GoogleFonts.outfit(
-                          color: Colors.black,
+                          color: Colors.white,
                           fontWeight: FontWeight.w900,
                           fontSize: 12,
                           letterSpacing: 1,
                         ),
                       ),
                     ),
-                    const Icon(Icons.qr_code_2_rounded, color: MifcColors.prestigeGold, size: 28),
+                    Icon(
+                      user.uid == 'guest' ? Icons.lock_outline_rounded : Icons.qr_code_2_rounded, 
+                      color: Colors.white, 
+                      size: 28
+                    ),
                   ],
                 ),
                 const Spacer(),
                 Text(
-                  user.name.toUpperCase(),
+                  user.uid == 'guest' ? 'JOIN THE ELITE' : user.name.toUpperCase(),
                   style: GoogleFonts.outfit(
                     color: Colors.white,
                     fontSize: 24,
@@ -270,9 +327,9 @@ class _MemberCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'MEMBER SINCE ${user.joinDate.year}',
+                  user.uid == 'guest' ? 'CREATE AN ACCOUNT TO START' : 'MEMBER SINCE ${user.joinDate.year}',
                   style: GoogleFonts.inter(
-                    color: MifcColors.prestigeGold.withValues(alpha: 0.6),
+                    color: Colors.white.withValues(alpha: 0.5),
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 1,
@@ -335,8 +392,30 @@ class _ActivityList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final activitiesAsync = ref.watch(userActivitiesProvider(uid));
+    if (uid == 'guest') {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 24),
+        child: Center(
+          child: Column(
+            children: [
+              Icon(Icons.lock_person_rounded, color: Colors.white.withValues(alpha: 0.05), size: 40),
+              const SizedBox(height: 12),
+              Text(
+                'LOGIN TO VIEW YOUR ACTIVITY',
+                style: GoogleFonts.outfit(
+                  color: Colors.white10,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
 
+    final activitiesAsync = ref.watch(userActivitiesProvider(uid));
     return activitiesAsync.when(
       data: (activities) {
         if (activities.isEmpty) {
@@ -457,55 +536,4 @@ class _ActivityList extends ConsumerWidget {
     return Divider(color: Colors.white.withValues(alpha: 0.05), height: 1);
   }
 }
-class _UnauthenticatedView extends StatelessWidget {
-  const _UnauthenticatedView();
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(40),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.lock_person_rounded, size: 80, color: MifcColors.prestigeGold.withValues(alpha: 0.3)),
-            const SizedBox(height: 24),
-            Text(
-              'ELITE ACCESS ONLY',
-              style: GoogleFonts.outfit(
-                fontSize: 24,
-                fontWeight: FontWeight.w900,
-                color: Colors.white,
-                letterSpacing: 2,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'Please log in to your account to access your personalized Member Hub and rewards.',
-              textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
-                color: Colors.white38,
-                fontSize: 14,
-                height: 1.5,
-              ),
-            ),
-            const SizedBox(height: 40),
-            ElevatedButton(
-              onPressed: () => context.push('/login'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: MifcColors.prestigeGold,
-                foregroundColor: Colors.black,
-                padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-              child: Text(
-                'LOG IN',
-                style: GoogleFonts.outfit(fontWeight: FontWeight.w900, letterSpacing: 1),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+// Removed _UnauthenticatedView as it's now integrated into the main profile view

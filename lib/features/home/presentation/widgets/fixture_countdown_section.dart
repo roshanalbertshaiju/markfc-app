@@ -1,29 +1,41 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:markfc/core/theme/mifc_colors.dart';
-import 'package:markfc/shared/widgets/section_header.dart';
 import 'package:markfc/shared/widgets/mifc_card.dart';
 import 'package:markfc/shared/widgets/scroll_reveal.dart';
-import 'dart:async';
+import 'package:markfc/shared/widgets/section_header.dart';
+import 'package:markfc/features/fixtures/domain/models/match_model.dart';
+import 'package:markfc/features/fixtures/data/repositories/fixtures_repository.dart';
 
-class FixtureCountdownSection extends StatefulWidget {
+class FixtureCountdownSection extends ConsumerStatefulWidget {
   const FixtureCountdownSection({super.key});
 
   @override
-  State<FixtureCountdownSection> createState() => _FixtureCountdownSectionState();
+  ConsumerState<FixtureCountdownSection> createState() => _FixtureCountdownSectionState();
 }
 
-class _FixtureCountdownSectionState extends State<FixtureCountdownSection> {
-  late Timer _timer;
-  Duration _timeLeft = const Duration(days: 4, hours: 22, minutes: 47, seconds: 12);
+class _FixtureCountdownSectionState extends ConsumerState<FixtureCountdownSection> {
+  Timer? _timer;
+  Duration _timeLeft = Duration.zero;
+  MatchModel? _nextMatch;
 
   @override
   void initState() {
     super.initState();
+    _startTimer();
+  }
+
+  void _startTimer() {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (mounted) {
+      if (mounted && _nextMatch != null) {
         setState(() {
-          _timeLeft = _timeLeft - const Duration(seconds: 1);
+          _timeLeft = _nextMatch!.timestamp.difference(DateTime.now());
+          if (_timeLeft.isNegative) {
+            _timeLeft = Duration.zero;
+          }
         });
       }
     });
@@ -31,12 +43,44 @@ class _FixtureCountdownSectionState extends State<FixtureCountdownSection> {
 
   @override
   void dispose() {
-    _timer.cancel();
+    _timer?.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final fixturesAsync = ref.watch(fixturesStreamProvider);
+
+    return fixturesAsync.when(
+      data: (fixtures) {
+        // Find the next upcoming match
+        final now = DateTime.now();
+        final upcomingMatches = fixtures
+            .where((m) => m.timestamp.isAfter(now))
+            .toList()
+          ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+
+        if (upcomingMatches.isEmpty) {
+          return const SizedBox.shrink();
+        }
+
+        final nextMatch = upcomingMatches.first;
+        if (_nextMatch?.id != nextMatch.id) {
+          _nextMatch = nextMatch;
+          _timeLeft = _nextMatch!.timestamp.difference(now);
+        }
+
+        return _buildContent(context, nextMatch);
+      },
+      loading: () => const SizedBox(
+        height: 200,
+        child: Center(child: CircularProgressIndicator()),
+      ),
+      error: (err, stack) => const SizedBox.shrink(),
+    );
+  }
+
+  Widget _buildContent(BuildContext context, MatchModel match) {
     return Column(
       children: [
         const SectionHeader(title: 'NEXT FIXTURE'),
@@ -60,7 +104,7 @@ class _FixtureCountdownSectionState extends State<FixtureCountdownSection> {
                   ),
                   const SizedBox(height: 40),
                   Text(
-                    'MARK INTERNATIONAL v MANCHESTER CITY',
+                    '${match.homeTeam.toUpperCase()} v ${match.awayTeam.toUpperCase()}',
                     textAlign: TextAlign.center,
                     style: GoogleFonts.outfit(
                       color: MifcColors.white,
@@ -76,7 +120,7 @@ class _FixtureCountdownSectionState extends State<FixtureCountdownSection> {
                       Icon(Icons.location_on_outlined, color: MifcColors.white.withValues(alpha: 0.3), size: 14),
                       const SizedBox(width: 6),
                       Text(
-                        'OLD TRAFFORD · 14 MAR 2026 · 15:00',
+                        '${match.venue.toUpperCase()} · ${DateFormat('dd MMM yyyy · HH:mm').format(match.timestamp)}',
                         style: GoogleFonts.inter(
                           color: MifcColors.white.withValues(alpha: 0.4),
                           fontSize: 10,
