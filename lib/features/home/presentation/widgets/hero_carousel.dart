@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:markfc/features/home/domain/models/hero_slide.dart' as model;
 import 'package:markfc/features/home/data/repositories/hero_repository.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:go_router/go_router.dart';
 import 'dart:async';
 
 class HeroCarousel extends ConsumerStatefulWidget {
@@ -18,8 +19,6 @@ class _HeroCarouselState extends ConsumerState<HeroCarousel> {
   int _currentIndex = 0;
   late PageController _pageController;
   Timer? _timer;
-
-  // Remove hardcoded slides
 
   @override
   void initState() {
@@ -96,7 +95,7 @@ class _HeroCarouselState extends ConsumerState<HeroCarousel> {
                       decoration: BoxDecoration(
                         color: index == _currentIndex
                             ? MifcColors.navyBlue
-                            : MifcColors.white.withValues(alpha: 0.2),
+                            : MifcColors.white.withAlpha(51),
                         borderRadius: BorderRadius.circular(2),
                       ),
                     );
@@ -121,7 +120,7 @@ class _HeroShimmer extends StatelessWidget {
     return Container(
       height: 480,
       width: double.infinity,
-      color: MifcColors.navyBlue.withValues(alpha: 0.05),
+      color: MifcColors.navyBlue.withAlpha(13),
       child: const Center(
         child: CircularProgressIndicator(color: MifcColors.navyBlue),
       ),
@@ -137,7 +136,7 @@ class _HeroErrorState extends StatelessWidget {
     return Container(
       height: 480,
       width: double.infinity,
-      color: MifcColors.navyBlue.withValues(alpha: 0.1),
+      color: MifcColors.navyBlue.withAlpha(26),
       child: const Center(
         child: Icon(Icons.error_outline, color: MifcColors.navyBlue),
       ),
@@ -160,7 +159,7 @@ class HeroSlideWidget extends StatelessWidget {
           imageUrl: slide.imageUrl,
           fit: BoxFit.cover,
           placeholder: (context, url) => Container(
-            color: MifcColors.navyBlue.withValues(alpha: 0.1),
+            color: MifcColors.navyBlue.withAlpha(26),
             child: const Center(
               child: CircularProgressIndicator(color: MifcColors.white),
             ),
@@ -192,10 +191,10 @@ class HeroSlideWidget extends StatelessWidget {
               end: Alignment.bottomCenter,
               stops: const [0.0, 0.3, 0.7, 1.0],
               colors: [
-                const Color(0xFF0D1B3E).withValues(alpha: 0.7),
-                const Color(0xFF0D1B3E).withValues(alpha: 0.0),
-                const Color(0xFF0D1B3E).withValues(alpha: 0.0),
-                const Color(0xFF0D1B3E).withValues(alpha: 0.8),
+                const Color(0xFF0D1B3E).withAlpha(179),
+                const Color(0xFF0D1B3E).withAlpha(0),
+                const Color(0xFF0D1B3E).withAlpha(0),
+                const Color(0xFF0D1B3E).withAlpha(204),
               ],
             ),
           ),
@@ -231,7 +230,7 @@ class HeroSlideWidget extends StatelessWidget {
               Text(
                 slide.body,
                 style: GoogleFonts.inter(
-                  color: MifcColors.white.withValues(alpha: 0.7),
+                  color: MifcColors.white.withAlpha(179),
                   fontSize: 15,
                   fontWeight: FontWeight.w400,
                   height: 1.5,
@@ -264,7 +263,11 @@ class _PrimaryButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: () {},
+      onPressed: () {
+        if (link.isNotEmpty) {
+          context.push(link);
+        }
+      },
       style: ElevatedButton.styleFrom(
         backgroundColor: MifcColors.white,
         foregroundColor: MifcColors.black,

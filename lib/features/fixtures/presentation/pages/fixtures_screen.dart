@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
+import 'dart:ui';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:markfc/core/theme/mifc_colors.dart';
-import 'package:markfc/shared/widgets/mifc_card.dart';
+import '../../domain/models/match_model.dart';
 import 'package:markfc/shared/widgets/scroll_reveal.dart';
 import 'package:markfc/shared/widgets/mifc_top_bar.dart';
 import 'package:markfc/features/fixtures/data/repositories/fixtures_repository.dart';
-import 'package:markfc/features/fixtures/domain/models/match_model.dart';
 
 class FixturesScreen extends ConsumerStatefulWidget {
   const FixturesScreen({super.key});
@@ -217,29 +217,46 @@ class _FixturesScreenState extends ConsumerState<FixturesScreen> with SingleTick
   }
 
   Widget _buildTabsHeader() {
-    return Container(
-      color: const Color(0xFF06080F),
-      child: Column(
-        children: [
-          TabBar(
-            controller: _tabController,
-            indicatorColor: MifcColors.navyBlue,
-            indicatorWeight: 3,
-            labelColor: Colors.white,
-            unselectedLabelColor: Colors.white.withValues(alpha: 0.5),
-            dividerColor: Colors.white.withValues(alpha: 0.05),
-            labelStyle: GoogleFonts.outfit(
-              fontSize: 14,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 1.0,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            height: 48,
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.05),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.05),
+              ),
             ),
-            indicatorPadding: const EdgeInsets.symmetric(horizontal: 16),
-            tabs: const [
-              Tab(text: 'UNITED'),
-              Tab(text: 'ALL TEAMS'),
-            ],
+            child: TabBar(
+              controller: _tabController,
+              indicator: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: MifcColors.crimson.withValues(alpha: 0.15),
+                border: Border.all(
+                  color: MifcColors.crimson.withValues(alpha: 0.3),
+                ),
+              ),
+              indicatorSize: TabBarIndicatorSize.tab,
+              dividerColor: Colors.transparent,
+              labelColor: Colors.white,
+              unselectedLabelColor: Colors.white.withValues(alpha: 0.4),
+              labelStyle: GoogleFonts.outfit(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 1.2,
+              ),
+              tabs: const [
+                Tab(text: 'UNITED'),
+                Tab(text: 'ALL TEAMS'),
+              ],
+            ),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -257,12 +274,22 @@ class _FixturesList extends ConsumerWidget {
       children: [
         resultsAsync.when(
           data: (results) => _buildGroupedMatches(results, 'COMPLETED MATCHES'),
-          loading: () => const Center(child: CircularProgressIndicator()),
+          loading: () => const Center(
+            child: Padding(
+              padding: EdgeInsets.all(40.0),
+              child: CircularProgressIndicator(color: MifcColors.crimson),
+            ),
+          ),
           error: (err, stack) => const SizedBox.shrink(),
         ),
         fixturesAsync.when(
           data: (fixtures) => _buildGroupedMatches(fixtures, 'UPCOMING FIXTURES'),
-          loading: () => const Center(child: CircularProgressIndicator()),
+          loading: () => const Center(
+            child: Padding(
+              padding: EdgeInsets.all(40.0),
+              child: CircularProgressIndicator(color: MifcColors.crimson),
+            ),
+          ),
           error: (err, stack) => const SizedBox.shrink(),
         ),
       ],
@@ -283,45 +310,49 @@ class _FixturesList extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(24, 32, 24, 8),
-          child: Text(
-            title,
-            style: GoogleFonts.outfit(
-              fontSize: 14,
-              fontWeight: FontWeight.w900,
-              color: MifcColors.navyBlue,
-              letterSpacing: 2.0,
-            ),
+          padding: const EdgeInsets.fromLTRB(24, 40, 24, 20),
+          child: Row(
+            children: [
+              Container(
+                width: 4,
+                height: 16,
+                decoration: BoxDecoration(
+                  color: MifcColors.crimson,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                title,
+                style: GoogleFonts.outfit(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w900,
+                  color: Colors.white,
+                  letterSpacing: 2.0,
+                ),
+              ),
+            ],
           ),
         ),
         ...grouped.entries.map((entry) => Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _MatchGroupHeader(title: entry.key),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
+              child: Text(
+                entry.key,
+                style: GoogleFonts.outfit(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white.withValues(alpha: 0.3),
+                  letterSpacing: 1.5,
+                ),
+              ),
+            ),
             ...entry.value.map((m) => _MatchCard(match: m)),
           ],
         )),
       ],
-    );
-  }
-}
-
-class _MatchGroupHeader extends StatelessWidget {
-  final String title;
-  const _MatchGroupHeader({required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
-      child: Text(
-        title,
-        style: GoogleFonts.outfit(
-          fontSize: 16,
-          fontWeight: FontWeight.w700,
-          color: Colors.white.withValues(alpha: 0.6),
-          letterSpacing: 1.2,
-        ),
-      ),
     );
   }
 }
@@ -333,8 +364,6 @@ class _MatchCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dateStr = DateFormat('EEE d MMM | ').format(match.timestamp) + match.competition;
-    
     // Unified name handling
     final bool isHomeMifc = match.homeCode.toUpperCase().contains('MIFC') || match.homeTeam.toUpperCase().contains('MARK');
     final bool isAwayMifc = match.awayCode.toUpperCase().contains('MIFC') || match.awayTeam.toUpperCase().contains('MARK');
@@ -342,161 +371,269 @@ class _MatchCard extends StatelessWidget {
     final String homeName = isHomeMifc ? "MARK INT FC" : match.homeTeam.toUpperCase();
     final String awayName = isAwayMifc ? "MARK INT FC" : match.awayTeam.toUpperCase();
 
+    final dateStr = DateFormat('EEE d MMM').format(match.timestamp);
+    final timeStr = DateFormat('HH:mm').format(match.timestamp);
+
     return ScrollReveal(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-        child: MifcCard(
-          padding: EdgeInsets.zero,
-          child: Column(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(
-                      color: Colors.white.withValues(alpha: 0.05),
-                    ),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        "UNITED MATCH · ${dateStr.toUpperCase()}",
-                        style: GoogleFonts.inter(
-                          fontSize: 10,
-                          color: MifcColors.crimson,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.05),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        'Match Info',
-                        style: GoogleFonts.outfit(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white.withValues(alpha: 0.7),
-                        ),
-                      ),
-                    ),
-                  ],
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.03),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.05),
+                  width: 1,
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Row(
-                  children: [
-                    // Home Team
-                    Expanded(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Flexible(
-                            child: Text(
-                              homeName,
-                              style: GoogleFonts.outfit(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
-                              ),
-                              textAlign: TextAlign.right,
-                              overflow: TextOverflow.ellipsis,
+              child: Column(
+                children: [
+                  // Match Header Info
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.02),
+                      border: Border(
+                        bottom: BorderSide(
+                          color: Colors.white.withValues(alpha: 0.05),
+                        ),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            "UNITED MATCH · ${match.competition.toUpperCase()}",
+                            style: GoogleFonts.outfit(
+                              fontSize: 10,
+                              color: MifcColors.crimson,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 1.5,
                             ),
                           ),
-                          const SizedBox(width: 8),
-                          _buildCrest(match.homeCode, isHomeMifc),
+                        ),
+                        Text(
+                          dateStr.toUpperCase(),
+                          style: GoogleFonts.outfit(
+                            fontSize: 10,
+                            color: Colors.white.withValues(alpha: 0.5),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  
+                  // Main Match Info
+                  Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Row(
+                      children: [
+                        // Home Team
+                        Expanded(
+                          child: Column(
+                            children: [
+                              _buildCrest(match.homeCode, isHomeMifc, size: 48),
+                              const SizedBox(height: 12),
+                              Text(
+                                homeName,
+                                style: GoogleFonts.outfit(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                  letterSpacing: 0.5,
+                                ),
+                                textAlign: TextAlign.center,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                        
+                        // Score / Time / Status
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Column(
+                            children: [
+                              if (match.status == MatchStatus.upcoming) ...[
+                                Text(
+                                  timeStr,
+                                  style: GoogleFonts.outfit(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.w300,
+                                    color: Colors.white,
+                                    letterSpacing: 1,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: MifcColors.navyBlue.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(4),
+                                    border: Border.all(color: MifcColors.navyBlue.withValues(alpha: 0.2)),
+                                  ),
+                                  child: Text(
+                                    'UPCOMING',
+                                    style: GoogleFonts.outfit(
+                                      fontSize: 8,
+                                      fontWeight: FontWeight.w800,
+                                      color: MifcColors.navyBlue,
+                                      letterSpacing: 1,
+                                    ),
+                                  ),
+                                ),
+                              ] else ...[
+                                Text(
+                                  '${match.homeScore} - ${match.awayScore}',
+                                  style: GoogleFonts.outfit(
+                                    fontSize: 32,
+                                    fontWeight: FontWeight.w800,
+                                    color: Colors.white,
+                                    letterSpacing: 2,
+                                  ),
+                                ),
+                                if (match.status == MatchStatus.live) ...[
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        width: 6,
+                                        height: 6,
+                                        decoration: const BoxDecoration(
+                                          color: MifcColors.crimson,
+                                          shape: BoxShape.circle,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        'LIVE',
+                                        style: GoogleFonts.outfit(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w800,
+                                          color: MifcColors.crimson,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ],
+                            ],
+                          ),
+                        ),
+                        
+                        // Away Team
+                        Expanded(
+                          child: Column(
+                            children: [
+                              _buildCrest(match.awayCode, isAwayMifc, size: 48),
+                              const SizedBox(height: 12),
+                              Text(
+                                awayName,
+                                style: GoogleFonts.outfit(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                  letterSpacing: 0.5,
+                                ),
+                                textAlign: TextAlign.center,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  
+                  // Footer Info (Venue & Scorers)
+                  if (match.scorers.isNotEmpty || match.venue.isNotEmpty)
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.01),
+                        border: Border(
+                          top: BorderSide(
+                            color: Colors.white.withValues(alpha: 0.03),
+                          ),
+                        ),
+                      ),
+                      child: Column(
+                        children: [
+                          if (match.scorers.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 4),
+                              child: Text(
+                                match.scorers.join(' • '),
+                                style: GoogleFonts.inter(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.white.withValues(alpha: 0.4),
+                                  letterSpacing: 0.5,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          if (match.venue.isNotEmpty)
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.location_on_outlined, size: 10, color: Colors.white24),
+                                const SizedBox(width: 4),
+                                Text(
+                                  match.venue.toUpperCase(),
+                                  style: GoogleFonts.inter(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white24,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                              ],
+                            ),
                         ],
                       ),
                     ),
-                    
-                    // Score / Time
-                    Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 12),
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF1E1E1E),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        match.status == MatchStatus.upcoming 
-                          ? DateFormat('HH:mm').format(match.timestamp)
-                          : '${match.homeScore} - ${match.awayScore}',
-                        style: GoogleFonts.outfit(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w900,
-                          color: Colors.white,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                    ),
-                    
-                    // Away Team
-                    Expanded(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          _buildCrest(match.awayCode, isAwayMifc),
-                          const SizedBox(width: 8),
-                          Flexible(
-                            child: Text(
-                              awayName,
-                              style: GoogleFonts.outfit(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                ],
               ),
-              if (match.status == MatchStatus.finished && match.scorers.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: Text(
-                    match.scorers.join(', '),
-                    style: GoogleFonts.inter(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white.withValues(alpha: 0.4),
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                ),
-            ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildCrest(String code, bool isMifc) {
+  Widget _buildCrest(String code, bool isMifc, {double size = 32}) {
     return Container(
-      width: 32,
-      height: 32,
+      width: size,
+      height: size,
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.05),
         shape: BoxShape.circle,
         border: Border.all(
-          color: isMifc ? MifcColors.crimson.withValues(alpha: 0.5) : Colors.white10,
-          width: isMifc ? 1.5 : 1.0,
+          color: isMifc ? MifcColors.crimson.withValues(alpha: 0.3) : Colors.white10,
+          width: 1.5,
         ),
+        boxShadow: isMifc ? [
+          BoxShadow(
+            color: MifcColors.crimson.withValues(alpha: 0.1),
+            blurRadius: 10,
+            spreadRadius: 2,
+          )
+        ] : null,
       ),
       child: ClipOval(
         child: isMifc 
           ? Padding(
-              padding: const EdgeInsets.all(4),
+              padding: const EdgeInsets.all(6),
               child: Image.asset(
                 'assets/images/mifc_logo.png',
                 fit: BoxFit.contain,
@@ -506,7 +643,7 @@ class _MatchCard extends StatelessWidget {
               child: Text(
                 code.length > 3 ? code.substring(0, 3) : code,
                 style: GoogleFonts.outfit(
-                  fontSize: 10,
+                  fontSize: size * 0.3,
                   fontWeight: FontWeight.w800,
                   color: Colors.white,
                 ),

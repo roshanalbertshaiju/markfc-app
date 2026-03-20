@@ -4,8 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:markfc/shared/widgets/mifc_top_bar.dart';
 import '../widgets/hero_carousel.dart';
 import '../widgets/latest_news_section.dart';
-import '../widgets/match_centre_section.dart';
-import '../widgets/motm_poll_section.dart';
+import 'package:markfc/shared/widgets/scroll_reveal.dart';
 import '../widgets/fixture_countdown_section.dart';
 import '../widgets/player_of_the_month_section.dart';
 import '../widgets/top_players_section.dart';
@@ -18,6 +17,8 @@ import 'package:markfc/features/home/data/repositories/hero_repository.dart';
 import 'package:markfc/features/fixtures/data/repositories/fixtures_repository.dart';
 import 'package:markfc/features/home/data/repositories/league_repository.dart';
 import 'package:markfc/features/squad/data/repositories/squad_repository.dart';
+import 'package:markfc/features/profile/data/repositories/profile_repository.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -89,26 +90,47 @@ class _HomePageState extends ConsumerState<HomePage> {
               padding: EdgeInsets.zero,
               physics: const AlwaysScrollableScrollPhysics(), // Ensure it's scrollable for pull-to-refresh
               children: [
+                _buildGreeting(),
                 const HeroCarousel(),
-                const LatestNewsSection(),
+                const ScrollReveal(
+                  delay: Duration(milliseconds: 100),
+                  child: LatestNewsSection(),
+                ),
                 _buildDivider(),
-                const MatchCentreSection(),
+                const ScrollReveal(
+                  delay: Duration(milliseconds: 200),
+                  child: FixtureCountdownSection(),
+                ),
                 _buildDivider(),
-                const MotmPollSection(),
+                const ScrollReveal(
+                  delay: Duration(milliseconds: 300),
+                  child: PlayerOfTheMonthSection(),
+                ),
                 _buildDivider(),
-                const FixtureCountdownSection(), 
+                const ScrollReveal(
+                  delay: Duration(milliseconds: 400),
+                  child: TopPlayersSection(),
+                ),
                 _buildDivider(),
-                const PlayerOfTheMonthSection(),
+                const ScrollReveal(
+                  delay: Duration(milliseconds: 500),
+                  child: LeagueTableSection(),
+                ),
                 _buildDivider(),
-                const TopPlayersSection(), 
+                const ScrollReveal(
+                  delay: Duration(milliseconds: 600),
+                  child: MifcTvSection(),
+                ),
                 _buildDivider(),
-                const LeagueTableSection(),
+                const ScrollReveal(
+                  delay: Duration(milliseconds: 700),
+                  child: FanOfTheMonthSection(),
+                ),
                 _buildDivider(),
-                const MifcTvSection(),
-                _buildDivider(),
-                const FanOfTheMonthSection(),
-                _buildDivider(),
-                const SponsorStripSection(),
+                const ScrollReveal(
+                  delay: Duration(milliseconds: 800),
+                  child: SponsorStripSection(),
+                ),
                 const SizedBox(height: 100), 
               ],
             ),
@@ -129,6 +151,49 @@ class _HomePageState extends ConsumerState<HomePage> {
         child: const Icon(Icons.chat_bubble_outline, color: MifcColors.white),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+    );
+  }
+
+  Widget _buildGreeting() {
+    final userAsync = ref.watch(currentUserProvider);
+    final hour = DateTime.now().hour;
+    String greeting = "Welcome back";
+    if (hour < 12) {
+      greeting = "Good Morning";
+    } else if (hour < 17) {
+      greeting = "Good Afternoon";
+    } else {
+      greeting = "Good Evening";
+    }
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 100, 24, 24),
+      child: userAsync.when(
+        data: (user) => Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '$greeting,',
+              style: GoogleFonts.outfit(
+                fontSize: 14,
+                color: Colors.white70,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            Text(
+              user?.name ?? 'Mark FC Fan',
+              style: GoogleFonts.outfit(
+                fontSize: 24,
+                color: Colors.white,
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.5,
+              ),
+            ),
+          ],
+        ),
+        loading: () => const SizedBox(height: 50),
+        error: (error, stack) => const SizedBox.shrink(),
+      ),
     );
   }
 

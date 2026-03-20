@@ -8,6 +8,7 @@ import 'package:markfc/shared/widgets/mifc_card.dart';
 import 'package:markfc/shared/widgets/scroll_reveal.dart';
 import 'package:markfc/shared/widgets/section_header.dart';
 import 'package:markfc/features/fixtures/domain/models/match_model.dart';
+import 'package:go_router/go_router.dart';
 import 'package:markfc/features/fixtures/data/repositories/fixtures_repository.dart';
 
 class FixtureCountdownSection extends ConsumerStatefulWidget {
@@ -196,7 +197,9 @@ class _TicketButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: () {},
+      onPressed: () {
+        context.push('/fixtures');
+      },
       style: ElevatedButton.styleFrom(
         backgroundColor: MifcColors.crimson,
         foregroundColor: MifcColors.white,

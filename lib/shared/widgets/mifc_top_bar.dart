@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:ui';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -26,10 +27,20 @@ class MifcTopBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppBar(
-      backgroundColor: const Color(0xFF0D1B3E).withValues(alpha: opacity),
-      elevation: opacity * 4,
-      scrolledUnderElevation: 0,
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF0D1B3E).withValues(alpha: opacity * 0.8),
+      ),
+      child: ClipRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(
+            sigmaX: opacity * 15,
+            sigmaY: opacity * 15,
+          ),
+          child: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            scrolledUnderElevation: 0,
       toolbarHeight: 64,
       systemOverlayStyle: const SystemUiOverlayStyle(
         statusBarColor: Colors.black,
@@ -217,9 +228,11 @@ class MifcTopBar extends StatelessWidget implements PreferredSizeWidget {
             ],
           ),
         ],
-        const SizedBox(width: 8),
-      ],
-    );
+        ],
+      ),
+    ),
+  ),
+);
   }
 
   @override
